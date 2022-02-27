@@ -81,9 +81,10 @@ async function updateDocsInDB(docs, query, symbol, inputTime) {
   console.log(res.upsertedId);
 }
 
-// add db docs
+// add docs to array in db
 async function addDocsInDB(docs, query, symbol, inputTime) {
   const queryModel = CreateMongooseModel(query);
+  const res = await queryModel.updateOne({ symboL: symbol }, { lastUpdated: inputTime, $push: { docs: docs } } )
   console.log(res.acknowledged);
   console.log(res.upsertedId);
 }
@@ -124,11 +125,11 @@ function lastUpdateQuery(docs, startUpdatePeriod, endtUpdatePeriod) {
 // checking to see if data to be periodically (monthly/quartly/yearly... etc...) needs to be updated. 
 // Input will be string from db doc that has been parsed
 // change variable names to something along the lines off, addNewDocToStack
-function updateNext(symbol, query, docs, nextSymbol, nextQuery) {
+function updateNext(symbol, query, docs, listOfPreviousQuery) {
   const inputUnixTime = fromUnixTime(docs.nextUpdate);
   const formatedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docs.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
   if (isPast(inputUnixTime) && formatedLastUpdateCheck > 24) {
-    addDocsInDB(docs, nextQuery, nextSymbol);
+    addDocsInDB(docs, listOfPreviousQuery, symbol);
     const docsFromAPI = apiQuery(query, symbol).data;
     updateDocsInDB(docsFromAPI, query, symbol, Date.now());
     return docsFromAPI.body;

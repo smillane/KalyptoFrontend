@@ -27,6 +27,7 @@ export default function Index() {
       </div>
     );
   }
+  
   return (
     <div className="container">
       <main>
