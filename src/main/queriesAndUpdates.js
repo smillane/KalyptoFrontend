@@ -1,13 +1,13 @@
 import { mongoose } from "mongoose";
 
 // for queries that will be updated every 5 minutes
-export function updateAndReplace(symbol, query, basicQuote) {
-  if (basicQuote) {
+export function updateAndReplace(symbol, query, basicQuoteBool) {
+  if (basicQuoteBool) {
     const startUpdatePeriod = "7:00";
     const endtUpdatePeriod = "20:00";
   }
 
-  if (!basicQuote) {
+  if (!basicQuoteBool) {
     const startUpdatePeriod = "9:30";
     const endtUpdatePeriod = "16:00";
   }
@@ -82,6 +82,8 @@ async function updateDocsInDB(docs, query, symbol, inputTime) {
 }
 
 // add docs to array in db
+// maybe use addToSet?
+// The $addToSet operator adds a value to an array unless the value is already present, in which case $addToSet does nothing to that array.
 async function addDocsInDB(docs, query, symbol, inputTime) {
   const queryModel = CreateMongooseModel(query);
   const res = await queryModel.updateOne({ symboL: symbol }, { lastUpdated: inputTime, $push: { docs: docs } } )
@@ -129,9 +131,10 @@ function updateNext(symbol, query, docs, listOfPreviousQuery) {
   const inputUnixTime = fromUnixTime(docs.nextUpdate);
   const formatedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docs.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
   if (isPast(inputUnixTime) && formatedLastUpdateCheck > 24) {
-    addDocsInDB(docs, listOfPreviousQuery, symbol);
+    const currentTime = Date.now()
+    addDocsInDB(docs, listOfPreviousQuery, symbol, currentTime);
     const docsFromAPI = apiQuery(query, symbol).data;
-    updateDocsInDB(docsFromAPI, query, symbol, Date.now());
+    updateDocsInDB(docsFromAPI, query, symbol, currentTime);
     return docsFromAPI.body;
   }
   return docs.docs;
