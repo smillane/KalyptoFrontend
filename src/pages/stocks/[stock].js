@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
-import {updateAndReplace, updateAndAdd, findAndReturn} from '../../main/queriesAndUpdates'
+import {updateAndReplace, updateOnIntervalsAndAdd, findAndReturn} from '../../main/queriesAndUpdates'
 
+// if user is not logged in with an account, only show a basic quote and chart
 export default function Stock() {
 
     const router = useRouter()
@@ -16,12 +17,15 @@ export default function Stock() {
 }
 
 export async function getServerSideProps(context) {
-  const updateAndReplaceQueries = [stockQuote, stockStatsBasic, stockLargestTrades];
+  // const updateAndReplaceQueries = [stockQuote, stockStatsBasic, stockLargestTrades];
+  const updateAndReplaceQueries = new Map([[stockQuote, [true, false]], [stockStatsBasic, false, false]], [stockLargestTrades, [false, false]], [stockInsiderTrading, [false, true]]);
   const findAndReturnQueries = [stockPreviousDividends];
-  const updateAndAddQueries = [stockInsiderTrading, stockNextDividends];
+  const updateOnIntervalsAndAddQueries = [stockNextDividends];
 
-  const response = updateAndReplace(params, stockQuote, true);
-  const response2 = updateAndAdd(params, stockNextDividends, )
+  // const response = updateAndReplace(params, stockQuote, true);
+  const response = updateAndReplaceQueries.forEach((value, key) => {updateAndReplace(params, key, value[0], value[1])});
+  const response2 = updateOnIntervalsAndAdd(params, stockNextDividends);
+  const response3 = findAndReturn(params, stockNextDividends);
 
   return {
     props: {response},

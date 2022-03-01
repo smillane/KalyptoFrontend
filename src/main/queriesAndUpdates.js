@@ -1,24 +1,28 @@
 import { mongoose } from "mongoose";
 
+// add logic to update certain queries multiple data points such as dividends (last 4) or insider transactions (last 6 or 8?)
+
 // for queries that will be updated every 5 minutes
-export function updateAndReplace(symbol, query, basicQuoteBool) {
+export function updateAndReplace(symbol, query, basicQuoteBool, onceDailyBool) {
+  if (!dbQueryExistsCheck(symbol, query, Model)) { 
+    returnNotFound(); 
+  }
+
+  const Model = CreateMongooseModel(query);
+  const docsFromDb = getDocsFromDb(symbol, Model);
+
+  if (onceDailyBool) {
+    updateOnceADayQuery(symbol, query, docsFromDb);
+  }
+
   if (basicQuoteBool) {
     const startUpdatePeriod = "7:00";
     const endtUpdatePeriod = "20:00";
   }
-
   if (!basicQuoteBool) {
     const startUpdatePeriod = "9:30";
     const endtUpdatePeriod = "16:00";
-  }
-
-  const Model = CreateMongooseModel(query);
-
-  if (!dbQueryExistsCheck(symbol, query, Model)) {
-    returnNotFound();
-  }
-
-  const docsFromDb = getDocsFromDb(symbol, Model);
+  }  
 
   if (!lastUpdateQuery(docsFromDb, startUpdatePeriod, endtUpdatePeriod)) {
     return docsFromDb.docs;
@@ -30,7 +34,7 @@ export function updateAndReplace(symbol, query, basicQuoteBool) {
 }
 
 // for queries that will be updated and added to previous docs
-export function updateAndAdd(symbol, query, nextSymbol, nextQuery) {
+export function updateOnIntervalsAndAdd(symbol, query, nextSymbol, nextQuery) {
   const Model = CreateMongooseModel(query);
 
   if (!dbQueryExistsCheck(symbol, query, Model)) {
@@ -81,12 +85,17 @@ async function updateDocsInDB(docs, query, symbol, inputTime) {
   console.log(res.upsertedId);
 }
 
+// function using pagination checking if api call == last update in docs
+function dbUpdateWithPagination(symbol, query, docs) {
+  
+}
+
 // add docs to array in db
 // maybe use addToSet?
 // The $addToSet operator adds a value to an array unless the value is already present, in which case $addToSet does nothing to that array.
 async function addDocsInDB(docs, query, symbol, inputTime) {
   const queryModel = CreateMongooseModel(query);
-  const res = await queryModel.updateOne({ symboL: symbol }, { lastUpdated: inputTime, $push: { docs: docs } } )
+  const res = await queryModel.updateOne({ symbol: symbol }, { lastUpdated: inputTime, $push: { docs: docs } } )
   console.log(res.acknowledged);
   console.log(res.upsertedId);
 }
@@ -96,8 +105,8 @@ async function addDocsInDB(docs, query, symbol, inputTime) {
 // if it's after M/T/W/R 4:06PM and has been updated, don't do anything
 // if it's before T/W/R/F 9:30AM and has been updated, don't do anything
 // otherwise, if it's been more than 5 minutes since it's been updated, call api, update db, return data
-function updatedLessThanFiveMinutesCheck(dbQueryResponse) {
-  const lastUpdatedToNow = differenceInSeconds(formatDistanceToNowStrict(dbQueryResponse.lastUpdated, { includeSeconds: true, addSuffix: true }))
+function updatedLessThanFiveMinutesCheck(dbLastUpdated) {
+  const lastUpdatedToNow = differenceInSeconds(formatDistanceToNowStrict(dbLastUpdated.lastUpdated, { includeSeconds: true, addSuffix: true }))
   if (lastUpdatedToNow <= 300) {
     return false;
   }
@@ -123,6 +132,26 @@ function lastUpdateQuery(docs, startUpdatePeriod, endtUpdatePeriod) {
   }
   return true;
 }
+    
+// need to do a check for basic quote, which will update max of every 5 mins, til 8pm, and other queries which will stop updating at 4:06pm
+// endUpdatePeriod = 8pm for basicQuote Mon-Thurs or 4:05pm for the rest of stock info
+// startUpdatePeriod = 7am for basicQuote, or 9:30 for rest of stock info, commodities, and treasuries
+// crypto will update every 5 mins
+function updateOnceADayQuery(symbol, query, docs) {  
+  const lastUpdatedUnixTime = fromUnixTime(docs.lastUpdated);
+  const formatedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docs.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
+
+  if (lastUpdatedUnixTime.indexOf('Sat') || lastUpdatedUnixTime.indexOf('Sun')) {
+    return false;
+  }
+
+  if (lastUpdatedUnixTime.indexOf('Mon') || lastUpdatedUnixTime.indexOf('Tues') || lastUpdatedUnixTime.indexOf('Wed') || lastUpdatedUnixTime.indexOf('Thurs') || lastUpdatedUnixTime.indexOf('Fri')) {
+    if (formatedLastUpdateCheck > 24) {
+      dbUpdateWithPagination(symbol, query, docs);
+    }
+  }
+  return true;
+}
 
 // checking to see if data to be periodically (monthly/quartly/yearly... etc...) needs to be updated. 
 // Input will be string from db doc that has been parsed
@@ -139,8 +168,6 @@ function updateNext(symbol, query, docs, listOfPreviousQuery) {
   }
   return docs.docs;
 }
-
-
 
 // query api, and return data
 function apiQuery(query, symbol) {

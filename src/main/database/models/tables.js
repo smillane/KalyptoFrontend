@@ -5,38 +5,38 @@ const { Schema } = mongoose;
 const stockQuote = new Schema({
     symbol: String,
     lastUpdated: Number,
-    docs: Object,
+    docs: Object
 })
 
 const stockStatsBasic = new Schema({
     symbol: String,
     lastUpdated: Number,
-    docs: Object,
+    docs: Object
 })
 
 const stockLargestTrades = new Schema({
     symbol: String,
     lastUpdated: Number,
-    docs: Object,
+    docs: Object
 })
 
 const stockInsiderTrading = new Schema({
     symbol: String,
     lastUpdated: Number,
-    docs: Array,
+    docs: Array
 })
 
 const stockPreviousDividends = new Schema({
     symbol: String,
     lastUpdated: Number,
-    docs: Array,
+    docs: Array
 })
 
 const stockNextDividends = new Schema({
     symbol: String,
     nextUpdate: Number,
     lastUpdated: Number,
-    docs: Object,
+    docs: Object
 })
 
 
@@ -45,7 +45,7 @@ const stockNextDividends = new Schema({
 const upcomingIPOs = new Schema({
     symbol: String,
     lastUpdated: Number,
-    docs: Object,
+    docs: Object
 })
 
 
@@ -54,7 +54,7 @@ const upcomingIPOs = new Schema({
 const cryptoQuote = new Schema({
     symbol: String,
     lastUpdated: Number,
-    docs: Object,
+    docs: Object
 })
 
 
@@ -63,7 +63,7 @@ const cryptoQuote = new Schema({
 const treasuryQuote = new Schema({
     symbol: String,
     lastUpdated: Number,
-    docs: Object,
+    docs: Object
 })
 
 
@@ -72,7 +72,7 @@ const treasuryQuote = new Schema({
 const commodityQuote = new Schema({
     symbol: String,
     lastUpdated: Number,
-    docs: Object,
+    docs: Object
 })
 
 
