@@ -123,12 +123,13 @@ function updatedLessThanFiveMinutesCheck(dbLastUpdated) {
 // crypto will update every 5 mins
 function lastUpdateQuery(docs, startUpdatePeriod, endtUpdatePeriod) {  
   const lastUpdatedUnixTime = fromUnixTime(docs.lastUpdated);
-
-  if (lastUpdatedUnixTime.indexOf('Sat') || lastUpdatedUnixTime.indexOf('Sun')) {
+  const weekends = ['Sat', 'Sun']
+  if (weekends.includes(lastUpdatedUnixTime)) {
     return false;
   }
 
-  if (lastUpdatedUnixTime.indexOf('Mon') || lastUpdatedUnixTime.indexOf('Tues') || lastUpdatedUnixTime.indexOf('Wed') || lastUpdatedUnixTime.indexOf('Thurs') || lastUpdatedUnixTime.indexOf('Fri')) {
+  const weekdays = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri']
+  if (weekdays.includes(lastUpdatedUnixTime)) {
     if (endtUpdatePeriod >= docs.lastUpdated.getHours() >= startUpdatePeriod) {
       return false;
     }
@@ -142,27 +143,33 @@ function lastUpdateQuery(docs, startUpdatePeriod, endtUpdatePeriod) {
 // startUpdatePeriod = 7am for basicQuote, or 9:30 for rest of stock info, commodities, and treasuries
 // crypto will update every 5 mins
 function updateOnceADayQuery(symbol, query, Model, docsFromDb) {  
-  const lastUpdatedUnixTime = fromUnixTime(docs.lastUpdated);
+  const lastUpdatedUnixTime = fromUnixTime(docsFromDb.lastUpdated);
   const formatedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docs.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
+  
+  if (formatedLastUpdateCheck > 12){
+    const weekends = ['Sat', 'Sun']
+    if (weekends.includes(lastUpdatedUnixTime)) {
+      return docsFromDb.data;
+    }
 
-  if (lastUpdatedUnixTime.indexOf('Sat') || lastUpdatedUnixTime.indexOf('Sun')) {
-    return false;
-  }
-
-  if (lastUpdatedUnixTime.indexOf('Mon') || lastUpdatedUnixTime.indexOf('Tues') || lastUpdatedUnixTime.indexOf('Wed') || lastUpdatedUnixTime.indexOf('Thurs') || lastUpdatedUnixTime.indexOf('Fri')) {
-    if (formatedLastUpdateCheck > 24) {
+    const weekdays = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri']
+    if (weekdays.includes(lastUpdatedUnixTime)) {
       dbUpdateList(symbol, query, Model, docsFromDb, lastUpdatedUnixTime);
     }
   }
-  return true;
+  return docsFromDb.data;
 }
 
 // checking to see if data to be periodically (monthly/quartly/yearly... etc...) needs to be updated. 
 // Input will be string from db doc that has been parsed
 // change variable names to something along the lines off, addNewDocToStack
+// EXAMPLE
+// will add nextDividend to previousDividends, once date passes and there is a new nextDividend
+// will then query the new nextDividend, and update nextDividend endpoint in db
 function updateNext(symbol, query, docs, listOfPreviousQuery) {
   const inputUnixTime = fromUnixTime(docs.nextUpdate);
   const formatedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docs.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
+
   if (isPast(inputUnixTime) && formatedLastUpdateCheck > 24) {
     const currentTime = Date.now()
     addDocsInDB(docs, listOfPreviousQuery, symbol, currentTime);
