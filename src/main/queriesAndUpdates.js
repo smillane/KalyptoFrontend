@@ -12,7 +12,7 @@ export function updateAndReplace(symbol, query, basicQuoteBool, onceDailyBool) {
   const docsFromDb = getDocsFromDb(symbol, Model);
 
   if (onceDailyBool) {
-    updateOnceADayQuery(symbol, query, docsFromDb);
+    updateOnceADayQuery(symbol, query, Model, docsFromDb);
   }
 
   if (basicQuoteBool) {
@@ -29,7 +29,7 @@ export function updateAndReplace(symbol, query, basicQuoteBool, onceDailyBool) {
   }
 
   const docsFromAPI = apiQuery(query, symbol).data;
-  updateDocsInDB(docsFromAPI, query, symbol, Date.now());
+  updateDocsInDB(docsFromAPI, query, symbol, Date.now(), Model);
   return docsFromAPI.body;
 }
 
@@ -69,25 +69,29 @@ function getDocsFromDb(symbol, model) {
 }
 
 // check if query is in db, if it's not, check API, if doesn't exist, return 404, symbol is not supported
-function dbQueryExistsCheck(symbol, query, model) {
+function dbQueryExistsCheck(symbol, model) {
   if (!model.exists({ 'symbol': symbol }).exec()) {
     console.log(symbol)
-    apiStatusCheck(apiQuery(query, symbol).statusCode);
+    apiStatusCheck(apiQuery(stockQuote, symbol).statusCode);
   }
   return true;
 }
 
 // update db docs
-async function updateDocsInDB(docs, query, symbol, inputTime) {
-  const queryModel = CreateMongooseModel(query);
+async function updateDocsInDB(docs, query, symbol, inputTime, queryModel) {
   const res = await queryModel.updateOne({ symbol: symbol }, { lastUpdated: inputTime, docs: docs }, { upsert: true });
   console.log(res.acknowledged);
   console.log(res.upsertedId);
 }
 
-// function using pagination checking if api call == last update in docs
-function dbUpdateWithPagination(symbol, query, docs) {
-  
+function dbUpdateList(symbol, query, Model, docsFromDb, lastUpdatedUnixTime) {
+  // ?from={CURRENT DATE}}&limit=(probably 10 or 15?, can adjust based off API usage, 
+  // don't want too small, but don't want too big incase it hasn't been updated in a while)
+  const docsFromAPI = apiQuery(query, symbol, docs.lastUpdated).data;
+  const res = await Model.updateOne({ symbol: symbol }, { lastUpdated: lastUpdatedUnixTime, $push: { docs: docsFromAPI } } );
+  console.log(res.acknowledged);
+  console.log(res.upsertedId);
+  return getDocsFromDb(symbol, Model);
 }
 
 // add docs to array in db
@@ -137,7 +141,7 @@ function lastUpdateQuery(docs, startUpdatePeriod, endtUpdatePeriod) {
 // endUpdatePeriod = 8pm for basicQuote Mon-Thurs or 4:05pm for the rest of stock info
 // startUpdatePeriod = 7am for basicQuote, or 9:30 for rest of stock info, commodities, and treasuries
 // crypto will update every 5 mins
-function updateOnceADayQuery(symbol, query, docs) {  
+function updateOnceADayQuery(symbol, query, Model, docsFromDb) {  
   const lastUpdatedUnixTime = fromUnixTime(docs.lastUpdated);
   const formatedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docs.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
 
@@ -147,7 +151,7 @@ function updateOnceADayQuery(symbol, query, docs) {
 
   if (lastUpdatedUnixTime.indexOf('Mon') || lastUpdatedUnixTime.indexOf('Tues') || lastUpdatedUnixTime.indexOf('Wed') || lastUpdatedUnixTime.indexOf('Thurs') || lastUpdatedUnixTime.indexOf('Fri')) {
     if (formatedLastUpdateCheck > 24) {
-      dbUpdateWithPagination(symbol, query, docs);
+      dbUpdateList(symbol, query, Model, docsFromDb, lastUpdatedUnixTime);
     }
   }
   return true;
@@ -170,8 +174,8 @@ function updateNext(symbol, query, docs, listOfPreviousQuery) {
 }
 
 // query api, and return data
-function apiQuery(query, symbol) {
-  return fetch(query(symbol));
+function apiQuery(query, symbol, nextN) {
+  return fetch(query(symbol, nextN));
 }
   
 // res.headers('HTTP/2') or res.statusCode
