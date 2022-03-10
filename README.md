@@ -10,3 +10,6 @@ if query not found, add logic to not save to db, and return 404 not found page.
 
 https://iexcloud.io/docs/api/#u-s-holidays-and-trading-dates
 just create dict with those dates?
+
+https://iexcloud.io/docs/api/#list
+create endpoint for mostactive, gainers, losers

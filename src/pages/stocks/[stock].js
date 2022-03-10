@@ -23,6 +23,12 @@ export async function getServerSideProps(context) {
   const updateOnIntervalsAndAddQueries = [stockNextDividends];
 
   // const response = updateAndReplace(params, stockQuote, true);
+  if (!dbQueryExistsCheck(params)) {
+    return {
+      notFound: true
+    }
+  }
+  
   const response = updateAndReplaceQueries.forEach((value, key) => {updateAndReplace(params, key, value[0], value[1])});
   const response2 = updateOnIntervalsAndAdd(params, stockNextDividends);
   const response3 = findAndReturn(params, stockNextDividends);

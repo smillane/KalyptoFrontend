@@ -2,11 +2,25 @@ import { mongoose } from "mongoose";
 
 // add logic to update certain queries multiple data points such as dividends (last 4) or insider transactions (last 6 or 8?)
 
+// query to check if symbol exists and there is an API endpoint for it, if there is, will return data and update the db
+// other queries will then run afterwards, logic will be done on [stock] page
+// check if query is in db, if it's not, check API, if doesn't exist, return 404, symbol is not supported
+export function dbQueryExistsCheck(symbol, model) {
+  const Model = CreateMongooseModel(stockQuote);
+  if (!Model.exists({ 'symbol': symbol }).exec()) {
+    console.log(symbol);
+    const apiReturnData = apiQuery(stockQuote, symbol)
+    if (!apiStatusCheck(apiReturnData.statusCode)) {
+      returnNotFound();
+    }
+    updateDocsInDB(apiReturnData.data, symbol, Date.now(), Model);
+  }
+  return true;
+}
+
+
 // for queries that will be updated every 5 minutes
 export function updateAndReplace(symbol, query, basicQuoteBool, onceDailyBool) {
-  if (!dbQueryExistsCheck(symbol, query, Model)) { 
-    returnNotFound(); 
-  }
 
   const Model = CreateMongooseModel(query);
   const docsFromDb = getDocsFromDb(symbol, Model);
@@ -36,11 +50,6 @@ export function updateAndReplace(symbol, query, basicQuoteBool, onceDailyBool) {
 // for queries that will be updated and added to previous docs
 export function updateOnIntervalsAndAdd(symbol, query, nextSymbol, nextQuery) {
   const Model = CreateMongooseModel(query);
-
-  if (!dbQueryExistsCheck(symbol, query, Model)) {
-    returnNotFound();
-  }
-
   const docsFromDb = getDocsFromDb(symbol, Model);
 
   updateNext(symbol, query, docsFromDb, nextSymbol, nextQuery, Model);
@@ -49,11 +58,6 @@ export function updateOnIntervalsAndAdd(symbol, query, nextSymbol, nextQuery) {
 // for functions that will not directly be updated, such as dividends
 export function findAndReturn(symbol, query) {
   const Model = CreateMongooseModel(query);
-
-  if (!dbQueryExistsCheck(symbol, query, Model)) {
-    returnNotFound();
-  }
-
   return getDocsFromDb(symbol, Model).docs;
 }
 
@@ -66,15 +70,6 @@ function CreateMongooseModel(query) {
 
 function getDocsFromDb(symbol, model) {
   return model.find({ symbol: symbol });
-}
-
-// check if query is in db, if it's not, check API, if doesn't exist, return 404, symbol is not supported
-function dbQueryExistsCheck(symbol, model) {
-  if (!model.exists({ 'symbol': symbol }).exec()) {
-    console.log(symbol)
-    apiStatusCheck(apiQuery(stockQuote, symbol).statusCode);
-  }
-  return true;
 }
 
 // update db docs
@@ -189,9 +184,9 @@ function apiQuery(query, symbol, lastUpdated) {
 // check api status, if it's not between 200 and 209, return notFound: true, which sends a 404 page
 // look into customizing this later for response
 // add logging for header response to see on backend
-function apiStatusCheck(statusCode) {
-  if (statusCode >= 300 || statusCode < 200) {
-    console.log(statusCode);
+function apiStatusCheck(apiStatus) {
+  if (apiStatus >= 300 || apiStatus < 200) {
+    console.log(apiStatus);
     return false;
   }
   return true;
