@@ -5,13 +5,13 @@ import { mongoose } from "mongoose";
 // query to check if symbol exists and there is an API endpoint for it, if there is, will return data and update the db
 // other queries will then run afterwards, logic will be done on [stock] page
 // check if query is in db, if it's not, check API, if doesn't exist, return 404, symbol is not supported
-export function dbQueryExistsCheck(symbol, model) {
+export function dbQueryExistsCheck(symbol) {
   const Model = CreateMongooseModel(stockQuote);
   if (!Model.exists({ 'symbol': symbol }).exec()) {
     console.log(symbol);
     const apiReturnData = apiQuery(stockQuote, symbol)
     if (!apiStatusCheck(apiReturnData.statusCode)) {
-      returnNotFound();
+      return false;
     }
     updateDocsInDB(apiReturnData.data, symbol, Date.now(), Model);
   }
@@ -123,7 +123,7 @@ function lastUpdateQuery(docs, startUpdatePeriod, endtUpdatePeriod) {
   }
 
   const weekdays = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri']
-  if (weekdays.includes(lastUpdated)) {
+  if (weekdays.includes(formattedLastUpdated)) {
     if (endtUpdatePeriod >= docs.lastUpdated.getHours() >= startUpdatePeriod) {
       return false;
     }
@@ -138,9 +138,9 @@ function lastUpdateQuery(docs, startUpdatePeriod, endtUpdatePeriod) {
 // crypto will update every 5 mins
 function updateOnceADayQuery(docsFromDb, symbol, query, model) {  
   const formattedLastUpdated = fromUnixTime(docsFromDb.lastUpdated);
-  const formattedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docsFromDb.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
+  const formattedLastUpdateInHours = parseInt(formatDistanceToNowStrict(docsFromDb.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
   
-  if (formattedLastUpdateCheck > 12){
+  if (formattedLastUpdateInHours > 12){
     const weekends = ['Sat', 'Sun']
     if (weekends.includes(formattedLastUpdated)) {
       return docsFromDb.docs;
@@ -162,9 +162,9 @@ function updateOnceADayQuery(docsFromDb, symbol, query, model) {
 // will then query the new nextDividend, and update nextDividend endpoint in db
 function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
   const inputUnixTime = fromUnixTime(docs.nextUpdate);
-  const formattedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docs.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
+  const formattedLastUpdateInHours = parseInt(formatDistanceToNowStrict(docs.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
 
-  if (isPast(inputUnixTime) && formattedLastUpdateCheck > 24) {
+  if (isPast(inputUnixTime) && formattedLastUpdateInHours > 24) {
     const currentTime = Date.now()
     addDocsInDB(docs, listOfPreviousQuery, symbol, currentTime, model);
     const docsFromAPI = apiQuery(query, symbol).data;
@@ -181,7 +181,7 @@ function apiQuery(query, symbol, lastUpdated) {
   
 // res.headers('HTTP/2') or res.statusCode
 // unsure on the .statusCode for nextjs
-// check api status, if it's not between 200 and 209, return notFound: true, which sends a 404 page
+// check api status, if it's not between 200 and 299, return notFound: true, which sends a 404 page
 // look into customizing this later for response
 // add logging for header response to see on backend
 function apiStatusCheck(apiStatus) {
