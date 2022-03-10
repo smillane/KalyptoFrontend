@@ -12,8 +12,10 @@ function stockStatsBasic(symbol) {
     return `${IEX_BASE_API}stock/${symbol}/stats?token=${IEX_PUBLIC_TOKEN}`
 }
 
-function stockInsiderTrading(symbol) {
-    return `${IEX_BASE_API_TIMES_SERIES}insider_transactions/${symbol}?last=1?token=${IEX_PUBLIC_TOKEN}`
+// ?from={CURRENT DATE}}&limit=(probably 10 or 15?, can adjust based off API usage, 
+// don't want too small, but don't want too big incase it hasn't been updated in a while)
+function stockInsiderTrading(symbol, lastUpdated) {
+    return `${IEX_BASE_API_TIMES_SERIES}insider_transactions/${symbol}?from=${lastUpdated}&limit=15?token=${IEX_PUBLIC_TOKEN}`
 }
 
 function stockPreviousDividends(symbol) {

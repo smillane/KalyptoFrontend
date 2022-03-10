@@ -12,7 +12,7 @@ export function updateAndReplace(symbol, query, basicQuoteBool, onceDailyBool) {
   const docsFromDb = getDocsFromDb(symbol, Model);
 
   if (onceDailyBool) {
-    updateOnceADayQuery(symbol, query, Model, docsFromDb);
+    updateOnceADayQuery(docsFromDb, symbol, query, Model);
   }
 
   if (basicQuoteBool) {
@@ -29,7 +29,7 @@ export function updateAndReplace(symbol, query, basicQuoteBool, onceDailyBool) {
   }
 
   const docsFromAPI = apiQuery(query, symbol).data;
-  updateDocsInDB(docsFromAPI, query, symbol, Date.now(), Model);
+  updateDocsInDB(docsFromAPI, symbol, Date.now(), Model);
   return docsFromAPI.body;
 }
 
@@ -43,7 +43,7 @@ export function updateOnIntervalsAndAdd(symbol, query, nextSymbol, nextQuery) {
 
   const docsFromDb = getDocsFromDb(symbol, Model);
 
-  updateNext(symbol, query, docsFromDb, nextSymbol, nextQuery);
+  updateNext(symbol, query, docsFromDb, nextSymbol, nextQuery, Model);
 }
 
 // for functions that will not directly be updated, such as dividends
@@ -78,28 +78,27 @@ function dbQueryExistsCheck(symbol, model) {
 }
 
 // update db docs
-async function updateDocsInDB(docs, query, symbol, inputTime, queryModel) {
-  const res = await queryModel.updateOne({ symbol: symbol }, { lastUpdated: inputTime, docs: docs }, { upsert: true });
+async function updateDocsInDB(docs, symbol, inputTime, model) {
+  const res = await model.updateOne({ symbol: symbol }, { lastUpdated: inputTime, docs: docs }, { upsert: true });
   console.log(res.acknowledged);
   console.log(res.upsertedId);
 }
 
-function dbUpdateList(symbol, query, Model, lastUpdated) {
+async function updateListInDB(symbol, query, lastUpdated, model) {
   // ?from={CURRENT DATE}}&limit=(probably 10 or 15?, can adjust based off API usage, 
   // don't want too small, but don't want too big incase it hasn't been updated in a while)
   const docsFromAPI = apiQuery(query, symbol, lastUpdated).data;
-  const res = await Model.updateOne({ symbol: symbol }, { lastUpdated: Date.now(), $push: { docs: docsFromAPI } } );
+  const res = await model.updateOne({ symbol: symbol }, { lastUpdated: Date.now(), $push: { docs: docsFromAPI } });
   console.log(res.acknowledged);
   console.log(res.upsertedId);
-  return getDocsFromDb(symbol, Model);
+  return getDocsFromDb(symbol, model);
 }
 
 // add docs to array in db
 // maybe use addToSet?
 // The $addToSet operator adds a value to an array unless the value is already present, in which case $addToSet does nothing to that array.
-async function addDocsInDB(docs, query, symbol, inputTime) {
-  const queryModel = CreateMongooseModel(query);
-  const res = await queryModel.updateOne({ symbol: symbol }, { lastUpdated: inputTime, $push: { docs: docs } } )
+async function addDocsInDB(docs, query, symbol, inputTime, model) {
+  const res = await model.updateOne({ symbol: symbol }, { lastUpdated: inputTime, $push: { docs: docs } } )
   console.log(res.acknowledged);
   console.log(res.upsertedId);
 }
@@ -129,7 +128,7 @@ function lastUpdateQuery(docs, startUpdatePeriod, endtUpdatePeriod) {
   }
 
   const weekdays = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri']
-  if (weekdays.includes(formattedLastUpdated)) {
+  if (weekdays.includes(lastUpdated)) {
     if (endtUpdatePeriod >= docs.lastUpdated.getHours() >= startUpdatePeriod) {
       return false;
     }
@@ -142,7 +141,7 @@ function lastUpdateQuery(docs, startUpdatePeriod, endtUpdatePeriod) {
 // endUpdatePeriod = 8pm for basicQuote Mon-Thurs or 4:05pm for the rest of stock info
 // startUpdatePeriod = 7am for basicQuote, or 9:30 for rest of stock info, commodities, and treasuries
 // crypto will update every 5 mins
-function updateOnceADayQuery(symbol, query, Model, docsFromDb) {  
+function updateOnceADayQuery(docsFromDb, symbol, query, model) {  
   const formattedLastUpdated = fromUnixTime(docsFromDb.lastUpdated);
   const formattedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docsFromDb.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
   
@@ -154,7 +153,7 @@ function updateOnceADayQuery(symbol, query, Model, docsFromDb) {
 
     const weekdays = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri']
     if (weekdays.includes(formattedLastUpdated)) {
-      dbUpdateList(symbol, query, Model, formattedLastUpdated);
+      updateListInDB(symbol, query, formattedLastUpdated, model);
     }
   }
   return docsFromDb.docs;
@@ -166,23 +165,23 @@ function updateOnceADayQuery(symbol, query, Model, docsFromDb) {
 // EXAMPLE
 // will add nextDividend to previousDividends, once date passes and there is a new nextDividend
 // will then query the new nextDividend, and update nextDividend endpoint in db
-function updateNext(symbol, query, docs, listOfPreviousQuery) {
+function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
   const inputUnixTime = fromUnixTime(docs.nextUpdate);
   const formattedLastUpdateCheck = parseInt(formatDistanceToNowStrict(docs.lastUpdated.getHours(), {unit: 'hour'}.split(" ")))
 
   if (isPast(inputUnixTime) && formattedLastUpdateCheck > 24) {
     const currentTime = Date.now()
-    addDocsInDB(docs, listOfPreviousQuery, symbol, currentTime);
+    addDocsInDB(docs, listOfPreviousQuery, symbol, currentTime, model);
     const docsFromAPI = apiQuery(query, symbol).data;
-    updateDocsInDB(docsFromAPI, query, symbol, currentTime);
+    updateDocsInDB(docsFromAPI, symbol, currentTime, model);
     return docsFromAPI.body;
   }
   return docs.docs;
 }
 
 // query api, and return data
-function apiQuery(query, symbol, nextN) {
-  return fetch(query(symbol, nextN));
+function apiQuery(query, symbol, lastUpdated) {
+  return fetch(query(symbol, lastUpdated));
 }
   
 // res.headers('HTTP/2') or res.statusCode
