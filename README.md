@@ -13,3 +13,5 @@ just create dict with those dates?
 
 https://iexcloud.io/docs/api/#list
 create endpoint for mostactive, gainers, losers
+
+Add logic for if nothing found in db, populate with last 4, 8, etc for endpoints such as past dividends, insider transactions

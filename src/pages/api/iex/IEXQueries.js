@@ -19,7 +19,7 @@ function stockInsiderTrading(symbol, lastUpdated) {
 }
 
 function stockPreviousDividends(symbol) {
-    return `${IEX_BASE_API}stock/${symbol}/dividends/1y?token=${IEX_PUBLIC_TOKEN}`
+    return `${IEX_BASE_API_TIMES_SERIES}dividends/${symbol}/last=4?token=${IEX_PUBLIC_TOKEN}`
 }
 
 function stockNextDividends(symbol) {
