@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import {updateAndReplace, updateOnIntervalsAndAdd, findAndReturn} from '../../main/queriesAndUpdates'
+import { updateAndReplace, updateOnIntervalsAndAdd, findAndReturn } from '../../main/queriesAndUpdates'
 
 // if user is not logged in with an account, only show a basic quote and chart
 export default function Stock() {
@@ -28,7 +28,7 @@ export async function getServerSideProps(context) {
       notFound: true
     }
   }
-  
+
   const response = updateAndReplaceQueries.forEach((value, key) => {updateAndReplace(params, key, value[0], value[1])});
   const response2 = updateOnIntervalsAndAdd(params, stockNextDividends);
   const response3 = findAndReturn(params, stockNextDividends);

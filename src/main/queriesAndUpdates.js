@@ -58,6 +58,11 @@ export function updateOnIntervalsAndAdd(symbol, query, nextSymbol, nextQuery) {
 // for functions that will not directly be updated, such as dividends
 export function findAndReturn(symbol, query) {
   const Model = CreateMongooseModel(query);
+  if (!Model.exists({ 'symbol': symbol }).exec()) {
+    const docsFromApi = apiQuery(query, symbol).data;
+    updateDocsInDB(docsFromApi, symbol, Date.now(), Model);
+    return docsFromApi;
+  }
   return getDocsFromDb(symbol, Model).docs;
 }
 
