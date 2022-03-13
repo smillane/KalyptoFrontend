@@ -17,13 +17,11 @@ export default function Stock() {
 }
 
 export async function getServerSideProps(context) {
-  // const updateAndReplaceQueries = [stockQuote, stockStatsBasic, stockLargestTrades];
   const updateAndReplaceQueries = new Map([[stockQuote, [true, false]], [stockStatsBasic, false, false]], [stockLargestTrades, [false, false]], [stockInsiderTrading, [false, true]]);
   const findAndReturnQueries = [stockPreviousDividends];
   const updateOnIntervalsAndAddQueries = [stockNextDividends];
 
-  // const response = updateAndReplace(params, stockQuote, true);
-  if (!dbQueryExistsCheck(params)) {
+  if (!queryExistsCheck(params)) {
     return {
       notFound: true
     }

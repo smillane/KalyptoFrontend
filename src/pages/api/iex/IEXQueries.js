@@ -18,6 +18,7 @@ function stockInsiderTrading(symbol, lastUpdated) {
     return `${IEX_BASE_API_TIMES_SERIES}insider_transactions/${symbol}?from=${lastUpdated}&limit=15?token=${IEX_PUBLIC_TOKEN}`
 }
 
+// return last 10 insider transactions, will only be called if there is nothing in db for this symbol
 function lastTenStockInsiderTrading(symbol) {
     return `${IEX_BASE_API_TIMES_SERIES}insider_transactions/${symbol}?last=10?token=${IEX_PUBLIC_TOKEN}`
 }

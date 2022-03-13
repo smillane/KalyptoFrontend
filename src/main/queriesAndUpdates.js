@@ -1,12 +1,10 @@
 import { mongoose } from "mongoose";
 
-// add logic to update certain queries multiple data points such as dividends (last 4) or insider transactions (last 6 or 8?)
-
 // query to check if symbol exists and there is an API endpoint for it, if there is, will return data and update the db
 // other queries will then run afterwards, logic will be done on [stock] page
 // check if query is in db, if it's not, check API, if doesn't exist, return 404, symbol is not supported
 // if stock exists, will then call lastTenStockInsiderTrading, and save api data to db
-export function dbQueryExistsCheck(symbol) {
+export function queryExistsCheck(symbol) {
   const Model = CreateMongooseModel(stockQuote);
   if (!Model.exists({ 'symbol': symbol }).exec()) {
     console.log(symbol);
