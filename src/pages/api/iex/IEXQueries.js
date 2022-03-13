@@ -18,6 +18,10 @@ function stockInsiderTrading(symbol, lastUpdated) {
     return `${IEX_BASE_API_TIMES_SERIES}insider_transactions/${symbol}?from=${lastUpdated}&limit=15?token=${IEX_PUBLIC_TOKEN}`
 }
 
+function lastTenStockInsiderTrading(symbol) {
+    return `${IEX_BASE_API_TIMES_SERIES}insider_transactions/${symbol}?last=10?token=${IEX_PUBLIC_TOKEN}`
+}
+
 function stockPreviousDividends(symbol) {
     return `${IEX_BASE_API_TIMES_SERIES}dividends/${symbol}/last=4?token=${IEX_PUBLIC_TOKEN}`
 }

@@ -30,8 +30,8 @@ export async function getServerSideProps(context) {
   }
 
   const response = updateAndReplaceQueries.forEach((value, key) => {updateAndReplace(params, key, value[0], value[1])});
+  const response3 = findAndReturn(params, stockPreviousDividends);
   const response2 = updateOnIntervalsAndAdd(params, stockNextDividends);
-  const response3 = findAndReturn(params, stockNextDividends);
 
   return {
     props: {response},
