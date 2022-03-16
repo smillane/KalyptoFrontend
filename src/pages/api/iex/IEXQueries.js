@@ -4,7 +4,7 @@ const IEX_BASE_API_TIMES_SERIES = 'https://sandbox.iexapis.com/stable/time-serie
 
 // STOCKS
 
-function stockQuote(symbol) {
+export function stockQuote(symbol) {
     return `${IEX_BASE_API}stock/${symbol}/quote?token=${IEX_PUBLIC_TOKEN}`
 }
 
@@ -19,7 +19,7 @@ function stockInsiderTrading(symbol, lastUpdated) {
 }
 
 // return last 10 insider transactions, will only be called if there is nothing in db for this symbol
-function lastTenStockInsiderTrading(symbol) {
+export function lastTenStockInsiderTrading(symbol) {
     return `${IEX_BASE_API_TIMES_SERIES}insider_transactions/${symbol}?last=10?token=${IEX_PUBLIC_TOKEN}`
 }
 

@@ -1,21 +1,22 @@
-import { mongoose } from "mongoose";
+import { mongoose } from 'mongoose';
+import { stockQuote, lastTenStockInsiderTrading } from '../pages/api/iex/IEXQueries'
+import { stockInsiderTradingModel, stockQuoteModel } from '../main/database/models/tables'
 
 // query to check if symbol exists and there is an API endpoint for it, if there is, will return data and update the db
 // other queries will then run afterwards, logic will be done on [stock] page
 // check if query is in db, if it's not, check API, if doesn't exist, return 404, symbol is not supported
 // if stock exists, will then call lastTenStockInsiderTrading, and save api data to db
 export function queryExistsCheck(symbol) {
-  const Model = CreateMongooseModel(stockQuote);
-  if (!Model.exists({ 'symbol': symbol }).exec()) {
+  const Model = stockQuoteModel;
+  if (!Model.exists({ symbol: symbol })) {
     console.log(symbol);
     const apiReturnData = apiQuery(stockQuote, symbol)
     if (!apiStatusCheck(apiReturnData.statusCode)) {
       return false;
     }
     updateDocsInDB(apiReturnData.data, symbol, Date.now(), Model);
-    const lastTenStockInsiderTradingModel = CreateMongooseModel(lastTenStockInsiderTrading);
     const lastTenStockInsiderTradingAPICall = apiQuery(lastTenStockInsiderTrading, symbol);
-    updateDocsInDB(lastTenStockInsiderTradingAPICall.data, symbol, Date.now(), lastTenStockInsiderTradingModel);
+    updateDocsInDB(lastTenStockInsiderTradingAPICall.data, symbol, Date.now(), stockInsiderTradingModel);
   }
   return true;
 }
@@ -72,7 +73,7 @@ export function findAndReturn(symbol, query) {
 
 //create mongoose model for queries,updates, etc
 function CreateMongooseModel(query) {
-  return mongoose.model(query, `${query}Schema`);
+  return mongoose.model(`${query}`, query);
 }
 
 function getDocsFromDb(symbol, model) {
