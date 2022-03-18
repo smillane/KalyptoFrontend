@@ -8,48 +8,48 @@ const stockQuote = new Schema({
     docs: Object
 })
 
-export const stockQuoteModel = mongoose.model('stockQuote', stockQuote)
+export const stockQuoteModel = mongoose.models.stockQuote || mongoose.model('stockQuote', stockQuote);
 
 const stockStatsBasic = new Schema({
     symbol: String,
     lastUpdated: Number,
     docs: Object
-})
+});
 
-export const stockStatsBasicModel = mongoose.model('stockStatsBasic', stockStatsBasic)
+export const stockStatsBasicModel = mongoose.models.stockStatsBasic || mongoose.model('stockStatsBasic', stockStatsBasic);
 
 const stockLargestTrades = new Schema({
     symbol: String,
     lastUpdated: Number,
     docs: Object
-})
+});
 
-export const stockLargestTradesModel = mongoose.model('stockLargestTrades', stockLargestTrades)
+export const stockLargestTradesModel = mongoose.models.stockLargestTrades || mongoose.model('stockLargestTrades', stockLargestTrades);
 
 const stockInsiderTrading = new Schema({
     symbol: String,
     lastUpdated: Number,
     docs: Array
-})
+});
 
-export const stockInsiderTradingModel = mongoose.model('stockInsiderTrading', stockInsiderTrading)
+export const stockInsiderTradingModel = mongoose.models.stockInsiderTrading || mongoose.model('stockInsiderTrading', stockInsiderTrading);
 
 const stockPreviousDividends = new Schema({
     symbol: String,
     lastUpdated: Number,
     docs: Array
-})
+});
 
-export const stockPreviousDividendsModel = mongoose.model('stockPreviousDividends', stockPreviousDividends)
+export const stockPreviousDividendsModel = mongoose.models.stockPreviousDividends || mongoose.model('stockPreviousDividends', stockPreviousDividends);
 
 const stockNextDividends = new Schema({
     symbol: String,
     nextUpdate: Number,
     lastUpdated: Number,
     docs: Object
-})
+});
 
-export const stockNextDividendsModel = mongoose.model('stockNextDividends', stockNextDividends)
+export const stockNextDividendsModel = mongoose.models.stockNextDividends || mongoose.model('stockNextDividends', stockNextDividends);
 
 
 

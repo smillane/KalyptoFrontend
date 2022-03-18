@@ -8,13 +8,13 @@ export function stockQuote(symbol) {
     return `${IEX_BASE_API}stock/${symbol}/quote?token=${IEX_PUBLIC_TOKEN}`
 }
 
-function stockStatsBasic(symbol) {
+export function stockStatsBasic(symbol) {
     return `${IEX_BASE_API}stock/${symbol}/stats?token=${IEX_PUBLIC_TOKEN}`
 }
 
 // ?from={CURRENT DATE}}&limit=(probably 10 or 15?, can adjust based off API usage, 
 // don't want too small, but don't want too big incase it hasn't been updated in a while)
-function stockInsiderTrading(symbol, lastUpdated) {
+export function stockInsiderTrading(symbol, lastUpdated) {
     return `${IEX_BASE_API_TIMES_SERIES}insider_transactions/${symbol}?from=${lastUpdated}&limit=15?token=${IEX_PUBLIC_TOKEN}`
 }
 
@@ -23,15 +23,15 @@ export function lastTenStockInsiderTrading(symbol) {
     return `${IEX_BASE_API_TIMES_SERIES}insider_transactions/${symbol}?last=10?token=${IEX_PUBLIC_TOKEN}`
 }
 
-function stockPreviousDividends(symbol) {
+export function stockPreviousDividends(symbol) {
     return `${IEX_BASE_API_TIMES_SERIES}dividends/${symbol}/last=4?token=${IEX_PUBLIC_TOKEN}`
 }
 
-function stockNextDividends(symbol) {
+export function stockNextDividends(symbol) {
     return `${IEX_BASE_API}stock/${symbol}/dividends/next?token=${IEX_PUBLIC_TOKEN}`
 }
 
-function stockLargestTrades(symbol) {
+export function stockLargestTrades(symbol) {
     return `${IEX_BASE_API}stock/${symbol}/largest-trades?token=${IEX_PUBLIC_TOKEN}`
 }
 

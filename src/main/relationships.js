@@ -1,0 +1,4 @@
+import { stockQuoteModel, stockStatsBasicModel, stockLargestTradesModel, stockInsiderTradingModel, stockPreviousDividendsModel, stockNextDividendsModel } from './database/models/models'
+import { stockQuote, stockStatsBasic, stockLargestTrades, stockInsiderTrading, stockPreviousDividends, stockNextDividends } from '../pages/api/iex/IEXQueries'
+
+export const stockRelationships = new Map([[stockQuoteModel, stockQuote], [stockStatsBasicModel, stockStatsBasic], [stockLargestTradesModel,stockLargestTrades], [stockInsiderTradingModel, stockInsiderTrading], [stockPreviousDividendsModel, stockPreviousDividends], [stockNextDividendsModel, stockNextDividends]]);
