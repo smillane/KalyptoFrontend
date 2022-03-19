@@ -1,6 +1,6 @@
-import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime } from 'date-fns';
+import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime, isPast } from 'date-fns';
 
-import { stockQuote, lastTenStockInsiderTrading } from '../pages/api/iex/IEXQueries';
+import { stockQuote, lastTenStockInsiderTrading } from '../../pages/api/iex/IEXQueries';
 import { stockInsiderTradingModel, stockQuoteModel } from './database/models/models';
 
 // query to check if symbol exists and there is an API endpoint for it, if there is, will return data and update the db
@@ -16,10 +16,10 @@ export async function queryExistsCheck(symbol) {
       return false;
     }
     console.log(apiReturnData);
-    updateDocsInDB(apiReturnData.data, symbol, Date.now(), stockQuoteModel);
+    updateDocsInDB(apiReturnData, symbol, Date.now(), stockQuoteModel);
     const lastTenStockInsiderTradingAPICall = apiQuery(lastTenStockInsiderTrading, symbol);
     console.log(lastTenStockInsiderTradingAPICall);
-    updateDocsInDB(lastTenStockInsiderTradingAPICall.data, symbol, Date.now(), stockInsiderTradingModel);
+    updateDocsInDB(lastTenStockInsiderTradingAPICall, symbol, Date.now(), stockInsiderTradingModel);
   }
   return true;
 }
@@ -29,7 +29,7 @@ export async function queryExistsCheck(symbol) {
 export async function updateAndReplace(symbol, query, model, basicQuoteBool, onceDailyBool) {
   const modelSearch = await model.exists({ symbol: symbol });
   if (!modelSearch) {
-    const docsFromAPI = apiQuery(query, symbol).data;
+    const docsFromAPI = apiQuery(query, symbol);
     updateDocsInDB(docsFromAPI, symbol, Date.now(), model);
     return docsFromAPI;
   }
@@ -58,7 +58,7 @@ export async function updateAndReplace(symbol, query, model, basicQuoteBool, onc
     }
   }
 
-  const docsFromAPI = apiQuery(query, symbol).data;
+  const docsFromAPI = apiQuery(query, symbol);
   updateDocsInDB(docsFromAPI, symbol, Date.now(), model);
   return docsFromAPI;
 }
@@ -67,19 +67,19 @@ export async function updateAndReplace(symbol, query, model, basicQuoteBool, onc
 export async function updateOnIntervalsAndAdd(symbol, query, model, nextQuery) {
   const modelSearch = await model.exists({ symbol: symbol });
   if (!modelSearch) {
-    const docsFromAPI = apiQuery(query, symbol).data;
+    const docsFromAPI = apiQuery(query, symbol);
     updateDocsInDB(docsFromAPI, symbol, Date.now(), model);
     return docsFromAPI;
   }
   const docsFromDb = getDocsFromDb(symbol, model);
-  updateNext(symbol, query, docsFromDb, nextSymbol, nextQuery, model);
+  updateNext(symbol, query, docsFromDb, nextQuery, model);
 }
 
 // for functions that will not directly be updated, such as dividends
 export async function findAndReturn(symbol, query, model) {
   const modelSearch = await model.exists({ symbol: symbol });
   if (!modelSearch) {
-    const docsFromApi = apiQuery(query, symbol).data;
+    const docsFromApi = apiQuery(query, symbol);
     updateDocsInDB(docsFromApi, symbol, Date.now(), model);
     return docsFromApi;
   }
@@ -100,7 +100,7 @@ async function updateDocsInDB(docs, symbol, inputTime, model) {
 async function updateListInDB(symbol, query, lastUpdated, model) {
   // ?from={CURRENT DATE}}&limit=(probably 10 or 15?, can adjust based off API usage, 
   // don't want too small, but don't want too big incase it hasn't been updated in a while)
-  const docsFromAPI = apiQuery(query, symbol, lastUpdated).data;
+  const docsFromAPI = apiQuery(query, symbol, lastUpdated);
   const res = await model.updateOne({ symbol: symbol }, { lastUpdated: Date.now(), $push: { docs: docsFromAPI } });
   console.log(res.acknowledged);
   console.log(res.upsertedId);
@@ -181,10 +181,10 @@ function updateOnceADayQuery(docsFromDb, symbol, query, model) {
 function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
   const formattedLastUpdateInHours = parseInt(formatDistanceToNowStrict(docs.lastUpdated, {unit: 'hour'}).split(" ")[0])
 
-  if (isPast(inputUnixTime) && formattedLastUpdateInHours > 24) {
+  if (isPast(docs.lastUpdated) && formattedLastUpdateInHours > 24) {
     const currentTime = Date.now()
     addDocsInDB(docs, listOfPreviousQuery, symbol, currentTime, model);
-    const docsFromAPI = apiQuery(query, symbol).data;
+    const docsFromAPI = apiQuery(query, symbol);
     updateDocsInDB(docsFromAPI, symbol, currentTime, model);
     return docsFromAPI.body;
   }
@@ -193,7 +193,7 @@ function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
 
 // query api, and return data
 function apiQuery(query, symbol, lastUpdated) {
-  return fetch(query(symbol, lastUpdated));
+  return fetch(query(symbol, lastUpdated)).then(response => response.body);
 }
   
 // res.headers('HTTP/2') or res.statusCode

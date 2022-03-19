@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 
-import { stockRelationships } from '../../main/relationships'
-import { updateAndReplace, updateOnIntervalsAndAdd, findAndReturn, queryExistsCheck } from '../../main/queriesAndUpdates'
-import { stockQuoteModel, stockStatsBasicModel, stockLargestTradesModel, stockInsiderTradingModel, stockPreviousDividendsModel, stockNextDividendsModel } from '../../main/database/models/models'
+import { stockRelationships } from '../../main/node/relationships'
+import { updateAndReplace, updateOnIntervalsAndAdd, findAndReturn, queryExistsCheck } from '../../main/node/queriesAndUpdates'
+import { stockQuoteModel, stockStatsBasicModel, stockLargestTradesModel, stockInsiderTradingModel, stockPreviousDividendsModel, stockNextDividendsModel } from '../../main/node/database/models/models'
 
 // if user is not logged in with an account, only show a basic quote and chart
 export default function Stock() {
@@ -14,9 +14,6 @@ export default function Stock() {
       <div>
         <h1>{stock}</h1>
         <h3>{response}</h3>
-        <h3>{response2}</h3>
-        <h3>{response3}</h3>
-        <h3>{props}</h3>
       </div>
     )
 }
@@ -33,11 +30,11 @@ export async function getServerSideProps(params) {
   }
 
   const response = updateAndReplaceQueries.forEach((value, key) => {updateAndReplace(params.id, stockRelationships.get(key) ,key, value[0], value[1])});
-  const response2 = updateOnIntervalsAndAdd(params.id, stockRelationships.get(stockNextDividendsModel), stockNextDividendsModel);
-  const response3 = findAndReturn(params.id, stockRelationships.get(stockPreviousDividendsModel), stockPreviousDividendsModel);
+  // const response2 = updateOnIntervalsAndAdd(params.id, stockRelationships.get(stockNextDividendsModel), stockNextDividendsModel, stockPreviousDividendsModel);
+  // const response3 = findAndReturn(params.id, stockRelationships.get(stockPreviousDividendsModel), stockPreviousDividendsModel);
 
   return {
-    props: {response, response2, response3},
+    props: {response},
   }
 }
   
