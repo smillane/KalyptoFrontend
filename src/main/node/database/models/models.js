@@ -2,13 +2,14 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 // STOCKS
-const stockQuote = new Schema({
+const stockQuoteSchema = new Schema({
     symbol: String,
     lastUpdated: Number,
     docs: Object
-})
+});
 
-export const stockQuoteModel = mongoose.models.stockQuote || mongoose.model('stockQuote', stockQuote);
+const stockQuote = mongoose.models.stockQuoteModel || mongoose.model('stockQuoteModel', stockQuoteSchema);
+export function stockQuoteModel() { return mongoose.models.stockQuoteModel || mongoose.model('stockQuoteModel', stockQuoteSchema) }
 
 const stockStatsBasic = new Schema({
     symbol: String,
@@ -16,7 +17,7 @@ const stockStatsBasic = new Schema({
     docs: Object
 });
 
-export const stockStatsBasicModel = mongoose.models.stockStatsBasic || mongoose.model('stockStatsBasic', stockStatsBasic);
+export function stockStatsBasicModel() { mongoose.models.stockStatsBasicModel || mongoose.model('stockStatsBasicModel', stockStatsBasic); }
 
 const stockLargestTrades = new Schema({
     symbol: String,
@@ -24,7 +25,7 @@ const stockLargestTrades = new Schema({
     docs: Object
 });
 
-export const stockLargestTradesModel = mongoose.models.stockLargestTrades || mongoose.model('stockLargestTrades', stockLargestTrades);
+export function stockLargestTradesModel() { mongoose.models.stockLargestTradesModel || mongoose.model('stockLargestTradesModel', stockLargestTrades); }
 
 const stockInsiderTrading = new Schema({
     symbol: String,
@@ -32,7 +33,7 @@ const stockInsiderTrading = new Schema({
     docs: Array
 });
 
-export const stockInsiderTradingModel = mongoose.models.stockInsiderTrading || mongoose.model('stockInsiderTrading', stockInsiderTrading);
+export function stockInsiderTradingModel() { mongoose.models.stockInsiderTradingModel || mongoose.model('stockInsiderTradingModel', stockInsiderTrading); }
 
 const stockPreviousDividends = new Schema({
     symbol: String,
@@ -40,7 +41,8 @@ const stockPreviousDividends = new Schema({
     docs: Array
 });
 
-export const stockPreviousDividendsModel = mongoose.models.stockPreviousDividends || mongoose.model('stockPreviousDividends', stockPreviousDividends);
+
+export function stockPreviousDividendsModel() { mongoose.models.stockPreviousDividendsModel || mongoose.model('stockPreviousDividendsModel', stockPreviousDividends); }
 
 const stockNextDividends = new Schema({
     symbol: String,
@@ -49,9 +51,7 @@ const stockNextDividends = new Schema({
     docs: Object
 });
 
-export const stockNextDividendsModel = mongoose.models.stockNextDividends || mongoose.model('stockNextDividends', stockNextDividends);
-
-
+export function stockNextDividendsModel() { mongoose.models.stockNextDividendsModel || mongoose.model('stockNextDividendsModel', stockNextDividends); }
 
 // UPCOMING IPOs
 const upcomingIPOs = new Schema({

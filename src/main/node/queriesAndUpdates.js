@@ -1,7 +1,7 @@
-import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime, isPast } from 'date-fns';
+import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime, isPast } from 'date-fns'
 
-import { stockQuote, lastTenStockInsiderTrading } from '../../pages/api/iex/IEXQueries';
-import { stockInsiderTradingModel, stockQuoteModel } from './database/models/models';
+import { stockQuote, lastTenStockInsiderTrading } from '../../pages/api/iex/IEXQueries'
+import { stockInsiderTradingModel, stockQuoteModel } from './database/models/models'
 
 // query to check if symbol exists and there is an API endpoint for it, if there is, will return data and update the db
 // other queries will then run afterwards, logic will be done on [stock] page
@@ -11,17 +11,22 @@ export async function queryExistsCheck(symbol) {
   const modelSearch = await stockQuoteModel.exists({ symbol: symbol })
   if (!modelSearch) {
     console.log(symbol);
-    const apiReturnData = apiQuery(stockQuote, symbol)
-    if (!apiStatusCheck(apiReturnData.statusCode)) {
+    const apiReturnData = apiQuery(stockQuote, symbol);
+    if (!apiStatusCheck(apiReturnData.response.status)) {
       return false;
     }
-    console.log(apiReturnData);
-    updateDocsInDB(apiReturnData, symbol, Date.now(), stockQuoteModel);
-    const lastTenStockInsiderTradingAPICall = apiQuery(lastTenStockInsiderTrading, symbol);
-    console.log(lastTenStockInsiderTradingAPICall);
-    updateDocsInDB(lastTenStockInsiderTradingAPICall, symbol, Date.now(), stockInsiderTradingModel);
+    // console.log(apiReturnData.then(response => response.body));
+    // saveDocsInDB(apiReturnData.then(response => response.body), symbol, Date.now(), stockQuoteModel);
+    // const lastTenStockInsiderTradingAPICall = apiQueryBody(lastTenStockInsiderTrading, symbol);
+    // console.log(lastTenStockInsiderTradingAPICall);
+    // updateDocsInDB(lastTenStockInsiderTradingAPICall, symbol, Date.now(), stockInsiderTradingModel);
+    return apiReturnData.response.body;
   }
-  return true;
+  return false;
+}
+
+async function firstRunSaveAndQuery(symbol) {
+
 }
 
 
@@ -29,7 +34,7 @@ export async function queryExistsCheck(symbol) {
 export async function updateAndReplace(symbol, query, model, basicQuoteBool, onceDailyBool) {
   const modelSearch = await model.exists({ symbol: symbol });
   if (!modelSearch) {
-    const docsFromAPI = apiQuery(query, symbol);
+    const docsFromAPI = apiQueryBody(query, symbol);
     updateDocsInDB(docsFromAPI, symbol, Date.now(), model);
     return docsFromAPI;
   }
@@ -58,7 +63,7 @@ export async function updateAndReplace(symbol, query, model, basicQuoteBool, onc
     }
   }
 
-  const docsFromAPI = apiQuery(query, symbol);
+  const docsFromAPI = apiQueryBody(query, symbol);
   updateDocsInDB(docsFromAPI, symbol, Date.now(), model);
   return docsFromAPI;
 }
@@ -67,7 +72,7 @@ export async function updateAndReplace(symbol, query, model, basicQuoteBool, onc
 export async function updateOnIntervalsAndAdd(symbol, query, model, nextQuery) {
   const modelSearch = await model.exists({ symbol: symbol });
   if (!modelSearch) {
-    const docsFromAPI = apiQuery(query, symbol);
+    const docsFromAPI = apiQueryBody(query, symbol);
     updateDocsInDB(docsFromAPI, symbol, Date.now(), model);
     return docsFromAPI;
   }
@@ -79,7 +84,7 @@ export async function updateOnIntervalsAndAdd(symbol, query, model, nextQuery) {
 export async function findAndReturn(symbol, query, model) {
   const modelSearch = await model.exists({ symbol: symbol });
   if (!modelSearch) {
-    const docsFromApi = apiQuery(query, symbol);
+    const docsFromApi = apiQueryBody(query, symbol);
     updateDocsInDB(docsFromApi, symbol, Date.now(), model);
     return docsFromApi;
   }
@@ -88,6 +93,13 @@ export async function findAndReturn(symbol, query, model) {
 
 function getDocsFromDb(symbol, model) {
   return model.find({ symbol: symbol });
+}
+
+// create db docs
+async function saveDocsInDB(docs, symbol, inputTime, model) {
+  const res = await model.save({ symbol: symbol }, { lastUpdated: inputTime, docs: docs });
+  console.log(res.acknowledged);
+  console.log(res.upsertedId);
 }
 
 // update db docs
@@ -100,7 +112,7 @@ async function updateDocsInDB(docs, symbol, inputTime, model) {
 async function updateListInDB(symbol, query, lastUpdated, model) {
   // ?from={CURRENT DATE}}&limit=(probably 10 or 15?, can adjust based off API usage, 
   // don't want too small, but don't want too big incase it hasn't been updated in a while)
-  const docsFromAPI = apiQuery(query, symbol, lastUpdated);
+  const docsFromAPI = apiQueryBody(query, symbol, lastUpdated);
   const res = await model.updateOne({ symbol: symbol }, { lastUpdated: Date.now(), $push: { docs: docsFromAPI } });
   console.log(res.acknowledged);
   console.log(res.upsertedId);
@@ -184,7 +196,7 @@ function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
   if (isPast(docs.lastUpdated) && formattedLastUpdateInHours > 24) {
     const currentTime = Date.now()
     addDocsInDB(docs, listOfPreviousQuery, symbol, currentTime, model);
-    const docsFromAPI = apiQuery(query, symbol);
+    const docsFromAPI = apiQueryBody(query, symbol);
     updateDocsInDB(docsFromAPI, symbol, currentTime, model);
     return docsFromAPI.body;
   }
@@ -192,8 +204,14 @@ function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
 }
 
 // query api, and return data
-function apiQuery(query, symbol, lastUpdated) {
-  return fetch(query(symbol, lastUpdated)).then(response => response.body);
+async function apiQueryBody(query, symbol, lastUpdated) {
+  const response = await fetch(query(symbol, lastUpdated)).then(response => response.body);
+  return response;
+}
+
+async function apiQuery(query, symbol, lastUpdated) {
+  const response = await fetch(query(symbol, lastUpdated));
+  return response.body;
 }
   
 // res.headers('HTTP/2') or res.statusCode
