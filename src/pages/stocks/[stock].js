@@ -3,7 +3,7 @@ import { useRouter } from "next/router"
 import dbConnect from '../../main/node/database/dBConnect'
 import stockRelationships from '../../main/node/relationships'
 import { updateAndReplace, updateOnIntervalsAndAdd, findAndReturn, queryExistsCheck } from '../../main/node/queriesAndUpdates'
-import { stockQuoteModel, stockStatsBasicModel, stockLargestTradesModel, stockInsiderTradingModel, stockPreviousDividendsModel, stockNextDividendsModel } from '../../main/node/database/models/models'
+import { stockQuoteModel, stockStatsBasicModel, stockLargestTradesModel, stockInsiderTradingModel, stockPreviousDividendsModel, stockNextDividendsModel } from '../../main/node/database/models/Stocks/Quote'
 
 // if user is not logged in with an account, only show a basic quote and chart
 export default function Stock({apiData}) {
@@ -21,7 +21,7 @@ export async function getServerSideProps(context) {
   await dbConnect();
 
   const stock = context.params.stock;
-  const apiData = queryExistsCheck(stock);
+  const apiData = await queryExistsCheck(stock);
   // const updateAndReplaceQueries = new Map([[stockQuoteModel, [true, false]], [stockStatsBasicModel, [false, false]], [stockLargestTradesModel, [false, false]], [stockInsiderTradingModel, [false, true]]]);
   // const updateOnIntervalsAndAddQueries = [stockNextDividendsModel];
   // const findAndReturnQueries = [stockPreviousDividendsModel];

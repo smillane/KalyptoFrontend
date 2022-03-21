@@ -1,26 +1,32 @@
-import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime, isPast } from 'date-fns'
+import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime, isPast } from 'date-fns';
 
-import { stockQuote, lastTenStockInsiderTrading } from '../../pages/api/iex/IEXQueries'
-import { stockInsiderTradingModel, stockQuoteModel } from './database/models/models'
+import { stockQuote, lastTenStockInsiderTrading } from '../../pages/api/iex/IEXQueries';
+import StockQuoteModel from './database/models/Stocks/Quote';
 
 // query to check if symbol exists and there is an API endpoint for it, if there is, will return data and update the db
 // other queries will then run afterwards, logic will be done on [stock] page
 // check if query is in db, if it's not, check API, if doesn't exist, return 404, symbol is not supported
 // if stock exists, will then call lastTenStockInsiderTrading, and save api data to db
 export async function queryExistsCheck(symbol) {
-  const modelSearch = await stockQuoteModel.exists({ symbol: symbol })
-  if (!modelSearch) {
+  const ModelSearch = await StockQuoteModel.exists({ symbol: symbol });
+  if (ModelSearch) {
+    return ModelSearch
+  }
+  if (!ModelSearch) {
     console.log(symbol);
-    const apiReturnData = apiQuery(stockQuote, symbol);
-    if (!apiStatusCheck(apiReturnData.response.status)) {
+    const apiReturnData = await apiQuery(stockQuote, symbol);
+    console.log(apiReturnData.status);
+    if (!apiStatusCheck(apiReturnData.status)) {
       return false;
     }
-    // console.log(apiReturnData.then(response => response.body));
-    // saveDocsInDB(apiReturnData.then(response => response.body), symbol, Date.now(), stockQuoteModel);
     // const lastTenStockInsiderTradingAPICall = apiQueryBody(lastTenStockInsiderTrading, symbol);
     // console.log(lastTenStockInsiderTradingAPICall);
     // updateDocsInDB(lastTenStockInsiderTradingAPICall, symbol, Date.now(), stockInsiderTradingModel);
-    return apiReturnData.response.body;
+    console.log("..")
+    const data = await apiReturnData.json()
+    saveDocsInDB(data, symbol, Date.now(), StockQuoteModel);
+    console.log(data.symbol);
+    return data;
   }
   return false;
 }
@@ -97,14 +103,12 @@ function getDocsFromDb(symbol, model) {
 
 // create db docs
 async function saveDocsInDB(docs, symbol, inputTime, model) {
-  const res = await model.save({ symbol: symbol }, { lastUpdated: inputTime, docs: docs });
-  console.log(res.acknowledged);
-  console.log(res.upsertedId);
+  await model.create({ symbol: symbol, lastUpdated: inputTime, docs: docs });
 }
 
 // update db docs
 async function updateDocsInDB(docs, symbol, inputTime, model) {
-  const res = await model.updateOne({ symbol: symbol }, { lastUpdated: inputTime, docs: docs }, { upsert: true });
+  const res = await model.updateOne({ symbol: symbol, lastUpdated: inputTime, docs: docs }, { upsert: true });
   console.log(res.acknowledged);
   console.log(res.upsertedId);
 }
@@ -211,7 +215,7 @@ async function apiQueryBody(query, symbol, lastUpdated) {
 
 async function apiQuery(query, symbol, lastUpdated) {
   const response = await fetch(query(symbol, lastUpdated));
-  return response.body;
+  return response;
 }
   
 // res.headers('HTTP/2') or res.statusCode

@@ -1,5 +1,6 @@
 const IEX_BASE_API = 'https://sandbox.iexapis.com/stable/'
 const IEX_BASE_API_TIMES_SERIES = 'https://sandbox.iexapis.com/stable/time-series/'
+const IEX_PUBLIC_TOKEN = process.env.IEX_PUBLIC_TOKEN
 
 
 // STOCKS
