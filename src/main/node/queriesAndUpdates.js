@@ -1,7 +1,6 @@
 import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime, isPast } from 'date-fns';
 
-import stockRelationships from './relationships';
-import firstRunSRelationships from './firstRunRelationships';
+import firstRunRelationships from './firstRunRelationships';
 import { stockQuote, lastTenStockInsiderTrading } from '../../pages/api/iex/IEXQueries';
 import StockQuoteModel from './database/models/Stocks/Quote';
 import StockInsiderTradingModel from './database/models/Stocks/InsiderTrading';
@@ -35,7 +34,7 @@ async function firstRunQueryAndSave(symbol) {
   const lastTenStockInsiderTradingAPICall = await apiQuery(lastTenStockInsiderTrading, symbol);
   const lastTenInsiderJson = await lastTenStockInsiderTradingAPICall.json();
   saveDocsInDB(lastTenInsiderJson, symbol, Date.now(), StockInsiderTradingModel);
-  firstRunSRelationships.forEach((async (value, key) => {
+  firstRunRelationships().forEach((async (value, key) => {
     const apiData = await apiQuery(value, symbol);
     if (apiStatusCheck(apiData.status)) {
       const apiJsonData = await apiData.json();
