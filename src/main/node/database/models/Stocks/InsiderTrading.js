@@ -7,4 +7,4 @@ const stockInsiderTrading = new Schema({
     docs: Array
 });
 
-function stockInsiderTradingModel() { mongoose.models.StockInsiderTradingModel || mongoose.model('StockInsiderTradingModel', stockInsiderTrading) }
+export default mongoose.model('StockInsiderTradingModel') || mongoose.model('StockInsiderTradingModel', stockInsiderTrading);

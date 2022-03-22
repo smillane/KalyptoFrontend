@@ -6,3 +6,5 @@ const treasuryQuote = new Schema({
     lastUpdated: Number,
     docs: Object
 })
+
+export default mongoose.model('TreasuryQuoteModel') || mongoose.model('TreasuryQuoteModel', treasuryQuote);

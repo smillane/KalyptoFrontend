@@ -8,4 +8,4 @@ const stockPreviousDividends = new Schema({
 });
 
 
-function stockPreviousDividendsModel() { mongoose.models.StockPreviousDividendsModel || mongoose.model('StockPreviousDividendsModel', stockPreviousDividends) }
+export default mongoose.model('StockPreviousDividendsModel') || mongoose.model('StockPreviousDividendsModel', stockPreviousDividends);

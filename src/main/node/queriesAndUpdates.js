@@ -2,6 +2,7 @@ import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime, isPast } 
 
 import { stockQuote, lastTenStockInsiderTrading } from '../../pages/api/iex/IEXQueries';
 import StockQuoteModel from './database/models/Stocks/Quote';
+import StockInsiderTradingModel from './database/models/Stocks/InsiderTrading';
 
 // query to check if symbol exists and there is an API endpoint for it, if there is, will return data and update the db
 // other queries will then run afterwards, logic will be done on [stock] page
@@ -10,23 +11,22 @@ import StockQuoteModel from './database/models/Stocks/Quote';
 export async function queryExistsCheck(symbol) {
   const ModelSearch = await StockQuoteModel.exists({ symbol: symbol });
   if (ModelSearch) {
-    return ModelSearch
+    return true
   }
   if (!ModelSearch) {
     console.log(symbol);
-    const apiReturnData = await apiQuery(stockQuote, symbol);
-    console.log(apiReturnData.status);
-    if (!apiStatusCheck(apiReturnData.status)) {
+    const stockQuoteData = await apiQuery(stockQuote, symbol);
+    console.log(stockQuoteData.status);
+    if (!apiStatusCheck(stockQuoteData.status)) {
       return false;
     }
-    // const lastTenStockInsiderTradingAPICall = apiQueryBody(lastTenStockInsiderTrading, symbol);
-    // console.log(lastTenStockInsiderTradingAPICall);
-    // updateDocsInDB(lastTenStockInsiderTradingAPICall, symbol, Date.now(), stockInsiderTradingModel);
-    console.log("..")
-    const data = await apiReturnData.json()
-    saveDocsInDB(data, symbol, Date.now(), StockQuoteModel);
-    console.log(data.symbol);
-    return data;
+    const stockQuoteJson = await stockQuoteData.json();
+    saveDocsInDB(stockQuoteJson, symbol, Date.now(), StockQuoteModel);
+    const lastTenStockInsiderTradingAPICall = await apiQuery(lastTenStockInsiderTrading, symbol);
+    const lastTenJson = await lastTenStockInsiderTradingAPICall.json()
+    saveDocsInDB(lastTenJson, symbol, Date.now(), StockInsiderTradingModel);
+    console.log(stockQuoteJson.symbol);
+    return stockQuoteJson;
   }
   return false;
 }
@@ -207,15 +207,8 @@ function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
   return docs.docs;
 }
 
-// query api, and return data
-async function apiQueryBody(query, symbol, lastUpdated) {
-  const response = await fetch(query(symbol, lastUpdated)).then(response => response.body);
-  return response;
-}
-
 async function apiQuery(query, symbol, lastUpdated) {
-  const response = await fetch(query(symbol, lastUpdated));
-  return response;
+  return await fetch(query(symbol, lastUpdated));
 }
   
 // res.headers('HTTP/2') or res.statusCode

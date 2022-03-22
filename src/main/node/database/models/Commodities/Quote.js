@@ -6,3 +6,5 @@ const commodityQuote = new Schema({
     lastUpdated: Number,
     docs: Object
 })
+
+export default mongoose.model('CommodityQuoteModel') || mongoose.model('CommodityQuoteModel', commodityQuote);

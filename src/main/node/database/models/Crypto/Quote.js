@@ -6,3 +6,5 @@ const cryptoQuote = new Schema({
     lastUpdated: Number,
     docs: Object
 })
+
+export default mongoose.model('CryptoQuoteModel') || mongoose.model('CryptoQuoteModel', cryptoQuote);

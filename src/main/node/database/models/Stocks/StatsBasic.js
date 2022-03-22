@@ -7,4 +7,4 @@ const stockStatsBasic = new Schema({
     docs: Object
 });
 
-function stockStatsBasicModel() { mongoose.models.StockStatsBasicModel || mongoose.model('StockStatsBasicModel', stockStatsBasic) }
+export default mongoose.model('StockStatsBasicModel') || mongoose.model('StockStatsBasicModel', stockStatsBasic);
