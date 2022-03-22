@@ -1,5 +1,7 @@
 import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime, isPast } from 'date-fns';
 
+import stockRelationships from './relationships';
+import firstRunSRelationships from './firstRunRelationships';
 import { stockQuote, lastTenStockInsiderTrading } from '../../pages/api/iex/IEXQueries';
 import StockQuoteModel from './database/models/Stocks/Quote';
 import StockInsiderTradingModel from './database/models/Stocks/InsiderTrading';
@@ -11,7 +13,7 @@ import StockInsiderTradingModel from './database/models/Stocks/InsiderTrading';
 export async function queryExistsCheck(symbol) {
   const ModelSearch = await StockQuoteModel.exists({ symbol: symbol });
   if (ModelSearch) {
-    return true
+    return true;
   }
   if (!ModelSearch) {
     console.log(symbol);
@@ -22,19 +24,25 @@ export async function queryExistsCheck(symbol) {
     }
     const stockQuoteJson = await stockQuoteData.json();
     saveDocsInDB(stockQuoteJson, symbol, Date.now(), StockQuoteModel);
-    const lastTenStockInsiderTradingAPICall = await apiQuery(lastTenStockInsiderTrading, symbol);
-    const lastTenJson = await lastTenStockInsiderTradingAPICall.json()
-    saveDocsInDB(lastTenJson, symbol, Date.now(), StockInsiderTradingModel);
     console.log(stockQuoteJson.symbol);
-    return stockQuoteJson;
+    firstRunQueryAndSave(symbol);
+    return true;
   }
   return false;
 }
 
-async function firstRunSaveAndQuery(symbol) {
-
+async function firstRunQueryAndSave(symbol) {
+  const lastTenStockInsiderTradingAPICall = await apiQuery(lastTenStockInsiderTrading, symbol);
+  const lastTenInsiderJson = await lastTenStockInsiderTradingAPICall.json();
+  saveDocsInDB(lastTenInsiderJson, symbol, Date.now(), StockInsiderTradingModel);
+  firstRunSRelationships.forEach((async (value, key) => {
+    const apiData = await apiQuery(value, symbol);
+    if (apiStatusCheck(apiData.status)) {
+      const apiJsonData = await apiData.json();
+      saveDocsInDB(apiJsonData, symbol, Date.now(), key)
+    }
+  }))
 }
-
 
 // for queries that will be updated every 5 minutes
 export async function updateAndReplace(symbol, query, model, basicQuoteBool, onceDailyBool) {
@@ -222,13 +230,4 @@ function apiStatusCheck(apiStatus) {
     return false;
   }
   return true;
-}
-
-
-
-// return notFound: true to return a 404 error page
-function returnNotFound() {
-  return {
-    notFound: true
-  }
 }
