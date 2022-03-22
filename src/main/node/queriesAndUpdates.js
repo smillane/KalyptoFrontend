@@ -16,14 +16,14 @@ export async function queryExistsCheck(symbol) {
   }
   if (!ModelSearch) {
     console.log(symbol);
-    const stockQuoteData = await apiQuery(stockQuote, symbol);
-    console.log(stockQuoteData.status);
-    if (!apiStatusCheck(stockQuoteData.status)) {
+    const apiData = await apiQuery(stockQuote, symbol);
+    console.log(apiData.status);
+    if (!apiStatusCheck(apiData.status)) {
       return false;
     }
-    const stockQuoteJson = await stockQuoteData.json();
-    saveDocsInDB(stockQuoteJson, symbol, Date.now(), StockQuoteModel);
-    console.log(stockQuoteJson.symbol);
+    const jsonDocs = await apiData.json();
+    saveDocsInDB(jsonDocs, symbol, Date.now(), StockQuoteModel);
+    console.log(jsonDocs.symbol);
     firstRunQueryAndSave(symbol);
     return true;
   }
@@ -53,8 +53,9 @@ async function firstRunQueryAndSave(symbol) {
 export async function updateAndReplace(symbol, query, model, basicQuoteBool, onceDailyBool) {
   const modelSearch = await model.exists({ symbol: symbol });
   if (!modelSearch) {
-    const docsFromAPI = apiQueryBody(query, symbol);
-    updateDocsInDB(docsFromAPI, symbol, Date.now(), model);
+    const apiData = await apiQuery(query, symbol);
+    const jsonDocs = await apiData.json();
+    updateDocsInDB(jsonDocs, symbol, Date.now(), model);
     return docsFromAPI;
   }
 
@@ -82,18 +83,20 @@ export async function updateAndReplace(symbol, query, model, basicQuoteBool, onc
     }
   }
 
-  const docsFromAPI = apiQueryBody(query, symbol);
-  updateDocsInDB(docsFromAPI, symbol, Date.now(), model);
-  return docsFromAPI;
+  const apiData = apiQuery(query, symbol);
+  const jsonDocs = await apiData.json();
+  updateDocsInDB(jsonDocs, symbol, Date.now(), model);
+  return jsonDocs;
 }
 
 // for queries that will be updated and added to previous docs
 export async function updateOnIntervalsAndAdd(symbol, query, model, nextQuery) {
   const modelSearch = await model.exists({ symbol: symbol });
   if (!modelSearch) {
-    const docsFromAPI = apiQueryBody(query, symbol);
-    updateDocsInDB(docsFromAPI, symbol, Date.now(), model);
-    return docsFromAPI;
+    const apiData = await apiQuery(query, symbol);
+    const jsonDocs = await apiData.json();
+    updateDocsInDB(jsonDocs, symbol, Date.now(), model);
+    return jsonDocs;
   }
   const docsFromDb = getDocsFromDb(symbol, model);
   updateNext(symbol, query, docsFromDb, nextQuery, model);
@@ -103,15 +106,16 @@ export async function updateOnIntervalsAndAdd(symbol, query, model, nextQuery) {
 export async function findAndReturn(symbol, query, model) {
   const modelSearch = await model.exists({ symbol: symbol });
   if (!modelSearch) {
-    const docsFromApi = apiQueryBody(query, symbol);
-    updateDocsInDB(docsFromApi, symbol, Date.now(), model);
-    return docsFromApi;
+    const apiData = await apiQuery(query, symbol);
+    const jsonDocs = await apiData.json();
+    updateDocsInDB(jsonDocs, symbol, Date.now(), model);
+    return jsonDocs;
   }
   return getDocsFromDb(symbol, model).docs;
 }
 
-function getDocsFromDb(symbol, model) {
-  return model.find({ symbol: symbol });
+async function getDocsFromDb(symbol, model) {
+  return await model.find({ symbol: symbol });
 }
 
 // create db docs
@@ -129,8 +133,9 @@ async function updateDocsInDB(docs, symbol, inputTime, model) {
 async function updateListInDB(symbol, query, lastUpdated, model) {
   // ?from={CURRENT DATE}}&limit=(probably 10 or 15?, can adjust based off API usage, 
   // don't want too small, but don't want too big incase it hasn't been updated in a while)
-  const docsFromAPI = apiQueryBody(query, symbol, lastUpdated);
-  const res = await model.updateOne({ symbol: symbol }, { lastUpdated: Date.now(), $push: { docs: docsFromAPI } });
+  const apiData = apiQuery(query, symbol, lastUpdated);
+  const jsonDocs = await apiData.json();
+  const res = await model.updateOne({ symbol: symbol }, { lastUpdated: Date.now(), $push: { docs: jsonDocs } });
   console.log(res.acknowledged);
   console.log(res.upsertedId);
   return getDocsFromDb(symbol, model);
@@ -207,21 +212,24 @@ function updateOnceADayQuery(docsFromDb, symbol, query, model) {
 // EXAMPLE
 // will add nextDividend to previousDividends, once date passes and there is a new nextDividend
 // will then query the new nextDividend, and update nextDividend endpoint in db
-function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
+async function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
   const formattedLastUpdateInHours = parseInt(formatDistanceToNowStrict(docs.lastUpdated, {unit: 'hour'}).split(" ")[0])
 
   if (isPast(docs.lastUpdated) && formattedLastUpdateInHours > 24) {
     const currentTime = Date.now()
     addDocsInDB(docs, listOfPreviousQuery, symbol, currentTime, model);
-    const docsFromAPI = apiQueryBody(query, symbol);
-    updateDocsInDB(docsFromAPI, symbol, currentTime, model);
-    return docsFromAPI.body;
+    const apiData = await apiQuery(query, symbol);
+    const jsonDocs = await apiData.json();
+    updateDocsInDB(jsonDocs, symbol, currentTime, model);
+    return jsonDocs.body;
   }
   return docs.docs;
 }
 
 async function apiQuery(query, symbol, lastUpdated) {
-  return await fetch(query(symbol, lastUpdated));
+  const apiData = await fetch(query(symbol, lastUpdated));
+  sleep(200);
+  return apiData;
 }
   
 // res.headers('HTTP/2') or res.statusCode
