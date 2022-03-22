@@ -34,11 +34,17 @@ async function firstRunQueryAndSave(symbol) {
   const lastTenStockInsiderTradingAPICall = await apiQuery(lastTenStockInsiderTrading, symbol);
   const lastTenInsiderJson = await lastTenStockInsiderTradingAPICall.json();
   saveDocsInDB(lastTenInsiderJson, symbol, Date.now(), StockInsiderTradingModel);
-  firstRunRelationships().forEach((async (value, key) => {
+  firstRunRelationships.forEach((async (value, key) => {
     const apiData = await apiQuery(value, symbol);
     if (apiStatusCheck(apiData.status)) {
       const apiJsonData = await apiData.json();
+      console.log(apiJsonData);
       saveDocsInDB(apiJsonData, symbol, Date.now(), key)
+    }
+    else {
+      console.log(value);
+      console.log(apiData.statusText);
+      console.log(apiData.status);
     }
   }))
 }
