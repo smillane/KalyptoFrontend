@@ -6,4 +6,6 @@ import StockPreviousDividendsModel from './database/models/Stocks/PreviousDivide
 import StockNextDividendsModel from './database/models/Stocks/NextDividends'
 import { stockQuote, stockStatsBasic, stockLargestTrades, stockInsiderTrading, stockPreviousDividends, stockNextDividends } from '../../pages/api/iex/IEXQueries'
 
-export const stockRelationships = new Map([[StockQuoteModel, stockQuote], [StockStatsBasicModel, stockStatsBasic], [StockLargestTradesModel,stockLargestTrades], [StockInsiderTradingModel, stockInsiderTrading], [StockPreviousDividendsModel, stockPreviousDividends], [StockNextDividendsModel, stockNextDividends]]);
+const stockRelationships = new Map([[StockQuoteModel, stockQuote], [StockStatsBasicModel, stockStatsBasic], [StockLargestTradesModel,stockLargestTrades], [StockInsiderTradingModel, stockInsiderTrading], [StockPreviousDividendsModel, stockPreviousDividends], [StockNextDividendsModel, stockNextDividends]]);
+
+export default stockRelationships;

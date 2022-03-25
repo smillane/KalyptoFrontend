@@ -4,7 +4,7 @@ Work in progress.
 
 
 
-
+add SEC documents using edgar
 
 if query not found, add logic to not save to db, and return 404 not found page.
 

@@ -28,9 +28,9 @@ export async function getServerSideProps(context) {
 
   const stock = context.params.stock;
   const apiData = await queryExistsCheck(stock);
-  const updateAndReplaceQueries = new Map([[StockQuoteModel, [true, false]], [StockStatsBasicModel, [false, false]], [StockLargestTradesModel, [false, false]], [StockInsiderTradingModel, [false, true]]]);
-  const updateOnIntervalsAndAddQueries = [StockNextDividendsModel];
-  const findAndReturnQueries = [StockPreviousDividendsModel];
+  // const updateAndReplaceQueries = new Map([[StockQuoteModel, [true, false]], [StockStatsBasicModel, [false, false]], [StockLargestTradesModel, [false, false]], [StockInsiderTradingModel, [false, true]]]);
+  // const updateOnIntervalsAndAddQueries = [StockNextDividendsModel];
+  // const findAndReturnQueries = [StockPreviousDividendsModel];
 
   if (!apiData) {
     return {

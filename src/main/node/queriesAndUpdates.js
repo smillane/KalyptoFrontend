@@ -1,5 +1,8 @@
 import { differenceInSeconds, formatDistanceToNowStrict, fromUnixTime, isPast } from 'date-fns';
+import Bottleneck from "bottleneck";
+import mongoose from 'mongoose';
 
+import modelInitializer from '../node/database/models/ModelsInitializer'
 import firstRunRelationships from './firstRunRelationships';
 import { stockQuote, lastTenStockInsiderTrading } from '../../pages/api/iex/IEXQueries';
 import StockQuoteModel from './database/models/Stocks/Quote';
@@ -10,6 +13,9 @@ import StockInsiderTradingModel from './database/models/Stocks/InsiderTrading';
 // check if query is in db, if it's not, check API, if doesn't exist, return 404, symbol is not supported
 // if stock exists, will then call lastTenStockInsiderTrading, and save api data to db
 export async function queryExistsCheck(symbol) {
+  if (!StockQuoteModel) {
+    modelInitializer();
+  }
   const ModelSearch = await StockQuoteModel.exists({ symbol: symbol });
   if (ModelSearch) {
     return true;
@@ -227,8 +233,7 @@ async function updateNext(symbol, query, docs, listOfPreviousQuery, model) {
 }
 
 async function apiQuery(query, symbol, lastUpdated) {
-  const apiData = await fetch(query(symbol, lastUpdated));
-  sleep(200);
+  const apiData = await limiter.schedule(() => fetch(query(symbol, lastUpdated)));
   return apiData;
 }
   
@@ -244,3 +249,9 @@ function apiStatusCheck(apiStatus) {
   }
   return true;
 }
+
+
+// rate limits to 1 request per 10ms
+const limiter = new Bottleneck({
+  minTime: 10
+});
