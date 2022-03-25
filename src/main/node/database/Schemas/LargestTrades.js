@@ -7,4 +7,4 @@ const stockLargestTradesSchema = new Schema({
     docs: Object
 });
 
-export default stockLargestTradesSchema;
+export default mongoose.model('stockLargestTradesModel') || mongoose.model('stockLargestTradesModel', stockLargestTradesSchema);

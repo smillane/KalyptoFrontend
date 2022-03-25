@@ -7,4 +7,4 @@ const stockPreviousDividendSchema = new Schema({
     docs: Array
 });
 
-export default stockPreviousDividendSchema;
+export default mongoose.model('stockPreviousDividendModel') || mongoose.model('stockPreviousDividendModel', stockPreviousDividendSchema);

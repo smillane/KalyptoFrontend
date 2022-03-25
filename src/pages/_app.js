@@ -6,6 +6,8 @@ export default function App({ Component, pageProps }) {
   const { user } = pageProps;
   
   return (
+    <UserProvider>
       <Component {...pageProps} />
+    </UserProvider>
   );
 }
