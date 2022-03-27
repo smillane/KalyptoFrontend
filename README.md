@@ -1,4 +1,6 @@
-Stock app for displaying various market information.
+Front end for Stock app for displaying various market information.
+
+Backend located https://github.com/smillane/StockAppBackend
 
 Work in progress.
 
