@@ -136,7 +136,7 @@ async function updateListInDB(symbol, query, lastUpdated, model) {
   // don't want too small, but don't want too big incase it hasn't been updated in a while)
   const apiData = apiQuery(query, symbol, lastUpdated);
   const jsonDocs = await apiData.json();
-  const res = await model.updateOne({ symbol: symbol }, { lastUpdated: Date.now(), $push: { docs: jsonDocs } });
+  const res = await model.updateOne({ symbol: symbol,lastUpdated: Date.now(), $push: { docs: jsonDocs } });
   console.log(res.acknowledged);
   console.log(res.upsertedId);
   return getDocsFromDb(symbol, model);
@@ -146,7 +146,7 @@ async function updateListInDB(symbol, query, lastUpdated, model) {
 // maybe use addToSet?
 // The $addToSet operator adds a value to an array unless the value is already present, in which case $addToSet does nothing to that array.
 async function addDocsInDB(docs, symbol, inputTime, model) {
-  const res = await model.updateOne({ symbol: symbol }, { lastUpdated: inputTime, $push: { docs: docs } } )
+  const res = await model.updateOne({ symbol: symbol, lastUpdated: inputTime, $push: { docs: docs } } )
   console.log(res.acknowledged);
   console.log(res.upsertedId);
 }
