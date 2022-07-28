@@ -1,20 +1,42 @@
-import nav from './nav'
-import meta from './meta'
-import header from './header'
+import Meta from './meta'
 
-const layout = ({ children }) => {
+import {
+  AppShell,
+  Header,
+  Footer,
+  Text,
+  useMantineTheme,
+} from '@mantine/core';
+
+const Layout = ({ children }) => {
+  const theme = useMantineTheme();
+
   return (
-    <>
-      <meta />
-      <nav />
-      <div className={styles.container}>
-        <main className={styles.main}>
-          <header />
-          {children}
-        </main>
-      </div>
-    </>
+    <AppShell
+      styles={{
+        main: {
+          background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
+        },
+      }}
+      footer={
+        <Footer height={60} p="md">
+          Application footer
+        </Footer>
+      }
+      header={
+        <Header height={70} p="md">
+          <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            <Text>Application header</Text>
+          </div>
+        </Header>
+      }
+    >
+      <Meta />
+      <main>
+        {children}
+      </main>
+    </AppShell>
   )
 }
 
-export default layout
+export default Layout
