@@ -6,6 +6,7 @@ import {
   Footer,
   Text,
   useMantineTheme,
+  Container
 } from '@mantine/core';
 
 const Layout = ({ children }) => {
@@ -26,15 +27,17 @@ const Layout = ({ children }) => {
       header={
         <Header height={70} p="md">
           <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <Text>Application header</Text>
+            <Text>Kalypto</Text>
           </div>
         </Header>
       }
     >
       <Meta />
-      <main>
-        {children}
-      </main>
+      <Container>
+        <main>
+          {children}
+        </main>
+      </Container>
     </AppShell>
   )
 }

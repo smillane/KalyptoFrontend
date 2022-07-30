@@ -13,7 +13,7 @@ export default function Stock({ stockInformation, tempList }) {
       <h4>{router.query.stock}</h4>
       <p>{stockInformation.symbol}</p>
       <p>{stockInformation.latestPrice}</p>
-      <StockList value={tempList}/>
+      <StockList props={tempList}/>
     </Layout>
   )
 }
@@ -25,7 +25,7 @@ export async function getServerSideProps(context) {
 
   const stockInformation = `{"symbol": "${context.params.stock}", "latestPrice": 162}`
   const tempList = new Array([{"name": "tech", "list": {"amd": 102, "nvda": 170}}, {"name": "oil", "list": {"bp": 40, "shell": 50}}]);
-  
+
   if (!stockInformation) {
     return {
       notFound: true
