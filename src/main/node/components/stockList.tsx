@@ -1,11 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
-import { Accordion, ActionIcon, AccordionControlProps, Box, List, Button, Input, Dialog, TextInput, Text, Group } from '@mantine/core';
-import { IconDots } from '@tabler/icons';
-
-function SetListName(name) {
-
-}
+import { Alert, Container, ActionIcon, Group, Space, Accordion, Text, AccordionControlProps, Box, List, Button, TextInput, Collapse, Divider } from '@mantine/core';
+import { IconDots, IconPlus } from '@tabler/icons';
 
 function AccordionControl(props: AccordionControlProps) {
   const [listName, setListName] = useState();
@@ -21,41 +17,92 @@ function AccordionControl(props: AccordionControlProps) {
 }
 
 export default function StockList(props) {
-  const emptyList = new Array()
-  const UserStockLists = new Array([{"name": "tech", "list": {"amd": 102, "nvda": 170}}, {"name": "oil", "list": {"bp": 40, "shell": 50}}]);
+  type lists = Record<string, Record<string, number>>
 
+  const emptyList = new Array();
+  const UserStockLists: Array<lists> = [{"tech": {"amd": 102, "nvda": 170}}, {"oil": {"bp": 40, "shell": 50}}];
+  const UserStockLists2 = [{"tech": {"amd": 102, "nvda": 170}}, {"oil": {"bp": 40, "shell": 50}}];
+
+  const [listFromDB, setUpdatedList] = useState(UserStockLists);
   const [opened, setOpened] = useState(false);
+  const [error, setError] = useState<string>()
+  const [value, setValue] = useState<string>();
   
-  if (emptyList === undefined || emptyList.length === 0) {
+  if (!Array.isArray(listFromDB) || !listFromDB.length) {
     return (
-      <Accordion chevronPosition="left" sx={{ maxWidth: 800 }} mx="auto" style={{ flex: 1, alignItems: "stretch" }}>
-      <Accordion.Item value="list">
-      <AccordionControl>Add</AccordionControl>
-      <Accordion.Panel>
-        <TextInput placeholder="Name your list!" style = {{ flex: 1 }} rightSection={<Button variant="outline" color="dark">Add</Button>} rightSectionWidth={61} required={true}/>
-        {/* <Button onClick={() => addListHandler()}>Add</Button> */}
-        <Button variant="outline" color="dark" style = {{ flex: 1 }}>Add</Button>
-      </Accordion.Panel>
-      </Accordion.Item>
-      </Accordion>
+      <Container size={200}>
+        <Group position="apart" sx={{ width: 200 }}>
+          <Text size="lg">Lists</Text>
+          <Space w="md" />
+          <ActionIcon color="dark" onClick={() => setOpened(true)}>
+            <IconPlus size={16}/>
+          </ActionIcon>
+        </Group>
+        <Space h="sm" />
+        <Collapse in={opened} sx={{ width: 200 }}>
+          <TextInput placeholder="Name your list!" error={error} value={value} 
+          onChange={(event) => setValue(event.currentTarget.value)} />
+          <Space h="xs" />
+          <Group position="apart">
+            <Button variant="outline" color="dark" onClick={() => setOpened(false)}>Cancel</Button>
+            <Button variant="outline" color="dark" 
+                    onClick={() => addListHandler("userId", value)
+                    .then(() => {
+                      const temp: lists = `{${value}: {"test": 12}}`;
+                      setUpdatedList(UserStockLists.concat([]));
+                      setOpened(false);})
+                    .catch((err) => {
+                      console.log(err);
+                      setOpened(true);
+                      setError("There was an error, please try again");})}>Add</Button>
+          </Group>
+        </Collapse>
+      </Container>
   );
   }
   else {
     return (
-      <Accordion chevronPosition="left" sx={{ maxWidth: 400 }} mx="auto">
-        {UserStockLists.map((it) => it.map((temp) => 
-        <Accordion.Item value={temp.name} key={temp.name}>
-        <AccordionControl>{temp.name}</AccordionControl>
+      <Container size={200}>
+        <Group position="apart" sx={{ width: 200 }}>
+          <Text size="lg">Lists</Text>
+          <Space w="md" />
+          <ActionIcon color="dark" onClick={() => setOpened(true)}>
+            <IconPlus size={16}/>
+          </ActionIcon>
+        </Group>
+        <Space h="sm" />
+        <Collapse in={opened} sx={{ width: 200 }}>
+          <TextInput placeholder="Name your list!" error={error} value={value} 
+          onChange={(event) => setValue(event.currentTarget.value)} />
+          <Space h="xs" />
+          <Group position="apart">
+            <Button variant="outline" color="dark" onClick={() => setOpened(false)}>Cancel</Button>
+            <Button variant="outline" color="dark" 
+                    onClick={() => addListHandler("userId", value)
+                    .then(() => {
+                      setUpdatedList(UserStockLists.concat(value));
+                      setOpened(false);})
+                    .catch((err) => {
+                      console.log(err);
+                      setOpened(true);
+                      setError("There was an error, please try again");})}>Add</Button>
+          </Group>
+        </Collapse>
+      <Accordion multiple={true} chevronPosition="left" sx={{ width: 200 }} mx="auto">
+        {listFromDB.map((it) => Object.entries(it).map(([key, values]) => 
+        <Accordion.Item value={key} key={key}>
+        <AccordionControl>{key}</AccordionControl>
         <Accordion.Panel>
           <List>
-            {Object.entries(temp.list).map(([key, value]) => 
-            <List.Item key={key}>{key}: {value}</List.Item>
+            {Object.entries(values).map(([valueKey, valueValue]) => 
+            <List.Item key={valueKey}>{valueKey}: {valueValue}</List.Item>
             )}
           </List>
         </Accordion.Panel>
         </Accordion.Item>
         ))}
       </Accordion>
+      </Container>
     );
   }
 }
@@ -79,14 +126,14 @@ export async function getServerSideProps(userID, context) {
 }
 
 export async function addListHandler(userID, lists) {
-
-  fetch(`http://localhost:8080/users/${userID}/list`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(lists),
-  });
+  console.log(userID, lists)
+  // fetch(`http://localhost:8080/users/${userID}/list`, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify(lists),
+  // });
 }
 
 export async function updateListHandler(userID, list) {
