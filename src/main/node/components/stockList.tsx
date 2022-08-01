@@ -25,8 +25,8 @@ export default function StockList(props) {
 
   const [listFromDB, setUpdatedList] = useState(UserStockLists);
   const [opened, setOpened] = useState(false);
-  const [error, setError] = useState<string>()
-  const [value, setValue] = useState<string>();
+  const [error, setError] = useState<string>('')
+  const [value, setValue] = useState<string>('');
   
   if (!Array.isArray(listFromDB) || !listFromDB.length) {
     return (
@@ -48,8 +48,10 @@ export default function StockList(props) {
             <Button variant="outline" color="dark" 
                     onClick={() => addListHandler("userId", value)
                     .then(() => {
-                      const temp: lists = `{${value}: {"test": 12}}`;
-                      setUpdatedList(UserStockLists.concat([]));
+                      const temp = {};
+                      temp[value] = {};
+                      setValue('');
+                      setUpdatedList(UserStockLists.concat([temp]));
                       setOpened(false);})
                     .catch((err) => {
                       console.log(err);
@@ -80,7 +82,10 @@ export default function StockList(props) {
             <Button variant="outline" color="dark" 
                     onClick={() => addListHandler("userId", value)
                     .then(() => {
-                      setUpdatedList(UserStockLists.concat(value));
+                      const temp = {};
+                      temp[value] = {};
+                      setValue('');
+                      setUpdatedList(UserStockLists.concat([temp]));
                       setOpened(false);})
                     .catch((err) => {
                       console.log(err);
