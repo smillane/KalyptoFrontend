@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
-import { Alert, Container, ActionIcon, Group, Space, Accordion, Text, AccordionControlProps, Box, List, Button, TextInput, Collapse, Divider } from '@mantine/core';
-import { IconDots, IconPlus } from '@tabler/icons';
+import { Menu, Alert, Container, ActionIcon, Group, Space, Accordion, Text, AccordionControlProps, Box, List, Button, TextInput, Collapse, Divider } from '@mantine/core';
+import { IconDots, IconPlus, IconSettings } from '@tabler/icons';
 
 function AccordionControl(props: AccordionControlProps) {
   const [listName, setListName] = useState();
@@ -9,9 +9,18 @@ function AccordionControl(props: AccordionControlProps) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Accordion.Control {...props} />
-      <ActionIcon size="lg">
-        <IconDots size={16} />
-      </ActionIcon>
+      <Menu>
+      <Menu.Target>
+        <ActionIcon size="lg">
+          <IconDots size={16} />
+        </ActionIcon>
+      </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item>
+          <Menu.Item icon={<IconSettings size={14} />}>Rename</Menu.Item>
+          <Menu.Item icon={<IconSettings size={14} />}>Delete</Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
     </Box>
   );
 }
