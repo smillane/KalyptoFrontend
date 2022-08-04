@@ -19,10 +19,11 @@ function AccordionControl(props, accControlProps: AccordionControlProps) {
           <Menu.Item icon={<IconSettings size={14} />} onClick={() => updateListNameHandler("userId", name)}>Rename</Menu.Item>
           <Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item>
           <Menu.Item icon={<IconSettings size={14} />} onClick={
-            (e) => deleteListNameHandler("userId", e)
+            (i) => deleteListNameHandler("userId", i)
             .then(() => {
               const newList = props.listFromDB.filter(i => !i.hasOwnProperty(props.listName))
               console.log(newList)
+              console.log(props.listName)
               props.setUpdatedList(newList)})}>Delete</Menu.Item>
         </Menu.Dropdown>
       </Menu>
