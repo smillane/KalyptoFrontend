@@ -1,49 +1,21 @@
-import { useUser } from '@auth0/nextjs-auth0';
 import Link from 'next/link'
+import { useSession, signIn, signOut } from "next-auth/react"
+import Layout from '../main/node/components/layout'
 
 export default function Index() {
-  const { user, error, isLoading } = useUser();
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
-
-  if (user) {
+  const { data: session } = useSession()
+  if (session) {
     return (
-      <div className="container">
-        <main>
-          <header />
-          <h1>test</h1>
-          <div>
-            Welcome {user.name}! <Link href="/api/auth/logout">Logout</Link>
-          </div>
-          <layout />
-        </main>
-  
-        <footer>
-          <a>
-            footer
-          </a>
-        </footer>
-      </div>
-    );
+      <Layout>
+        Signed in as {session.user.email} <br />
+        <button onClick={() => signOut()}>Sign out</button>
+      </Layout>
+    )
   }
-  
   return (
-    <div className="container">
-      <main>
-        <header />
-        <h1>test</h1>
-        <div>
-          <Link href="/api/auth/login">Login</Link>
-        </div>
-        <layout />
-      </main>
-
-      <footer>
-        <a>
-          footer
-        </a>
-      </footer>
-    </div>
-    );
+    <Layout>
+      Not signed in <br />
+      <button onClick={() => signIn()}>Sign in</button>
+    </Layout>
+  )
 };

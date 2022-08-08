@@ -3,12 +3,11 @@ import { useState } from 'react';
 import { Menu, Container, ActionIcon, Group, Space, Accordion, Text, AccordionControlProps, Box, List, Button, TextInput, Collapse } from '@mantine/core';
 import { IconDots, IconPlus, IconSettings } from '@tabler/icons';
 
-function AccordionControl(props, accControlProps: AccordionControlProps) {
-  const [list, setList] = useState(props);
+function AccordionControl(props) {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Accordion.Control {...accControlProps} />
+      <Accordion.Control {...props} />
       <Menu>
       <Menu.Target>
         <ActionIcon size="lg">
@@ -21,10 +20,10 @@ function AccordionControl(props, accControlProps: AccordionControlProps) {
           <Menu.Item icon={<IconSettings size={14} />} onClick={
             (i) => deleteListNameHandler("userId", i)
             .then(() => {
-              const newList = props.listFromDB.filter(i => !i.hasOwnProperty(props.listName))
+              const newList = props.listfromdb.filter(i => !i.hasOwnProperty(props.listname))
               console.log(newList)
-              console.log(props.listName)
-              props.setUpdatedList(newList)})}>Delete</Menu.Item>
+              console.log(props.listname)
+              props.setupdatedlist(newList)})}>Delete</Menu.Item>
         </Menu.Dropdown>
       </Menu>
     </Box>
@@ -32,12 +31,9 @@ function AccordionControl(props, accControlProps: AccordionControlProps) {
 }
 
 export default function StockList(props) {
-  type lists = Record<string, Record<string, number>>
+  const UserStockLists: Array<Record<string, Array<string>>> = [{"tech": ["amd", "nvda", "net", "crwd"]}, {"oil": ["bp", "shel", "shell", "oxy"]}];
 
-  const emptyList = new Array();
-  const UserStockLists: Array<lists> = [{"tech": {"amd": 102, "nvda": 170}}, {"oil": {"bp": 40, "shell": 50}}];
-
-  const [listFromDB, setUpdatedList] = useState(UserStockLists);
+  const [listFromDB, setUpdatedList] = useState(props.tempList);
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState<string>('')
   const [value, setValue] = useState<string>('');
@@ -63,9 +59,9 @@ export default function StockList(props) {
                     onClick={() => addListHandler("userId", value)
                     .then(() => {
                       const newList = {};
-                      newList[value] = {};
+                      newList[value] = [];
+                      setUpdatedList(listFromDB.concat([newList]));
                       setValue('');
-                      setUpdatedList(UserStockLists.concat([newList]));
                       setOpened(false);})
                     .catch((err) => {
                       console.log(err);
@@ -97,9 +93,9 @@ export default function StockList(props) {
                     onClick={() => addListHandler("userId", value)
                     .then(() => {
                       const newList = {};
-                      newList[value] = {};
+                      newList[value] = [];
+                      setUpdatedList(listFromDB.concat([newList]));
                       setValue('');
-                      setUpdatedList(UserStockLists.concat([newList]));
                       setOpened(false);})
                     .catch((err) => {
                       console.log(err);
@@ -110,11 +106,11 @@ export default function StockList(props) {
       <Accordion multiple={true} chevronPosition="left" sx={{ width: 200 }} mx="auto">
         {listFromDB.map((it) => Object.entries(it).map(([key, values]) => 
         <Accordion.Item value={key} key={key}>
-        <AccordionControl listFromDB={listFromDB} listName={key} setUpdatedList={setUpdatedList}>{key}</AccordionControl>
+        <AccordionControl listfromdb={listFromDB} listname={key} setupdatedlist={setUpdatedList}>{key}</AccordionControl>
         <Accordion.Panel>
           <List>
-            {Object.entries(values).map(([valueKey, valueValue]) => 
-            <List.Item key={valueKey}>{valueKey}: {valueValue}</List.Item>
+            {values.map((stock) => 
+            <List.Item key={stock}>{stock}</List.Item>
             )}
           </List>
         </Accordion.Panel>
@@ -130,18 +126,18 @@ export default function StockList(props) {
 //if no lists, create an empty list with something such as "create a list to start tracking stocks"
 export async function getServerSideProps(userID, context) {
 
-  const res = await fetch(`http://localhost:8080/users/${userID}/list`);
-  const lists = await res.json();
+  // const res = await fetch(`http://localhost:8080/users/${userID}/list`);
+  // const lists = await res.json();
 
-  const templists = [{"tech": {"amd": 102, "nvda": 170}}, {"oil": {"bp": 40, "shell": 50}}];
+  // const tempList: Array<Record<string, Array<string>>> = [{"tech": ["amd", "nvda", "net", "crwd"]}, {"oil": ["bp", "shel", "shell", "oxy"]}];
 
-  if (!lists) {
-    return {
+  // if (!lists) {
+  //   return {
       
-    }
-  }
+  //   }
+  // }
 
-  return { props: { templists } }
+  return { props: { } }
 }
 
 export async function addListHandler(userID, lists) {
