@@ -12,7 +12,7 @@ export default function Stock({ stockInformation, tempList }) {
       <h1>stock quote</h1>
       <h4>{router.query.stock}</h4>
       <p>{stockInformation.symbol}</p>
-      <p>{stockInformation.latestPrice}</p>
+      <p>Latest Price: {stockInformation.latestPrice}</p>
       <StockList tempList={tempList}/>
     </Layout>
   )
@@ -23,7 +23,7 @@ export async function getServerSideProps(context) {
   // const res = await fetch(`http://localhost:8080/stocks/${context.params.stock}/quote`)
   // const stockInformation = await res.json()
 
-  const stockInformation = `{"symbol": "${context.params.stock}", "latestPrice": 162}`
+  const stockInformation = {"symbol": `${context.params.stock}`, "latestPrice": 162}
   const tempList = [{"tech": ["amd", "nvda", "net", "crwd"]}, {"oil": ["bp", "shel", "shell", "oxy"]}];
 
   if (!stockInformation) {
