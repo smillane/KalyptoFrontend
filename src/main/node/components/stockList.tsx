@@ -31,9 +31,10 @@ function AccordionControl(props) {
 }
 
 export default function StockList(props) {
+  type listFromDBType = Array<Record<string, Array<string>>>
   const UserStockLists: Array<Record<string, Array<string>>> = [{"tech": ["amd", "nvda", "net", "crwd"]}, {"oil": ["bp", "shel", "shell", "oxy"]}];
 
-  const [listFromDB, setUpdatedList] = useState(props.tempList);
+  const [listFromDB, setUpdatedList] = useState<listFromDBType>(props.tempList);
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState<string>('')
   const [value, setValue] = useState<string>('');
