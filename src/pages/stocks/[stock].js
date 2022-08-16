@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 
 import Layout from "../../main/node/components/layout"
-import StockList from "../../main/node/components/stockList"
+import Watchlist from "../../main/node/redux/features/userLists/Watchlist"
 
 // if user is not logged in with an account, only show a basic quote and chart
 export default function Stock({ stockInformation, tempList }) {
@@ -13,7 +13,7 @@ export default function Stock({ stockInformation, tempList }) {
       <h4>{router.query.stock}</h4>
       <p>{stockInformation.symbol}</p>
       <p>Latest Price: {stockInformation.latestPrice}</p>
-      <StockList tempList={tempList}/>
+      <Watchlist tempList={tempList}/>
     </Layout>
   )
 }

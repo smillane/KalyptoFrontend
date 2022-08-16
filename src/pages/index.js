@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { useSession, signIn, signOut } from "next-auth/react"
 import Layout from '../main/node/components/layout'
 
@@ -8,6 +7,7 @@ export default function Index() {
     return (
       <Layout>
         Signed in as {session.user.email} <br />
+        Access Token: {session.accessToken} <br />
         <button onClick={() => signOut()}>Sign out</button>
       </Layout>
     )
