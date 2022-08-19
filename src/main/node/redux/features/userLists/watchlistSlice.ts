@@ -7,6 +7,7 @@ const initialState = [
   {"oil": ["bp", "shel", "shell", "oxy"]}
 ];
 
+// add an async thunk for when the list is updated/changeOrder/addList to call API with necessary information
 const watchlistSlice = createSlice({
   name: 'watchlists',
   initialState,
