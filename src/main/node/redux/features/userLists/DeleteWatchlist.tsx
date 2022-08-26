@@ -3,7 +3,7 @@ import { Menu } from '@mantine/core';
 import { IconSettings } from '@tabler/icons';
 
 import { deleteListNameHandler } from './Watchlist';
-import { removeList } from './watchlistSlice';
+import { removeList } from './WatchlistSlice';
 
 export default function DeleteWatchlist(props) {
   const dispatch = useDispatch();
