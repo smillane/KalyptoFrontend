@@ -1,3 +1,9 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["airbnb", "airbnb/hooks", "next/core-web-vitals"],
+  "parserOptions": {
+    "project" : "./tsconfig.json"
+  },
+  "rules": {
+    "linebreak-style": ["error", "windows"]
+  }
 }
