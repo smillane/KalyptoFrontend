@@ -5,9 +5,9 @@ import { Container, ActionIcon, Group, Space, Text, Button, TextInput, Collapse 
 import { IconPlus } from '@tabler/icons';
 
 import { addListHandler } from './Watchlist';
-import { addList } from './WatchlistSlice';
+import { addList } from './WatchlistSlice'
 
-export const AddWatchlist = () => {
+export default function AddWatchlist() {
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState<string>('')
   const [listName, setListName] = useState<string>('');
@@ -59,5 +59,5 @@ export const AddWatchlist = () => {
         </Group>
       </Collapse>
     </Container>
-  )
+  );
 }

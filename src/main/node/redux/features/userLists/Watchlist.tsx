@@ -15,19 +15,16 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { IconDots, IconSettings } from '@tabler/icons';
-import { AddWatchlist } from './AddWatchlist';
+
+import AddWatchlist from './AddWatchlist';
 import DeleteWatchlist from './DeleteWatchlist';
 import EditWatchlistName from './EditWatchlistName';
-import { updateListName } from './watchlistSlice';
+import { updateListName } from './WatchlistSlice';
 
-export default function Watchlist(props) {
+function AccordionControl(props) {
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState<string>('');
   const [listName, setListName] = useState<string>('');
-
-	type listFromDBType = Array<Record<string, Array<string>>>;
-
-	const lists: listFromDBType = useSelector((state) => state.watchlists);
 
 	const onNewListNameChange = (e) => setListName(e.currentTarget.value);
 
@@ -35,29 +32,27 @@ export default function Watchlist(props) {
 
 	const dispatch = useDispatch();
 
-	function AccordionControl(props) {
-	  const oldName = props.listname;
-
-	  const onUpdateListClicked = () => {
-	    console.log('old name is', oldName);
-	    const list = lists.find((obj) => Object.keys(obj) == props.listname);
-	    console.log('found', list);
-	    if (listName.length != 0) {
-	      updateListNameHandler(props.userID, listName, list)
-	        .then(() => {
-	          dispatch(updateListName({ oldName, newName: listName }));
-	          setListName('');
-	          setOpened(false);
-	        })
-	        .catch((err) => {
-	          console.log(err);
-	          setOpened(true);
-	          setError('There was an error, please try again');
-	        });
-	    }
-	  };
-
-	  return (
+  const onUpdateListClicked = () => {
+    console.log('old name is', props.listname);
+    const list = props.lists.find((obj) => Object.keys(obj) == props.listname);
+    console.log('found', list);
+    if (listName.length != 0) {
+      updateListNameHandler(props.userID, listName, props.lists)
+      .then(() => {
+        dispatch(
+          updateListName({ oldName: props.listname, newName: listName }));
+        setListName('');
+        setOpened(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setOpened(true);
+        setError('There was an error, please try again');
+      });
+    }
+  };
+  
+  return (
   <>
     <Modal
       centered
@@ -103,12 +98,16 @@ export default function Watchlist(props) {
       </Menu>
     </Box>
   </>
-	  );
-	}
+  );
+}
+
+export default function Watchlist() {
+  type listFromDBType = Array<Record<string, Array<string>>>;
+  const lists: listFromDBType = useSelector((state) => state.watchlists);
 
 	if (!Array.isArray(lists) || !lists.length) {
-	  return <AddWatchlist />;
-	}
+    return <AddWatchlist />;
+  }
 	return (
   <Container size={200}>
     <AddWatchlist />
@@ -126,7 +125,7 @@ export default function Watchlist(props) {
             </List>
           </Accordion.Panel>
         </Accordion.Item>
-					  )))}
+        )))}
     </Accordion>
   </Container>
 	);
