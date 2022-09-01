@@ -20,84 +20,88 @@ import AddWatchlist from './AddWatchlist';
 import DeleteWatchlist from './DeleteWatchlist';
 import EditWatchlistName from './EditWatchlistName';
 import { updateListName } from './WatchlistSlice';
+import Link from 'next/link';
 
 function AccordionControl(props) {
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState<string>('');
   const [listName, setListName] = useState<string>('');
 
-	const onNewListNameChange = (e) => setListName(e.currentTarget.value);
+  const onNewListNameChange = (e) => setListName(e.currentTarget.value);
 
-	const theme = useMantineTheme();
+  const theme = useMantineTheme();
 
-	const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const onUpdateListClicked = () => {
     console.log('old name is', props.listname);
     const list = props.lists.find((obj) => Object.keys(obj) == props.listname);
     console.log('found', list);
-    if (listName.length != 0) {
+    if (listName.length !== 0) {
       updateListNameHandler(props.userID, listName, props.lists)
-      .then(() => {
-        dispatch(
-          updateListName({ oldName: props.listname, newName: listName }));
-        setListName('');
-        setOpened(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setOpened(true);
-        setError('There was an error, please try again');
-      });
+        .then(() => {
+          dispatch(
+            updateListName({ oldName: props.listname, newName: listName }),
+          );
+          setListName('');
+          setOpened(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setOpened(true);
+          setError('There was an error, please try again');
+        });
+    } else {
+      setError('Please input a name');
     }
   };
-  
-  return (
-  <>
-    <Modal
-      centered
-      opened={opened}
-      onClose={() => setOpened(false)}
-      title="Edit Watchlist Name"
-      overlayColor={theme.colors.gray[2]}
-    >
-      <TextInput
-        placeholder="Name your list!"
-        data-autofocus
-        error={error}
-        value={listName}
-        onChange={onNewListNameChange}
-      />
-      <Space h="xs" />
-      <Group position="apart">
-        <Button variant="outline" color="dark" onClick={() => setOpened(false)}>
-          Cancel
-        </Button>
-        <Button variant="outline" color="dark" onClick={onUpdateListClicked}>
-          Update
-        </Button>
-      </Group>
-    </Modal>
 
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Accordion.Control {...props} />
-      <Menu>
-        <Menu.Target>
-          <ActionIcon size="lg">
-            <IconDots size={16} />
-          </ActionIcon>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Item icon={<IconSettings size={14} />} onClick={() => setOpened(true)}>
-            Edit List Name
-          </Menu.Item>
-          <Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item>
-          <EditWatchlistName userID="userID" listname={props.listname} />
-          <DeleteWatchlist userID="userID" listname={props.listname} />
-        </Menu.Dropdown>
-      </Menu>
-    </Box>
-  </>
+  return (
+    <>
+      <Modal
+        centered
+        opened={opened}
+        onClose={() => {setOpened(false); setError('');}}
+        title="Edit Watchlist Name"
+        overlayColor={theme.colors.gray[2]}
+      >
+        <TextInput
+          placeholder="Name your list!"
+          data-autofocus
+          error={error}
+          value={listName}
+          onChange={onNewListNameChange}
+        />
+        <Space h="xs" />
+        <Group position="apart">
+          <Button variant="outline" color="dark" onClick={() => setOpened(false)}>
+            Cancel
+          </Button>
+          <Button variant="outline" color="dark" onClick={onUpdateListClicked}>
+            Update
+          </Button>
+        </Group>
+      </Modal>
+
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Accordion.Control {...props} />
+        <Menu>
+          <Menu.Target>
+            <ActionIcon size="lg">
+              <IconDots size={16} />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item icon={<IconSettings size={14} />} onClick={() => setOpened(true)}>
+              Edit List Name
+            </Menu.Item>
+            <Link href={`/watchlists/${props.listname}`}><Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item></Link>
+            <EditWatchlistName userID="userID" listname={props.listname} />
+            <DeleteWatchlist userID="userID" listname={props.listname} />
+          </Menu.Dropdown>
+        </Menu>
+      </Box>
+    </>
   );
 }
 
@@ -105,30 +109,30 @@ export default function Watchlist() {
   type listFromDBType = Array<Record<string, Array<string>>>;
   const lists: listFromDBType = useSelector((state) => state.watchlists);
 
-	if (!Array.isArray(lists) || !lists.length) {
+  if (!Array.isArray(lists) || !lists.length) {
     return <AddWatchlist />;
   }
-	return (
-  <Container size={200}>
-    <AddWatchlist />
-    <Accordion multiple chevronPosition="left" sx={{ width: 200 }} mx="auto">
-      {lists.map((it) => Object.entries(it).map(([key, values]) => (
-        <Accordion.Item value={key} key={key}>
-          <AccordionControl lists={lists} listname={key}>
-            {key}
-          </AccordionControl>
-          <Accordion.Panel>
-            <List>
-              {values.map((stock) => (
-                <List.Item key={stock}>{stock}</List.Item>
-              ))}
-            </List>
-          </Accordion.Panel>
-        </Accordion.Item>
+  return (
+    <Container size={200}>
+      <AddWatchlist />
+      <Accordion multiple chevronPosition="left" sx={{ width: 200 }} mx="auto">
+        {lists.map((it) => Object.entries(it).map(([key, values]) => (
+          <Accordion.Item value={key} key={key}>
+            <AccordionControl lists={lists} listname={key}>
+              {key}
+            </AccordionControl>
+            <Accordion.Panel>
+              <List>
+                {values.map((stock) => (
+                  <List.Item key={stock}>{stock}</List.Item>
+                ))}
+              </List>
+            </Accordion.Panel>
+          </Accordion.Item>
         )))}
-    </Accordion>
-  </Container>
-	);
+      </Accordion>
+    </Container>
+  );
 }
 
 // need to get a uuid from creation of user acc, if not, just show empty list with "create an account to create watch lists"
