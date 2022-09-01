@@ -1,3 +1,4 @@
+import { List } from "@mantine/core";
 import { useSelector } from "react-redux";
 
 import Layout from "../../main/node/components/layout"
@@ -7,10 +8,7 @@ export default function EditWatchListPage({ temp }) {
   type list = Record<string, Array<string>>;
   type listFromDBType = Array<Record<string, Array<string>>>;
   const lists: listFromDBType = useSelector((state) => state.watchlists);
-  console.log(temp.listname);
-  console.log(lists);
   const watchlist: list = lists.filter(it => it.hasOwnProperty(temp.listname))[0];
-  console.log(watchlist);
 
   if (watchlist && Object.keys(watchlist).length === 0 && Object.getPrototypeOf(watchlist) === Object.prototype) {
     return(
@@ -23,12 +21,11 @@ export default function EditWatchListPage({ temp }) {
       <Layout>
         <h1>{temp.listname}</h1>
         {Object.entries(watchlist).map(([key, value]) => (
-          <>
-            <h3 key={key}>{key}</h3>
+          <List>
             {value.map(it => 
-            <h5 key={it}>{it}</h5>
+            <List.Item key={it}>{it}</List.Item>
             )}
-          </>
+          </List>
         ))}
       </Layout>
     )

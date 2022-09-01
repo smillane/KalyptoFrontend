@@ -18,7 +18,6 @@ import { IconDots, IconSettings } from '@tabler/icons';
 
 import AddWatchlist from './AddWatchlist';
 import DeleteWatchlist from './DeleteWatchlist';
-import EditWatchlistName from './EditWatchlistName';
 import { updateListName } from './WatchlistSlice';
 import Link from 'next/link';
 
@@ -93,10 +92,9 @@ function AccordionControl(props) {
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item icon={<IconSettings size={14} />} onClick={() => setOpened(true)}>
-              Edit List Name
+              Rename
             </Menu.Item>
             <Link href={`/watchlists/${props.listname}`}><Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item></Link>
-            <EditWatchlistName userID="userID" listname={props.listname} />
             <DeleteWatchlist userID="userID" listname={props.listname} />
           </Menu.Dropdown>
         </Menu>
