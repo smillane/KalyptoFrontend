@@ -41,14 +41,13 @@ export default function AddWatchlist() {
 
   return (
     <Container size={200}>
-      <Group position="apart" sx={{ width: 200 }}>
+      <Group position="apart" sx={{ width: 180 }}>
         <Text size="lg">Lists</Text>
         <Space w="md" />
         <ActionIcon color="dark" onClick={() => setOpened(true)}>
           <IconPlus size={16}/>
         </ActionIcon>
       </Group>
-      <Space h="sm" />
       <Collapse in={opened} sx={{ width: 200 }}>
         <TextInput placeholder="Name your list!" error={error} value={listName} 
         onChange={onNewListNameChange} />

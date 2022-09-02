@@ -1,4 +1,3 @@
-import { List } from "@mantine/core";
 import { useSelector } from "react-redux";
 
 import Layout from "../../main/node/components/layout"
@@ -19,13 +18,20 @@ export default function EditWatchListPage({ temp }) {
   } else {
     return (
       <Layout>
-        <h1>{temp.listname}</h1>
         {Object.entries(watchlist).map(([key, value]) => (
-          <List>
+        <>
+          <thead>
+            <tr>
+              <th>
+                <h2>{key}</h2>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
             {value.map(it => 
-            <List.Item key={it}>{it}</List.Item>
+            <tr key={it}>{it}</tr>
             )}
-          </List>
+          </tbody></>
         ))}
       </Layout>
     )
