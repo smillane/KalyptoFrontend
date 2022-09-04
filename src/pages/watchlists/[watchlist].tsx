@@ -1,3 +1,5 @@
+import { Table } from "@mantine/core";
+import Link from "next/link";
 import { useSelector } from "react-redux";
 
 import Layout from "../../main/node/components/layout"
@@ -27,16 +29,23 @@ export default function EditWatchListPage({ temp }) {
               </th>
             </tr>
           </thead>
-          <tbody>
-            {value.map(it => 
-            <tr key={it}>{it}</tr>
-            )}
-          </tbody></>
+          <Table highlightOnHover>
+            <tbody>
+              {value.map(it => 
+              <Link href={`/stocks/${it}`}><tr key={it}>{it}</tr></Link>
+              )}
+            </tbody>
+          </Table>
+        </>
         ))}
       </Layout>
     )
   }
 }
+
+// add ability to remove item from list, 
+// or add new stock to list (would have to query backend to check if it exists?, 
+// or should just only have this functionatlity on the stock page itself)
 
 export async function getServerSideProps(context) {
 

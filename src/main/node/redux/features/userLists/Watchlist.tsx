@@ -13,6 +13,7 @@ import {
   Button,
   useMantineTheme,
   Text,
+  Table,
 } from '@mantine/core';
 import { IconDots, IconSettings } from '@tabler/icons';
 
@@ -104,8 +105,6 @@ function AccordionControl(props) {
 }
 
 export default function Watchlist() {
-  const theme = useMantineTheme();
-  
   type listFromDBType = Array<Record<string, Array<string>>>;
   const lists: listFromDBType = useSelector((state) => state.watchlists);
 
@@ -119,20 +118,18 @@ export default function Watchlist() {
         {lists.map((it) => Object.entries(it).map(([key, values]) => (
           <Accordion.Item value={key} key={key}>
             <AccordionControl lists={lists} listname={key}>
-              <thead>
-                <tr>
-                  <th>
-                    {key}
-                  </th>
-                </tr>
-              </thead>
+              <Text weight={700}>
+                {key}
+              </Text>
             </AccordionControl>
             <Accordion.Panel>
-              <tbody>
-                {values.map((stock) => (
-                  <tr key={stock}><Link href={`/stocks/${stock}`}>{stock}</Link></tr>
-                ))}
-              </tbody>
+              <Table highlightOnHover>
+                <tbody>
+                  {values.map((stock) => (
+                    <Link href={`/stocks/${stock}`} key={stock}><tr><td>{stock}</td></tr></Link>
+                  ))}
+                </tbody>
+              </Table>
             </Accordion.Panel>
           </Accordion.Item>
         )))}
