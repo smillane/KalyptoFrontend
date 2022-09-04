@@ -1,5 +1,5 @@
-import { Table, Grid, SimpleGrid, Divider, Text, Container } from "@mantine/core";
-import { IconPoint } from '@tabler/icons';
+import { Table, Grid, Divider, Text, Container } from "@mantine/core";
+import Link from "next/link";
 
 import Layout from "../../main/node/components/layout"
 import Watchlist from "../../main/node/redux/features/userLists/Watchlist"
@@ -8,10 +8,10 @@ import Watchlist from "../../main/node/redux/features/userLists/Watchlist"
 export default function Stock({ stockSymbol, quote, advancedStats, insiderTrading }) {  
   return (
     <Layout>
-      <h1>{stockSymbol.symbol}</h1>
+      <Text transform="capitalize" size="lg" weight={700}>{stockSymbol.symbol}</Text>
       <Grid grow>
-          <Grid.Col span={4}>
-            <Container>
+        <Grid.Col span={4}>
+          <Container>
             <Text transform="capitalize" size="lg" weight={700}>Quote</Text>
             <Table>
               <tbody>
@@ -23,10 +23,11 @@ export default function Stock({ stockSymbol, quote, advancedStats, insiderTradin
                       </tr>
                   )}
               </tbody>
-            </Table></Container>
-          </Grid.Col>
-          <Grid.Col span={4}>
-            <Container>
+            </Table>
+          </Container>
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <Container>
             <Text transform="capitalize" size="lg" weight={700}>Advanced Stats</Text>
             <Table>
               <tbody>
@@ -40,12 +41,12 @@ export default function Stock({ stockSymbol, quote, advancedStats, insiderTradin
               </tbody>
             </Table></Container>
           </Grid.Col>
-          <Grid.Col span={4}><Container>
-            <Text transform="capitalize" size="lg" weight={700}>Insider Trading</Text>
-            
-              
-                {insiderTrading.map(it => 
-                  <><Table key={it}>
+        <Grid.Col span={4}>
+          <Container>
+            <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} insiderTrading={insiderTrading}><Text transform="capitalize" size="lg" weight={700}>Insider Trading</Text></Link>
+              {insiderTrading.map(it => 
+                <>
+                  <Table key={it}>
                     <tbody> 
                       {Object.entries(it).map(
                       ([key, value]) =>
@@ -56,11 +57,11 @@ export default function Stock({ stockSymbol, quote, advancedStats, insiderTradin
                       )}
                     </tbody>
                   </Table>
-                  <Divider my="sm" /></>
-                  )}
-              
-            </Container>
-          </Grid.Col>
+                  <Divider my="sm" />
+                </>
+              )}
+          </Container>
+        </Grid.Col>
       </Grid>
       <Watchlist />
     </Layout>
