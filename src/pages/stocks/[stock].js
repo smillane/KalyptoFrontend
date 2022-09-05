@@ -5,27 +5,14 @@ import Layout from "../../main/node/components/layout"
 import Watchlist from "../../main/node/redux/features/userLists/Watchlist"
 
 function millionOrBillion(number) {
-  return Math.abs(Number(number)) >= 1.0e+9
-
-  ? (Math.abs(Number(number)) / 1.0e+9).toLocaleString("en", {   
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-}) + " Billion"
-  // Six Zeroes for Millions 
+  return Math.abs(Number(number)) >= 1.0e+12
+  ? (Math.abs(Number(number)) / 1.0e+12).toFixed(2) + " Trillion"
+  : Math.abs(Number(number)) / 1.0e+9
+  ? (Math.abs(Number(number)) / 1.0e+9).toFixed(2) + " Billion"
   : Math.abs(Number(number)) >= 1.0e+6
-
-  ? (Math.abs(Number(number)) / 1.0e+6).toLocaleString("en", {   
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-}) + " Million"
-  // Three Zeroes for Thousands
+  ? (Math.abs(Number(number)) / 1.0e+6).toFixed(2) + " Million"
   : Math.abs(Number(number)) >= 1.0e+3
-
-  ? (Math.abs(Number(number)) / 1.0e+3).toLocaleString("en", {   
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-}) + " Thousand"
-
+  ? (Math.abs(Number(number)) / 1.0e+3).toFixed(2) + " Thousand"
   : Math.abs(Number(number));
 }
 
@@ -35,138 +22,141 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
   return (
     <Layout>
       <Title order={1} transform="capitalize">{stockSymbol.symbol}</Title>
-      <Grid grow gutter="xl">
-        <Grid.Col span={1}>
-          <Container>
-            <Title order={3}>Quote</Title>
-            <Table highlightOnHover>
-              <tbody>
-                <tr key={quote["latestPrice"]}>
-                  <td><Text transform="capitalize">Latest Price</Text></td>
-                  <td><Text transform="capitalize" weight={700}>{quote["latestPrice"]}</Text></td>
-                </tr>
-                <tr key={quote["change"]}>
-                  <td><Text transform="capitalize">Change</Text></td>
-                  <td><Group position="apart" spacing="xs"><Text transform="capitalize" weight={700}>{quote["change"]}</Text><Text weight={700}>({quote["changePercent"]*100} %)</Text></Group></td>
-                </tr>
-                <tr key={quote["volume"]}>
-                  <td><Text transform="capitalize">Volume</Text></td>
-                  <td><Text transform="capitalize">{quote["volume"].toLocaleString()}</Text></td>
-                </tr>
-                <tr key={quote["avgTotalVolume"]}>
-                  <td><Text transform="capitalize">Avg Volume</Text></td>
-                  <td><Text transform="capitalize">{quote["avgTotalVolume"].toLocaleString()}</Text></td>
-                </tr>
-                <tr key={quote["marketCap"]}>
-                  <td><Text transform="capitalize">Market Cap</Text></td>
-                  <td><Text transform="capitalize">{millionOrBillion(quote["marketCap"])}</Text></td>
-                </tr>
-              </tbody>
-            </Table>
-          </Container>
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <Container>
-            <Title order={3}>Stats</Title>
-            <Table highlightOnHover>
-              <tbody>
-                <tr key={advancedStats["week52high"]}>
-                  <td><Text transform="capitalize">52 week high</Text></td>
-                  <td><Text transform="capitalize">{advancedStats["week52high"]}</Text></td>
-                </tr>
-                <tr key={advancedStats["week52low"]}>
-                  <td><Text transform="capitalize">52 week low</Text></td>
-                  <td><Group position="apart" spacing="xs"><Text transform="capitalize">{advancedStats["week52low"]}</Text><Text weight={700}>({quote["changePercent"]*100} %)</Text></Group></td>
-                </tr>
-                <tr key={advancedStats["week52change"]}>
-                  <td><Text transform="capitalize">52 week change</Text></td>
-                  <td><Text transform="capitalize">{(advancedStats["week52change"]*100).toLocaleString()} %</Text></td>
-                </tr>
-                <tr key={advancedStats["avgTotalVolume"]}>
-                  <td><Text transform="capitalize">YTD Change</Text></td>
-                  <td><Text transform="capitalize">{(advancedStats["ytdChangePercent"]*100).toLocaleString()} %</Text></td>
-                </tr>
-                <tr key={advancedStats["nextEarningsDate"]}>
-                  <td><Text transform="capitalize">Next Earnings Date</Text></td>
-                  <td><Text transform="capitalize">{advancedStats["nextEarningsDate"]}</Text></td>
-                </tr>
-              </tbody>
-            </Table>
-          </Container>
-        </Grid.Col>
-        <Grid.Col span={4}>
-          <Container>
-          <Link href={`/stocks/${stockSymbol.symbol}/dividends`} passHref><Button variant="subtle" color="dark"><Title order={3}>Previous Dividends</Title></Button></Link>
-            <Space h="md" />
-                  <Table>
-                    <thead>
-                      <tr>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Payment Date</Text></th>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Ex Date</Text></th>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Amount</Text></th>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Payment Type</Text></th>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Frequency</Text></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {previousDividends.map(dividend => 
-                      <tr key={dividend}>
-                        <td><Text transform="capitalize">{dividend["paymentDate"]}</Text></td>
-                        <td><Text transform="capitalize">{dividend["exDate"]}</Text></td>
-                        <td>
-                          <Group position="center">
-                            <Text weight={600} transform="capitalize">{dividend["amount"]}</Text>
-                            <Text transform="capitalize">{dividend["currency"]}</Text>
-                          </Group>
-                        </td>
-                        <td><Text transform="capitalize">{dividend["flag"]}</Text></td>
-                        <td><Text transform="capitalize">{dividend["frequency"]}</Text></td>
-                      </tr>
-                      )}
-                    </tbody>
-                  </Table>
-          </Container>
-        </Grid.Col>
-        <Grid.Col>
-          <Container>
-            <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref><Button variant="subtle" color="dark"><Title order={3}>Insider Trading</Title></Button></Link>
-            <Space h="md" />
-                  <Table>
-                    <thead>
-                      <tr>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Insider</Text></th>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Transaction</Text></th>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Price Per Share</Text></th>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Total Value</Text></th>
-                        <th><Text transform="capitalize" size="lg" weight={700}>Shares After</Text></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {insiderTrading.map(indTrade => 
-                      <tr key={indTrade}>
-                        <td>
-                          <Stack>
-                            <Text weight={550} transform="capitalize">{indTrade["fullName"]}</Text>
-                            <Text transform="capitalize">{indTrade["reportedTitle"]}</Text>
-                          </Stack>
-                        </td>
-                        <td>
-                          <Stack>
-                            <Text weight={550} transform="capitalize">{indTrade["transactionCode"]}</Text>
-                            <Text transform="capitalize">{indTrade["transactionDate"]}</Text>
-                          </Stack>
-                        </td>
-                        <td><Text align="right" transform="capitalize">{indTrade["transactionPrice"]}</Text></td>
-                        <td><Text align="right" transform="capitalize">{indTrade["transactionValue"]}</Text></td>
-                        <td><Text align="right" transform="capitalize">{indTrade["postShares"]}</Text></td>
-                      </tr>
-                      )}
-                    </tbody>
-                  </Table>
-          </Container>
-        </Grid.Col>
-      </Grid>
-      <Watchlist />
+      <Container>
+        <Grid gutter="xl">
+          <Grid.Col span={3}>
+            <Container>
+              <Title order={3}>Quote</Title>
+              <Table highlightOnHover>
+                <tbody>
+                  <tr key={quote["latestPrice"]}>
+                    <td><Text transform="capitalize">Latest Price</Text></td>
+                    <td><Text transform="capitalize" weight={700}>{quote["latestPrice"]}</Text></td>
+                  </tr>
+                  <tr key={quote["change"]}>
+                    <td><Text transform="capitalize">Change</Text></td>
+                    <td><Group position="apart" spacing="xs"><Text transform="capitalize" weight={700}>{quote["change"]}</Text><Text weight={700}>({quote["changePercent"]*100} %)</Text></Group></td>
+                  </tr>
+                  <tr key={quote["volume"]}>
+                    <td><Text transform="capitalize">Volume</Text></td>
+                    <td><Text transform="capitalize">{quote["volume"].toLocaleString()}</Text></td>
+                  </tr>
+                  <tr key={quote["avgTotalVolume"]}>
+                    <td><Text transform="capitalize">Avg Volume</Text></td>
+                    <td><Text transform="capitalize">{quote["avgTotalVolume"].toLocaleString()}</Text></td>
+                  </tr>
+                  <tr key={quote["marketCap"]}>
+                    <td><Text transform="capitalize">Market Cap</Text></td>
+                    <td><Text transform="capitalize">{millionOrBillion(quote["marketCap"])}</Text></td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Container>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Container>
+              <Title order={3}>Stats</Title>
+              <Table highlightOnHover>
+                <tbody>
+                  <tr key={advancedStats["week52high"]}>
+                    <td><Text transform="capitalize">52 week high</Text></td>
+                    <td><Text transform="capitalize">{advancedStats["week52high"]}</Text></td>
+                  </tr>
+                  <tr key={advancedStats["week52low"]}>
+                    <td><Text transform="capitalize">52 week low</Text></td>
+                    <td><Group position="apart" spacing="xs"><Text transform="capitalize">{advancedStats["week52low"]}</Text><Text weight={700}>({quote["changePercent"]*100} %)</Text></Group></td>
+                  </tr>
+                  <tr key={advancedStats["week52change"]}>
+                    <td><Text transform="capitalize">52 week change</Text></td>
+                    <td><Text transform="capitalize">{(advancedStats["week52change"]*100).toLocaleString()} %</Text></td>
+                  </tr>
+                  <tr key={advancedStats["avgTotalVolume"]}>
+                    <td><Text transform="capitalize">YTD Change</Text></td>
+                    <td><Text transform="capitalize">{(advancedStats["ytdChangePercent"]*100).toLocaleString()} %</Text></td>
+                  </tr>
+                  <tr key={advancedStats["nextEarningsDate"]}>
+                    <td><Text transform="capitalize">Next Earnings Date</Text></td>
+                    <td><Text transform="capitalize">{advancedStats["nextEarningsDate"]}</Text></td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Container>
+          </Grid.Col>
+        </Grid>
+        <Grid columns={1} gutter="xl">
+          <Grid.Col>
+            <Container>
+            <Link href={`/stocks/${stockSymbol.symbol}/dividends`} passHref><Button variant="subtle" color="dark"><Title order={3}>Previous Dividends</Title></Button></Link>
+              <Space h="md" />
+                    <Table highlightOnHover>
+                      <thead>
+                        <tr>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Payment Date</Text></th>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Ex Date</Text></th>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Amount</Text></th>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Payment Type</Text></th>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Frequency</Text></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previousDividends.map(dividend => 
+                        <tr key={dividend}>
+                          <td><Text transform="capitalize">{dividend["paymentDate"]}</Text></td>
+                          <td><Text transform="capitalize">{dividend["exDate"]}</Text></td>
+                          <td>
+                            <Group position="center">
+                              <Text weight={600} transform="capitalize">{dividend["amount"]}</Text>
+                              <Text transform="capitalize">{dividend["currency"]}</Text>
+                            </Group>
+                          </td>
+                          <td><Text transform="capitalize">{dividend["flag"]}</Text></td>
+                          <td><Text transform="capitalize">{dividend["frequency"]}</Text></td>
+                        </tr>
+                        )}
+                      </tbody>
+                    </Table>
+            </Container>
+          </Grid.Col>
+          <Grid.Col>
+            <Container>
+              <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref><Button variant="subtle" color="dark"><Title order={3}>Insider Trading</Title></Button></Link>
+              <Space h="md" />
+                    <Table highlightOnHover>
+                      <thead>
+                        <tr>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Insider</Text></th>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Transaction</Text></th>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Price Per Share</Text></th>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Total Value</Text></th>
+                          <th><Text transform="capitalize" size="lg" weight={700}>Shares After</Text></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {insiderTrading.map(indTrade => 
+                        <tr key={indTrade}>
+                          <td>
+                            <Stack>
+                              <Text weight={550} transform="capitalize">{indTrade["fullName"]}</Text>
+                              <Text transform="capitalize">{indTrade["reportedTitle"]}</Text>
+                            </Stack>
+                          </td>
+                          <td>
+                            <Stack>
+                              <Text weight={550} transform="capitalize">{indTrade["transactionCode"]}</Text>
+                              <Text transform="capitalize">{indTrade["transactionDate"]}</Text>
+                            </Stack>
+                          </td>
+                          <td><Text align="right" transform="capitalize">{indTrade["transactionPrice"]}</Text></td>
+                          <td><Text align="right" transform="capitalize">{indTrade["transactionValue"]}</Text></td>
+                          <td><Text align="right" transform="capitalize">{indTrade["postShares"]}</Text></td>
+                        </tr>
+                        )}
+                      </tbody>
+                    </Table>
+            </Container>
+          </Grid.Col>
+        </Grid>
+      </Container>
     </Layout>
   )
 }

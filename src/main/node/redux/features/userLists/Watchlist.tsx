@@ -126,7 +126,7 @@ export default function Watchlist() {
               <Table highlightOnHover>
                 <tbody>
                   {values.map((stock) => (
-                    <Link href={`/stocks/${stock}`} key={stock}><tr><td>{stock}</td></tr></Link>
+                    <Link href={`/stocks/${stock}`} key={stock}><tr><td><Text transform="capitalize">{stock}</Text></td></tr></Link>
                   ))}
                 </tbody>
               </Table>
