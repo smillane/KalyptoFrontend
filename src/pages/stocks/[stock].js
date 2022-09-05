@@ -1,8 +1,7 @@
-import { Table, Grid, Title, Text, Container, Button, Stack, Space, Group } from "@mantine/core";
+import { Table, Grid, Title, Text, Container, Button, Stack, Space, Group, SimpleGrid } from "@mantine/core";
 import Link from "next/link";
 
 import Layout from "../../main/node/components/layout"
-import Watchlist from "../../main/node/redux/features/userLists/Watchlist"
 
 function millionOrBillion(number) {
   return Math.abs(Number(number)) >= 1.0e+12
@@ -21,11 +20,10 @@ function millionOrBillion(number) {
 export default function Stock({ stockSymbol, quote, advancedStats, previousDividends, insiderTrading }) {  
   return (
     <Layout>
-      <Title order={1} transform="capitalize">{stockSymbol.symbol}</Title>
       <Container>
-        <Grid gutter="xl">
-          <Grid.Col span={3}>
-            <Container>
+      <Title order={1} transform="capitalize">{stockSymbol.symbol}</Title>
+        <Grid>
+            <Grid.Col sm={6} md={6} lg={6}>
               <Title order={3}>Quote</Title>
               <Table highlightOnHover>
                 <tbody>
@@ -51,10 +49,8 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
                   </tr>
                 </tbody>
               </Table>
-            </Container>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Container>
+            </Grid.Col>
+            <Grid.Col sm={6} md={6} lg={6}>
               <Title order={3}>Stats</Title>
               <Table highlightOnHover>
                 <tbody>
@@ -80,8 +76,7 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
                   </tr>
                 </tbody>
               </Table>
-            </Container>
-          </Grid.Col>
+            </Grid.Col>
         </Grid>
         <Grid columns={1} gutter="xl">
           <Grid.Col>

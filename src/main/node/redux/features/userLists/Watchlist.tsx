@@ -113,6 +113,7 @@ export default function Watchlist() {
   }
   return (
     <Container size={200}>
+      <Space h="xl" />
       <AddWatchlist />
       <Accordion multiple sx={{ width: 200 }} mx="auto">
         {lists.map((it) => Object.entries(it).map(([key, values]) => (
