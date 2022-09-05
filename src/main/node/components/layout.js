@@ -5,7 +5,8 @@ import {
   Grid,
   useMantineTheme,
   Container,
-  Space
+  Space,
+  Button
 } from '@mantine/core';
 import Link from 'next/link'
 import Watchlist from '../redux/features/userLists/Watchlist';
@@ -31,9 +32,9 @@ const Layout = ({ children }) => {
       header={
         <Header height={60} p="xs">
           <Grid align="center">
-            <Grid.Col span={1}><Link href="/">Kalypto</Link></Grid.Col>
-            <Grid.Col span={4}><SearchBar /></Grid.Col>
-            <Grid.Col span={1} offset={6}><Link href="/about">About</Link></Grid.Col>
+            <Grid.Col span={1}><Link href="/"><Button variant="subtle" color="dark">Kalypto</Button></Link></Grid.Col>
+            <Grid.Col span={2}><SearchBar /></Grid.Col>
+            <Grid.Col span={1} align="right"><Link href="/about"><Button variant="subtle" color="dark">About</Button></Link></Grid.Col>
           </Grid>
         </Header>
       }

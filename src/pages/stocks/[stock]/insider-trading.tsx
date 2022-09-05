@@ -1,4 +1,5 @@
 import { Table, Space, Text, Container, Stack, Title } from "@mantine/core";
+import { v4 as uuidv4 } from 'uuid';
 
 import Layout from "../../../main/node/components/layout";
 
@@ -20,7 +21,7 @@ export default function InsiderTrading({ stockSymbol, insiderTrading }) {
                     </thead>
                     <tbody>
                       {insiderTrading.map(indTrade => 
-                      <tr key={indTrade}>
+                      <tr key={uuidv4()}>
                         <td>
                           <Stack>
                             <Text weight={550} transform="capitalize">{indTrade["fullName"]}</Text>
@@ -40,22 +41,6 @@ export default function InsiderTrading({ stockSymbol, insiderTrading }) {
                       )}
                     </tbody>
                   </Table>
-              {/* {insiderTrading.map(it => 
-                <>
-                  <Table key={it}>
-                    <tbody> 
-                      {Object.entries(it).map(
-                      ([key, value]) =>
-                        <tr key={key}>
-                          <td><Text transform="capitalize">{key}</Text></td>
-                          <td><Text transform="capitalize">{value}</Text></td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </Table>
-                  <Divider my="sm" />
-                </>
-              )} */}
           </Container>
     </Layout>
   )

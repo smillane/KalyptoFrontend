@@ -20,7 +20,7 @@ export default function Dividends({ stockSymbol, previousDividends }) {
                     </thead>
                     <tbody>
                       {previousDividends.map(dividend => 
-                      <tr key={dividend}>
+                      <tr key={dividend["paymentDate"]}>
                         <td><Text transform="capitalize">{dividend["paymentDate"]}</Text></td>
                         <td><Text transform="capitalize">{dividend["exDate"]}</Text></td>
                         <td>
