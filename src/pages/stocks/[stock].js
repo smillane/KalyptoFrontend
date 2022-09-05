@@ -21,15 +21,16 @@ function greenOrRed(number) {
 }
 
 // if user is not logged in with an account, only show a basic quote and chart
-export default function Stock({ stockSymbol, quote, advancedStats, previousDividends, insiderTrading, institutionalOwnership, peerGroup }) {  
+export default function Stock({ stockSymbol, quote, advancedStats, previousDividends, nextDiv, insiderTrading, institutionalOwnership, peerGroup }) {  
   return (
     <Layout>
       <Container>
       <Title order={1} transform="capitalize">{stockSymbol.symbol}</Title>
+      <Space h="sm" />
       <Group>
-        <Text transform="capitalize" weight={700}>{quote["latestPrice"]}</Text>
-        <Text transform="capitalize" weight={700} color={greenOrRed(quote["change"])}>{quote["change"]}</Text>
-        <Text transform="capitalize" weight={700} color={greenOrRed(quote["changePercent"])}>{(quote["changePercent"]*100).toFixed(2)}%</Text>
+        <Title transform="capitalize" order={4}>{quote["latestPrice"]}</Title>
+        <Title transform="capitalize" order={4} color={greenOrRed(quote["change"])}>{quote["change"]}</Title>
+        <Title transform="capitalize" order={4} color={greenOrRed(quote["changePercent"])}>{(quote["changePercent"]*100).toFixed(2)}%</Title>
       </Group>
       <Space h="lg" />
         <Grid>
@@ -119,14 +120,42 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
             <>
             <Link href={`/stocks/${stockSymbol.symbol}/dividends`} passHref><Button variant="subtle" color="dark"><Title order={3}>Dividends</Title></Button></Link>
               <Space h="md" />
+                    <Title order={5}>Next Dividend</Title>
                     <Table highlightOnHover>
                       <thead>
                         <tr>
-                          <th><Text transform="capitalize" size="lg" weight={700}>Payment Date</Text></th>
-                          <th><Text transform="capitalize" size="lg" weight={700}>Ex Date</Text></th>
-                          <th><Text transform="capitalize" size="lg" weight={700}>Amount</Text></th>
-                          <th><Text transform="capitalize" size="lg" weight={700}>Payment Type</Text></th>
-                          <th><Text transform="capitalize" size="lg" weight={700}>Frequency</Text></th>
+                          <th><Title transform="capitalize" order={6}>Payment Date</Title></th>
+                          <th><Title transform="capitalize" order={6}>Ex Date</Title></th>
+                          <th><Title transform="capitalize" order={6}>Amount</Title></th>
+                          <th><Title transform="capitalize" order={6}>Payment Type</Title></th>
+                          <th><Title transform="capitalize" order={6}>Frequency</Title></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><Text transform="capitalize">{nextDiv["paymentDate"]}</Text></td>
+                          <td><Text transform="capitalize">{nextDiv["exDate"]}</Text></td>
+                          <td>
+                            <Group position="center">
+                              <Text weight={600} transform="capitalize">{nextDiv["amount"]}</Text>
+                              <Text transform="capitalize">{nextDiv["currency"]}</Text>
+                            </Group>
+                          </td>
+                          <td><Text transform="capitalize">{nextDiv["flag"]}</Text></td>
+                          <td><Text transform="capitalize">{nextDiv["frequency"]}</Text></td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                    <Space h="sm" />
+                    <Title order={5}>Previous Dividends</Title>
+                    <Table highlightOnHover>
+                      <thead>
+                        <tr>
+                          <th><Title transform="capitalize" order={6}>Payment Date</Title></th>
+                          <th><Title transform="capitalize" order={6}>Ex Date</Title></th>
+                          <th><Title transform="capitalize" order={6}>Amount</Title></th>
+                          <th><Title transform="capitalize" order={6}>Payment Type</Title></th>
+                          <th><Title transform="capitalize" order={6}>Frequency</Title></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -304,6 +333,24 @@ export async function getServerSideProps(context) {
     "SPY",
     "QQQ"
   ]
+  const nextDiv = {
+    "amount": 0.23,
+    "currency": "USD",
+    "declaredDate": "2022-07-19",
+    "description": "s yraSindrearhO",
+    "exDate": "2022-07-23",
+    "flag": "Cash",
+    "frequency": "quarterly",
+    "paymentDate": "2022-08-09",
+    "recordDate": "2022-07-24",
+    "refid": 2760702,
+    "symbol": "AAPL",
+    "id": "IEDVIDDNS",
+    "key": "PAAL",
+    "subkey": "2750165",
+    "date": 1659657600000,
+    "updated": 1697984825164
+  }
 
   if (!stockInfo) {
     return {
@@ -311,5 +358,5 @@ export async function getServerSideProps(context) {
     }
   }
 
-  return { props: { stockSymbol, quote, advancedStats, previousDividends, insiderTrading, institutionalOwnership, peerGroup } }
+  return { props: { stockSymbol, quote, advancedStats, previousDividends, nextDiv, insiderTrading, institutionalOwnership, peerGroup } }
 }
