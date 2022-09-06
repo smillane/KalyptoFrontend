@@ -1,4 +1,4 @@
-import { Table, Grid, Title, Text, Container, Button, Stack, Space, Group, SimpleGrid } from "@mantine/core";
+import { Table, Grid, Title, Text, Container, Button, Stack, Space, Group, SimpleGrid, Paper } from "@mantine/core";
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -28,11 +28,15 @@ function transactionColor(code) {
   return code === "P" ? "green" : "S" ? "red" : A ? "green" : "D" ? "red" : "F" ? "red" : "I" ? "red" : "M" ? "green" : "C" ? "green" : "E" ? "red" : "H" ? "red" : "O" ? "green" : "X" ? "green" : "G" ? "red" : "L" ? "green" : "W" ? "black" : "Z" ? "black" : "J" ? "black" : "K" ? "black" : "U" ? "red" : "black"
 }
 
+
+// implement scrollbar sideways for containers such as dividends, insider trading, institutional ownership etc, based on page width, for mobile
+// or restructure how data is displayed, what data is, format, etc
+// trailing ..., not finishing full name for people/companies for insider/institutions
 // if user is not logged in with an account, only show a basic quote and chart
 export default function Stock({ stockSymbol, quote, advancedStats, previousDividends, nextDiv, insiderTrading, institutionalOwnership, peerGroup }) {
   return (
     <Layout>
-      <Container>
+      <Container size="xl">
         <Group>
           <Title order={1} transform="uppercase">{stockSymbol.symbol}</Title>
           <Title order={1} weight={100} transform="capitalize">{advancedStats["companyName"]}</Title>
@@ -136,9 +140,13 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
             </Table>
           </Grid.Col>
         </Grid>
-        <Grid columns={1} gutter="xl" sx={{ margin: "2px" }}>
-          <Grid.Col sx={theme => ({
-            boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+        <SimpleGrid breakpoints={[
+            { minWidth: 'sm', cols: 1 },
+            { minWidth: 1200, cols: 1 },
+            { minWidth: 1450, cols: 2 },
+          ]} sx={{ margin: "2px" }}>
+          <Container sx={theme => ({
+            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
             <>
               <Link href={`/stocks/${stockSymbol.symbol}/dividends`} passHref>
@@ -151,11 +159,11 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
               <Table highlightOnHover>
                 <thead>
                   <tr>
-                    <th><Title transform="capitalize" order={6}>Payment Date</Title></th>
-                    <th><Title transform="capitalize" order={6}>Ex Date</Title></th>
-                    <th><Title align="right" transform="capitalize" order={6}>Amount</Title></th>
-                    <th><Title align="right" transform="capitalize" order={6}>Payment Type</Title></th>
-                    <th><Title align="right" transform="capitalize" order={6}>Frequency</Title></th>
+                    <th><Title transform="capitalize" order={5}>Payment Date</Title></th>
+                    <th><Title transform="capitalize" order={5}>Ex Date</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Amount</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Payment Type</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Frequency</Title></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -173,11 +181,11 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
               <Table highlightOnHover>
                 <thead>
                   <tr>
-                    <th><Title transform="capitalize" order={6}>Payment Date</Title></th>
-                    <th><Title transform="capitalize" order={6}>Ex Date</Title></th>
-                    <th><Title align="right" transform="capitalize" order={6}>Amount</Title></th>
-                    <th><Title align="right" transform="capitalize" order={6}>Payment Type</Title></th>
-                    <th><Title align="right" transform="capitalize" order={6}>Frequency</Title></th>
+                    <th><Title transform="capitalize" order={5}>Payment Date</Title></th>
+                    <th><Title transform="capitalize" order={5}>Ex Date</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Amount</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Payment Type</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Frequency</Title></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -193,9 +201,9 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
                 </tbody>
               </Table>
             </>
-          </Grid.Col>
-          <Grid.Col sx={theme => ({
-            boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+          </Container>
+          <Container sx={theme => ({
+            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
             <>
               <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref>
@@ -207,11 +215,11 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
               <Table highlightOnHover>
                 <thead>
                   <tr>
-                    <th><Text transform="capitalize" size="lg" weight={700}>Insider</Text></th>
-                    <th><Text transform="capitalize" size="lg" weight={700}>Transaction</Text></th>
-                    <th><Text align="right" transform="capitalize" size="lg" weight={700}>Price Per Share</Text></th>
-                    <th><Text align="right" transform="capitalize" size="lg" weight={700}>Total Value</Text></th>
-                    <th><Text align="right" transform="capitalize" size="lg" weight={700}>Shares After</Text></th>
+                    <th><Title transform="capitalize" order={5}>Insider</Title></th>
+                    <th><Title transform="capitalize" order={5}>Transaction</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Price / Share</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Total Value</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Shares After</Title></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -237,9 +245,9 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
                 </tbody>
               </Table>
             </>
-          </Grid.Col>
-          <Grid.Col sx={theme => ({
-            boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+          </Container>
+          <Container sx={theme => ({
+            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
             <>
               <Title order={3}>Insitutional Ownership</Title>
@@ -247,10 +255,10 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
               <Table highlightOnHover>
                 <thead>
                   <tr>
-                    <th><Text transform="capitalize" size="lg" weight={700}>Filing Date</Text></th>
-                    <th><Text transform="capitalize" size="lg" weight={700}>Shareholder</Text></th>
-                    <th><Text align="right" transform="capitalize" size="lg" weight={700}>Total Shares</Text></th>
-                    <th><Text align="right" transform="capitalize" size="lg" weight={700}>Value</Text></th>
+                    <th><Title transform="capitalize" order={5}>Filing Date</Title></th>
+                    <th><Title transform="capitalize" order={5}>Shareholder</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Total Shares</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Value</Title></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -273,9 +281,9 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
                 </tbody>
               </Table>
             </>
-          </Grid.Col>
-          <Grid.Col sx={theme => ({
-            boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+          </Container>
+          <Container sx={theme => ({
+            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
             <Title order={4}>People also viewed</Title>
             <Space h="md" />
@@ -290,8 +298,8 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
                 <Link href={`/stocks/${it}`} key={it}><Button variant="outline" color="dark">{it}</Button></Link>
               )}
             </SimpleGrid>
-          </Grid.Col>
-        </Grid>
+          </Container>
+        </SimpleGrid>
       </Container>
     </Layout>
   )

@@ -41,8 +41,8 @@ const Layout = ({ children }) => {
     >
       <Meta />
         <Grid grow>
-          <Container>
-          <Space h="xl" />
+          <Container size="xl">
+            <Space h="xl" />
             {children}
           </Container>
           <Watchlist />
