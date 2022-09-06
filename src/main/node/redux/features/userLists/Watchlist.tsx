@@ -61,7 +61,7 @@ function AccordionControl(props) {
       <Modal
         centered
         opened={opened}
-        onClose={() => {setOpened(false); setError('');}}
+        onClose={() => { setOpened(false); setError(''); }}
         title="Edit Watchlist Name"
         overlayColor={theme.colors.gray[2]}
       >
@@ -109,10 +109,16 @@ export default function Watchlist() {
   const lists: listFromDBType = useSelector((state) => state.watchlists);
 
   if (!Array.isArray(lists) || !lists.length) {
-    return <AddWatchlist />;
+    return <AddWatchlist
+      space={<Space h="xl" />}
+      theme={theme => ({
+        boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+      })} />
   }
   return (
-    <Container size={200}>
+    <Container sx={theme => ({
+      boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+    })}>
       <Space h="xl" />
       <AddWatchlist />
       <Accordion multiple sx={{ width: 200 }} mx="auto">

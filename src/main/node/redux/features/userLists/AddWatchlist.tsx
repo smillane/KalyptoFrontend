@@ -1,13 +1,13 @@
 import React from 'react';
 import { useState } from 'react';
 import { useDispatch  } from 'react-redux';
-import { Container, ActionIcon, Group, Space, Text, Button, TextInput, Collapse, Title } from '@mantine/core';
+import { Container, ActionIcon, Group, Space, Button, TextInput, Collapse, Title } from '@mantine/core';
 import { IconPlus } from '@tabler/icons';
 
 import { addListHandler } from './Watchlist';
 import { addList } from './WatchlistSlice'
 
-export default function AddWatchlist() {
+export default function AddWatchlist(props) {
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState<string>('')
   const [listName, setListName] = useState<string>('');
@@ -40,7 +40,8 @@ export default function AddWatchlist() {
   }
 
   return (
-    <Container size={200}>
+    <Container sx={props.theme}>
+      {props.space}
       <Group position="apart" sx={{ width: 180 }}>
         <Title order={3} align="center" transform="capitalize">Lists</Title>
         <Space w="md" />

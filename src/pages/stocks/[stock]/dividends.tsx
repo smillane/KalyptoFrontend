@@ -1,4 +1,5 @@
-import { Table, Space, Text, Container, Group, Title } from "@mantine/core";
+import { Table, Space, Text, Container, Group, Title, Button } from "@mantine/core";
+import Link from "next/link";
 
 import Layout from "../../../main/node/components/layout";
 
@@ -6,9 +7,11 @@ export default function Dividends({ stockSymbol, previousDividends }) {
   return (
     <Layout>
       <Container>
-            <Title order={2} align="center" transform="capitalize">Previous Dividends for {stockSymbol.symbol}</Title>
+          <Title order={2} align="center" transform="capitalize">Dividends for <Link href={`/stocks/${stockSymbol.symbol}`} passHref>{stockSymbol.symbol}</Link></Title>
             <Space h="md" />
-                  <Table>
+                  <Table sx={theme => ({ 
+                    boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0]
+                    })}>
                     <thead>
                       <tr>
                         <th><Text transform="capitalize" size="lg" weight={700}>Payment Date</Text></th>
@@ -21,16 +24,16 @@ export default function Dividends({ stockSymbol, previousDividends }) {
                     <tbody>
                       {previousDividends.map(dividend => 
                       <tr key={dividend["paymentDate"]}>
-                        <td><Text transform="capitalize">{dividend["paymentDate"]}</Text></td>
-                        <td><Text transform="capitalize">{dividend["exDate"]}</Text></td>
+                        <td><Text transform="capitalize" weight={700}>{dividend["paymentDate"]}</Text></td>
+                        <td><Text transform="capitalize" weight={700}>{dividend["exDate"]}</Text></td>
                         <td>
                           <Group position="center">
-                            <Text weight={600} transform="capitalize">{dividend["amount"]}</Text>
-                            <Text transform="capitalize">{dividend["currency"]}</Text>
+                            <Text transform="capitalize" weight={700}>{dividend["amount"]}</Text>
+                            <Text transform="capitalize" weight={700}>{dividend["currency"]}</Text>
                           </Group>
                         </td>
-                        <td><Text transform="capitalize">{dividend["flag"]}</Text></td>
-                        <td><Text transform="capitalize">{dividend["frequency"]}</Text></td>
+                        <td><Text transform="capitalize" weight={700}>{dividend["flag"]}</Text></td>
+                        <td><Text transform="capitalize" weight={700}>{dividend["frequency"]}</Text></td>
                       </tr>
                       )}
                     </tbody>

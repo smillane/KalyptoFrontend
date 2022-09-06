@@ -21,7 +21,7 @@ const Layout = ({ children }) => {
     <AppShell
       styles={{
         main: {
-          background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
+          background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[2],
         },
       }}
       footer={  
@@ -34,14 +34,14 @@ const Layout = ({ children }) => {
           <Grid align="center">
             <Grid.Col span={1}><Link href="/"><Button variant="subtle" color="dark">Kalypto</Button></Link></Grid.Col>
             <Grid.Col span={2}><SearchBar /></Grid.Col>
-            <Grid.Col span={1} align="right"><Link href="/about"><Button variant="subtle" color="dark">About</Button></Link></Grid.Col>
+            <Grid.Col span={1}><Link href="/about"><Button variant="subtle" color="dark">About</Button></Link></Grid.Col>
           </Grid>
         </Header>
       }
     >
       <Meta />
         <Grid grow>
-          <Container size="xl">
+          <Container>
           <Space h="xl" />
             {children}
           </Container>

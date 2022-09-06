@@ -8,7 +8,7 @@ export default function SearchBar() {
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      router.push(e.target.value)
+      router.push(`/stocks/${e.target.value}`)
     }
   }
 
