@@ -1,5 +1,3 @@
-import { it } from "node:test";
-
 export function millionOrBillion(number: number) {
   return Math.abs(Number(number)) >= 1.0e+12
     ? (Math.abs(Number(number)) / 1.0e+12).toFixed(2) + " Trillion"
