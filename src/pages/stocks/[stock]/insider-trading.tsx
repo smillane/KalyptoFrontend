@@ -1,8 +1,9 @@
-import { Table, Space, Text, Container, Stack, Title, Group } from "@mantine/core";
+import { Table, Space, Text, Container, Stack, Title } from "@mantine/core";
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 
 import Layout from "../../../main/node/components/layout";
+import { transactionColor, typeOfTransaction } from "../../../main/node/util/formating";
 
 export default function InsiderTrading({ stockSymbol, insiderTrading }) {
   return (
@@ -24,20 +25,20 @@ export default function InsiderTrading({ stockSymbol, insiderTrading }) {
                       {insiderTrading.map(indTrade => 
                       <tr key={uuidv4()}>
                         <td>
-                          <Stack>
+                          <Stack spacing="xs">
                             <Text transform="capitalize" weight={700}>{indTrade["fullName"]}</Text>
                             <Text transform="capitalize" weight={500}>{indTrade["reportedTitle"]}</Text>
                           </Stack>
                         </td>
                         <td>
-                          <Stack>
-                            <Text transform="capitalize" weight={700}>{indTrade["transactionCode"]}</Text>
+                          <Stack spacing="xs">
+                            <Text transform="capitalize" color={transactionColor(indTrade["transactionCode"])} weight={700}>{typeOfTransaction(indTrade["transactionCode"])}</Text>
                             <Text transform="capitalize" weight={500}>{indTrade["transactionDate"]}</Text>
                           </Stack>
                         </td>
-                        <td><Text align="right" transform="capitalize" weight={700}>{indTrade["transactionPrice"]}</Text></td>
-                        <td><Text align="right" transform="capitalize" weight={700}>{indTrade["transactionValue"]}</Text></td>
-                        <td><Text align="right" transform="capitalize" weight={700}>{indTrade["postShares"]}</Text></td>
+                        <td><Text align="right" transform="capitalize" weight={700}>${indTrade["transactionPrice"]}</Text></td>
+                        <td><Text align="right" transform="capitalize" weight={700}>${indTrade["transactionValue"].toLocaleString()}</Text></td>
+                        <td><Text align="right" transform="capitalize" weight={700}>{indTrade["postShares"].toLocaleString()}</Text></td>
                       </tr>
                       )}
                     </tbody>

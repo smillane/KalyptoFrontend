@@ -1,45 +1,21 @@
-import { Table, Grid, Title, Text, Container, Button, Stack, Space, Group, SimpleGrid, Paper } from "@mantine/core";
+import { Table, Grid, Title, Text, Container, Button, Stack, Space, Group, SimpleGrid } from "@mantine/core";
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 
 import Layout from "../../main/node/components/layout"
-
-function millionOrBillion(number) {
-  return Math.abs(Number(number)) >= 1.0e+12
-    ? (Math.abs(Number(number)) / 1.0e+12).toFixed(2) + " Trillion"
-    : Math.abs(Number(number)) / 1.0e+9
-      ? (Math.abs(Number(number)) / 1.0e+9).toFixed(2) + " Billion"
-      : Math.abs(Number(number)) >= 1.0e+6
-        ? (Math.abs(Number(number)) / 1.0e+6).toFixed(2) + " Million"
-        : Math.abs(Number(number)) >= 1.0e+3
-          ? (Math.abs(Number(number)) / 1.0e+3).toFixed(2) + " Thousand"
-          : Math.abs(Number(number));
-}
-
-function greenOrRed(number) {
-  return number >= 0 ? "green" : "red";
-}
-
-function typeOfTransaction(code) {
-  return code === "P" ? "Purchase" : "S" ? "Sale" : A ? "Grant" : "D" ? "Sale to issuer" : "F" ? "Payment of exercise" : "I" ? "Discretionary" : "M" ? "Exercise/Conversion" : "C" ? "Conversion" : "E" ? "Expiration of short derivative position" : "H" ? "Expiration/Cancellation of long derivative position" : "O" ? "Exercise OOM" : "X" ? "Exercise ITM/ATM" : "G" ? "Gift" : "L" ? "Small acquisition" : "W" ? "Acquisition/Disposition by wills/laws" : "Z" ? "Deposit/Withdrawl from voting trust" : "J" ? "Other acquisition/disposition" : "K" ? "Transaction of equity swap" : "U" ? "Disposition due to tender of shares in change of control transaction" : code
-}
-
-function transactionColor(code) {
-  return code === "P" ? "green" : "S" ? "red" : A ? "green" : "D" ? "red" : "F" ? "red" : "I" ? "red" : "M" ? "green" : "C" ? "green" : "E" ? "red" : "H" ? "red" : "O" ? "green" : "X" ? "green" : "G" ? "red" : "L" ? "green" : "W" ? "black" : "Z" ? "black" : "J" ? "black" : "K" ? "black" : "U" ? "red" : "black"
-}
-
+import { transactionColor, typeOfTransaction, millionOrBillion, greenOrRed } from "../../main/node/util/formating"
 
 // implement scrollbar sideways for containers such as dividends, insider trading, institutional ownership etc, based on page width, for mobile
 // or restructure how data is displayed, what data is, format, etc
 // trailing ..., not finishing full name for people/companies for insider/institutions
 // if user is not logged in with an account, only show a basic quote and chart
-export default function Stock({ stockSymbol, quote, advancedStats, previousDividends, nextDiv, insiderTrading, institutionalOwnership, peerGroup }) {
+export default function Stock({ stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, peerGroup }) {
   return (
     <Layout>
       <Container size="xl">
         <Group>
-          <Title order={1} transform="uppercase">{stockSymbol.symbol}</Title>
-          <Title order={1} weight={100} transform="capitalize">{advancedStats["companyName"]}</Title>
+          <Title order={1} transform="uppercase">{company["symbol"]}</Title>
+          <Title order={1} weight={100} transform="capitalize">{company["companyName"]}</Title>
         </Group>
         <Space h="sm" />
         <Group>
@@ -64,7 +40,15 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Market Cap</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{millionOrBillion(quote["marketCap"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${millionOrBillion(quote["marketCap"])}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Enterprise Value</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${millionOrBillion(fundamentalValuations["enterpriseValue"])}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Next Earnings Date</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats["nextEarningsDate"]}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -74,20 +58,36 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
             })}>
               <tbody>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>Next Earnings Date</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{advancedStats["nextEarningsDate"]}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Dividend Yield</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{(advancedStats["dividendYield"] * 100).toFixed(2)} %</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>PE Ratio</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{advancedStats["peRatio"].toFixed(2)}</Text></td>
-                </tr>
-                <tr>
                   <td><Text transform="capitalize" weight={700}>EPS</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{advancedStats["ttmEPS"]}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats["ttmEPS"]}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>P/E</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["pToE"].toFixed(2)}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Forward P/E</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{stats["forwardPERatio"].toFixed(2)}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Price to Revenue</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["priceToRevenue"].toFixed(2)}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>EV to Sales</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["evToSales"].toFixed(2)}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Book per Share</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["bookValuePerShare"].toFixed(2)}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Cash per Share</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>$ {Math.trunc(financials["totalCash"] / quote["latestPrice"]).toLocaleString()}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>FCF Share</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{Math.trunc(financials["cashFlow"] / quote["latestPrice"]).toLocaleString()}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -98,20 +98,90 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
             })}>
               <tbody>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>52 week high</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{advancedStats["week52high"]}</Text></td>
+                  <td><Text transform="capitalize" weight={700}>Revenue</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["revenueGrowth"])}>{millionOrBillion(financials["revenue"])}</Text></td>
                 </tr>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>52 week low</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{advancedStats["week52low"]}</Text></td>
+                  <td><Text transform="capitalize" weight={700}>EBITDA</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["ebitdaGrowth"])}>{millionOrBillion(financials["EBITDA"])}</Text></td>
                 </tr>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>52 week change</Text></td>
-                  <td><Text transform="capitalize" weight={700} color={greenOrRed(advancedStats["week52change"])} align="right">{(advancedStats["week52change"] * 100).toLocaleString()} %</Text></td>
+                  <td><Text transform="capitalize" weight={700}>GAAP Net Income</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["incomeNetYoyDelta"])}>{millionOrBillion(fundamentalValuations["incomeNet"])}</Text></td>
                 </tr>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>YTD Change</Text></td>
-                  <td><Text transform="capitalize" weight={700} color={greenOrRed(advancedStats["ytdChangePercent"])} align="right">{(advancedStats["ytdChangePercent"] * 100).toLocaleString()} %</Text></td>
+                  <td><Text transform="capitalize" weight={700}>Cash Flow</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["freeCashFlowGrowth"])}>{millionOrBillion(financials["cashFlow"])}</Text></td>
+                </tr>
+              </tbody>
+            </Table>
+            <Table highlightOnHover sx={theme => ({
+              boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+            })}>
+              <tbody>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Profit margin</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["profitGrossToRevenue"] * 100).toFixed(2)} %</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Oper. margin</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["operatingIncomeToRevenue"] * 100).toFixed(2)} %</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Gross margin</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["profitGrossToRevenue"] * 100).toFixed(2)} %</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>EBIT margin</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["ebitToRevenue"] * 100).toFixed(2)} %</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>EBITDA margin</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["ebitdaMargin"] * 100).toFixed(2)} %</Text></td>
+                </tr>
+              </tbody>
+            </Table>
+            <Table highlightOnHover sx={theme => ({
+              boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+            })}>
+              <tbody>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Return on Assets</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["returnOnAssets"] * 100).toFixed(2)} %</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Return on Equity</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["returnOnEquity"] * 100).toFixed(2)} %</Text></td>
+                </tr>
+              </tbody>
+            </Table>
+            <Table highlightOnHover sx={theme => ({
+              boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+            })}>
+              <tbody>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Debt to Equity</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["debtToEquity"]}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Debt to EBITDA</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["debtToEbitda"]}</Text></td>
+                </tr>
+              </tbody>
+            </Table>
+          </Grid.Col>
+          <Grid.Col xs={6} sm={4} md={4} lg={4}>
+            <Table highlightOnHover sx={theme => ({
+              boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+            })}>
+              <tbody>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Dividend</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${fundamentalValuations["dividendYield"] ? (fundamentalValuations["dividendYield"]).toFixed(2) : 0}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Dividend Yield</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["dividendYield"] ? (fundamentalValuations["dividendYield"] * 100).toFixed(2) : 0} %</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -122,19 +192,43 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
               <tbody>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>52 week high</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{advancedStats["week52high"]}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats["week52high"]}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>52 week low</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{advancedStats["week52low"]}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats["week52low"]}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>52 week change</Text></td>
-                  <td><Text transform="capitalize" weight={700} color={greenOrRed(advancedStats["week52change"])} align="right">{(advancedStats["week52change"] * 100).toLocaleString()} %</Text></td>
+                  <td><Text transform="capitalize" weight={700} color={greenOrRed(basicStats["week52change"])} align="right">{(basicStats["week52change"]).toFixed(2)}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>YTD Change</Text></td>
-                  <td><Text transform="capitalize" weight={700} color={greenOrRed(advancedStats["ytdChangePercent"])} align="right">{(advancedStats["ytdChangePercent"] * 100).toLocaleString()} %</Text></td>
+                  <td><Text transform="capitalize" weight={700} color={greenOrRed(basicStats["ytdChangePercent"])} align="right">{(basicStats["ytdChangePercent"] * 100).toLocaleString()} %</Text></td>
+                </tr>
+              </tbody>
+            </Table>
+            <Table highlightOnHover sx={theme => ({
+              boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+            })}>
+              <tbody>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Total Employees</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{stats["employees"].toLocaleString()}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Revenue Per Employee</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>$ {stats["revenuePerEmployee"].toLocaleString()}</Text></td>
+                </tr>
+              </tbody>
+            </Table>
+            <Table highlightOnHover sx={theme => ({
+              boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+            })}>
+              <tbody>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Put/Call Ratio</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{stats["putCallRatio"].toFixed(2)}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -150,7 +244,7 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
           })}>
             <>
               <Link href={`/stocks/${stockSymbol.symbol}/dividends`} passHref>
-                <Button variant="subtle" color="dark">
+                <Button variant="outline" color="dark" sx={theme => ({background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]})}>
                   <Title order={3}>Dividends</Title>
                 </Button>
               </Link>
@@ -189,7 +283,7 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
                   </tr>
                 </thead>
                 <tbody>
-                  {previousDividends.map(dividend =>
+                  {last4Dividends.map(dividend =>
                     <tr key={dividend["paymentDate"]}>
                       <td><Text transform="capitalize" weight={700}>{dividend["paymentDate"]}</Text></td>
                       <td><Text transform="capitalize" weight={700}>{dividend["exDate"]}</Text></td>
@@ -207,7 +301,7 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
           })}>
             <>
               <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref>
-                <Button variant="subtle" color="dark">
+                <Button variant="outline" color="dark" sx={theme => ({background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]})}>
                   <Title order={3}>Insider Trading</Title>
                 </Button>
               </Link>
@@ -265,16 +359,16 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
                   {institutionalOwnership.map(institution =>
                     <tr key={institution["entityProperName"]}>
                       <td>
-                        <Text transform="capitalize" weight={700}>{institution["filingDate"]}</Text>
+                        <Text transform="capitalize" weight={700}>{institution["reportDate"]}</Text>
                       </td>
                       <td>
                         <Text transform="capitalize" weight={700}>{institution["entityProperName"]}</Text>
                       </td>
                       <td>
-                        <Text align="right" transform="capitalize" weight={700}>{(institution["adjHolding"]).toLocaleString()}</Text>
+                        <Text align="right" transform="capitalize" weight={700}>{institution["adjustedHolding"].toLocaleString()}</Text>
                       </td>
                       <td>
-                        <Text align="right" transform="capitalize" weight={700}>${(institution["adjMv"]).toLocaleString()}</Text>
+                        <Text align="right" transform="capitalize" weight={700}>${millionOrBillion(institution["adjustedMarketValue"])}</Text>
                       </td>
                     </tr>
                   )}
@@ -282,24 +376,25 @@ export default function Stock({ stockSymbol, quote, advancedStats, previousDivid
               </Table>
             </>
           </Container>
-          <Container sx={theme => ({
+        </SimpleGrid>
+          <Container size="xl" sx={theme => ({
             boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
             <Title order={4}>People also viewed</Title>
             <Space h="md" />
             <SimpleGrid breakpoints={[
-              { minWidth: 0, cols: 3 },
+              { minWidth: 350, cols: 2 },
+              { minWidth: 500, cols: 3 },
               { minWidth: 'xs', cols: 4 },
               { minWidth: 'sm', cols: 4 },
               { minWidth: 'md', cols: 6 },
-              { minWidth: 1200, cols: 8 }]}
+              { minWidth: 1200, cols: 6 }]}
             >
               {peerGroup.map(it =>
                 <Link href={`/stocks/${it}`} key={it}><Button variant="outline" color="dark">{it}</Button></Link>
               )}
             </SimpleGrid>
           </Container>
-        </SimpleGrid>
       </Container>
     </Layout>
   )
@@ -314,60 +409,244 @@ export async function getServerSideProps(context) {
   //   'public, s-maxage=300, stale-while-revalidate=300'
   // )
 
-  const stockInfo = "test"
-  const stockSymbol = { "symbol": `${context.params.stock}`, "Latest Price": 162 }
-  const quote = { "avgTotalVolume": 68051839, "calculationPrice": "close", "change": -2.22, "changePercent": 0.01417, "close": 158.06, "closeSource": "acfiolfi", "closeTime": 1673421927830, "companyName": "Apple Inc", "currency": "USD", "delayedPrice": 161.449, "delayedPriceTime": 1667658149711, "extendedChange": -0.17, "extendedChangePercent": -0.00105, "extendedPrice": 157.73, "extendedPriceTime": 1707334287226, "high": 163.5, "highSource": "ddti eu15nlemaeicpr y e", "highTime": 1664353583588, "iexAskPrice": null, "iexAskSize": null, "iexBidPrice": null, "iexBidSize": null, "iexClose": 161.683, "iexCloseTime": 1744171158299, "iexLastUpdated": null, "iexMarketPercent": null, "iexOpen": 166.68, "iexOpenTime": 1720689135893, "iexRealtimePrice": null, "iexRealtimeSize": null, "iexVolume": null, "lastTradeTime": 1673675161659, "latestPrice": 158.21, "latestSource": "Close", "latestTime": "September 2, 2022", "latestUpdate": 1717848652005, "latestVolume": 78728792, "low": 158.06, "lowSource": "lnedm pcdutier y1i ae5e", "lowTime": 1687239843853, "marketCap": 2594400687912, "oddLotDelayedPrice": 157.33, "oddLotDelayedPriceTime": 1710144377762, "open": 163.5, "openTime": 1709765099263, "openSource": "lfiiocfa", "peRatio": 26.67, "previousClose": 164.27, "previousVolume": 75991320, "primaryExchange": "ANSQDA", "symbol": `${context.params.stock}`, "volume": 77371178, "week52High": 183.56, "week52Low": 132.34, "ytdChange": -0.1326028502741089, "isUSMarketOpen": false }
-  const advancedStats = { "companyName": "Apple Inc", "marketcap": 2589492523467, "week52high": 190.37, "week52low": 132.54, "week52highSplitAdjustOnly": 190.01, "week52lowSplitAdjustOnly": 132.82, "week52change": 0.0158022070141329, "sharesOutstanding": 16089132395, "float": 0, "avg10Volume": 76877469, "avg30Volume": 68729232, "day200MovingAvg": 157.1, "day50MovingAvg": 167.5, "employees": 148531, "ttmEPS": 6.19, "ttmDividendRate": 0.8985073960027097, "dividendYield": 0.005975068065694612, "nextDividendDate": "", "exDividendDate": "2022-08-05", "nextEarningsDate": "2022-10-13", "peRatio": 25.65374342568991, "beta": 1.2591629569187481, "maxChangePercent": 60.79263780181754, "year5ChangePercent": 3.069363110860276, "year2ChangePercent": 0.2024766694057477, "year1ChangePercent": 0.020108910073601636, "ytdChangePercent": -0.12053640846794468, "month6ChangePercent": -0.06218530383746557, "month3ChangePercent": 0.03312673021951394, "month1ChangePercent": -0.0252192939653644, "day30ChangePercent": -0.06311858239415621, "day5ChangePercent": -0.0483139175240299 }
-  const previousDividends = [{ "amount": 0.23, "currency": "USD", "declaredDate": "2022-07-19", "description": "s yraSindrearhO", "exDate": "2022-07-23", "flag": "Cash", "frequency": "quarterly", "paymentDate": "2022-08-09", "recordDate": "2022-07-24", "refid": 2760702, "symbol": "AAPL", "id": "IEDVIDDNS", "key": "PAAL", "subkey": "2750165", "date": 1659657600000, "updated": 1697984825164 }, { "amount": 0.24, "currency": "USD", "declaredDate": "2022-04-23", "description": " rdsriyhrSaanOe", "exDate": "2022-04-25", "flag": "Cash", "frequency": "quarterly", "paymentDate": "2022-04-30", "recordDate": "2022-04-28", "refid": 2503278, "symbol": "AAPL", "id": "VDIDIDNSE", "key": "LAPA", "subkey": "2541510", "date": 1651795200000, "updated": 1711850314815.871 }, { "amount": 0.22, "currency": "USD", "declaredDate": "2022-01-19", "description": "yeiraOdh snSrra", "exDate": "2022-01-20", "flag": "Cash", "frequency": "quarterly", "paymentDate": "2022-02-05", "recordDate": "2022-02-05", "refid": 2435475, "symbol": "AAPL", "id": "DDDNISVIE", "key": "LAPA", "subkey": "2465533", "date": 1643932800000, "updated": 1687682435271.971 }, { "amount": 0.23, "currency": "USD", "declaredDate": "2021-10-18", "description": "aOreyriShsrnad ", "exDate": "2021-11-03", "flag": "Cash", "frequency": "quarterly", "paymentDate": "2021-10-29", "recordDate": "2021-11-08", "refid": 2354519, "symbol": "AAPL", "id": "DEVDDINIS", "key": "AALP", "subkey": "2367189", "date": 1636070400000, "updated": 1692854513488.657 }]
-  const insiderTrading = [{ "conversionOrExercisePrice": null, "directIndirect": "D", "effectiveDate": "2022-05-01", "filingDate": "2022-05-04", "fullName": "LBLEE SJ AMA", "is10b51": false, "postShares": 35292, "reportedTitle": "President", "secAccessionNumber": "30-2031-000260920030", "symbol": "AAPL", "transactionCode": "G", "transactionDate": "2022-04-27", "transactionPrice": null, "transactionShares": -1295, "transactionValue": 125125222, "id": "NTCAOERSNNIS_RIIADST", "key": "ALPA", "subkey": "-33020030060009-0122", "date": 1651795200000, "updated": 1723669009735 }, { "conversionOrExercisePrice": null, "directIndirect": "D", "effectiveDate": "2022-04-29", "filingDate": "2022-05-06", "fullName": "aaeLtsim.rKed A hn", "is10b51": true, "postShares": 486084, "reportedTitle": "CEO and Director", "secAccessionNumber": "60900023011300-2002-", "symbol": "AAPL", "transactionCode": "S", "transactionDate": "2022-05-01", "transactionPrice": 163.79, "transactionShares": -9387, "transactionValue": 1527216, "id": "NSATCEDNRNIASOII_RTS", "key": "LPAA", "subkey": "002100930-01223-0600", "date": 1651622400000, "updated": 1718823274912 }]
-  const institutionalOwnership = [
+  const stockSymbol = { "symbol": `${context.params.stock}` }
+  const company = [{"address":"1 Apple Park Way","address2":null,"ceo":"Timothy Cook","city":"Cupertino","companyName":"Apple Inc","country":"US","date":"2022-07-18","employees":147000,"exchange":"NASDAQ","exchangeCode":null,"industry":"Electronic Computer Manufacturing ","issuetype":"cs","longDescription":"Apple Inc. is an American multinational technology company headquartered in Cupertino, California, that designs, develops, and sells consumer electronics, computer software, and online services. It is considered one of the Big Five companies in the U.S. information technology industry, along with Amazon, Google, Microsoft, and Facebook. Its hardware products include the iPhone smartphone, the iPad tablet computer, the Mac personal computer, the iPod portable media player, the Apple Watch smartwatch, the Apple TV digital media player, the AirPods wireless earbuds, the AirPods Max headphones, and the HomePod smart speaker line. Apple's software includes iOS, iPadOS, macOS, watchOS, and tvOS operating systems, the iTunes media player, the Safari web browser, the Shazam music identifier, and the iLife and iWork creativity and productivity suites, as well as professional applications like Final Cut Pro X, Logic Pro, and Xcode. Its online services include the iTunes Store, the iOS App Store, Mac App Store, Apple Arcade, Apple Music, Apple TV+, iMessage, and iCloud. Other services include Apple Store, Genius Bar, AppleCare, Apple Pay, Apple Pay Cash, and Apple Card.\nApple was founded by Steve Jobs, Steve Wozniak, and Ronald Wayne in April 1976 to develop and sell Wozniak's Apple I personal computer, though Wayne sold his share back within 12 days. It was incorporated as Apple Computer, Inc., in January 1977, and sales of its computers, including the Apple I and Apple II, grew quickly.","marketcap":null,"phone":"14089961010","primarySicCode":"3571","sector":"Manufacturing","securityName":null,"securityType":"cs","shortDescription":"Apple Inc. is an American multinational technology company headquartered in Cupertino, California, that designs, develops, and sells consumer electronics, computer software, and online services. It is considered one of the Big Five companies in the U.S. information technology industry, along with Amazon, Google, Microsoft, and Facebook. Its hardware products include the iPhone smartphone, the iPad tablet computer, the Mac personal computer, the iPod portable media player, the Apple Watch smartwatch, the Apple TV digital media player, the AirPods wireless earbuds, the AirPods Max headphones, and the HomePod smart speaker line. Apple's software includes iOS, iPadOS, macOS, watchOS, and tvOS operating systems, the iTunes media player, the Safari web browser, the Shazam music identifier, and the iLife and iWork creativity and productivity suites, as well as professional applications like Final Cut Pro X, Logic Pro, and Xcode. Its online services include the iTunes Store, the iOS App Store, Mac App Store, Apple Arcade, Apple Music, Apple TV+, iMessage, and iCloud. Other services include Apple Store, Genius Bar, AppleCare, Apple Pay, Apple Pay Cash, and Apple Card.\nApple was founded by Steve Jobs, Steve Wozniak, and Ronald Wayne in April 1976 to develop and sell Wozniak's Apple I personal computer, though Wayne sold his share back within 12 days. It was incorporated as Apple Computer, Inc., in January 1977, and sales of its computers, including the Apple I and Apple II, grew quickly.","state":"California","symbol":"AAPL","website":"https://www.apple.com/","zip":"95014-0642","id":"COMPANY","key":"AAPL","subkey":"","updated":1658178636273.846}][0]
+  const quote = {"avgTotalVolume":70812911,"calculationPrice":"close","change":3.04,"changePercent":0.01904,"close":164.5,"closeSource":"affoicil","closeTime":1734295966795,"companyName":"Apple Inc","currency":"USD","delayedPrice":163.603,"delayedPriceTime":1737519598489,"extendedChange":0.15,"extendedChangePercent":0.00098,"extendedPrice":160.43,"extendedPriceTime":1729405496463,"high":164.5,"highSource":"piunimy ecede1dt laer5 ","highTime":1699741879641,"iexAskPrice":null,"iexAskSize":null,"iexBidPrice":null,"iexBidSize":null,"iexClose":162.47,"iexCloseTime":1691582608499,"iexLastUpdated":null,"iexMarketPercent":null,"iexOpen":156.81,"iexOpenTime":1725689786117,"iexRealtimePrice":null,"iexRealtimeSize":null,"iexVolume":null,"lastTradeTime":1669671197923,"latestPrice":159.19,"latestSource":"Close","latestTime":"September 9, 2022","latestUpdate":1685045584478,"latestVolume":71236798,"low":160.3,"lowSource":"edyree5di ime c antpul1","lowTime":1733695008100,"marketCap":2569564253181,"oddLotDelayedPrice":161.07,"oddLotDelayedPriceTime":1738846413646,"open":162.57,"openTime":1710357907314,"openSource":"ficilfoa","peRatio":26.39,"previousClose":155.07,"previousVolume":87690310,"primaryExchange":"DAAQSN","symbol":"AAPL","volume":70118569,"week52High":191.07,"week52Low":132.61,"ytdChange":-0.0941945158215941,"isUSMarketOpen":false}
+  const last4Dividends = [{"amount":0.23,"currency":"USD","declaredDate":"2022-07-28","description":"Ordinary Shares","exDate":"2022-08-05","flag":"Cash","frequency":"quarterly","paymentDate":"2022-08-11","recordDate":"2022-08-08","refid":2663365,"symbol":"AAPL","id":"DIVIDENDS","key":"AAPL","subkey":"2663365","date":1659657600000,"updated":1659479407000},{"amount":0.23,"currency":"USD","declaredDate":"2022-04-28","description":"Ordinary Shares","exDate":"2022-05-06","flag":"Cash","frequency":"quarterly","paymentDate":"2022-05-12","recordDate":"2022-05-09","refid":2502890,"symbol":"AAPL","id":"DIVIDENDS","key":"AAPL","subkey":"2502890","date":1651795200000,"updated":1652531943175.202},{"amount":0.22,"currency":"USD","declaredDate":"2022-01-27","description":"Ordinary Shares","exDate":"2022-02-04","flag":"Cash","frequency":"quarterly","paymentDate":"2022-02-10","recordDate":"2022-02-07","refid":2430900,"symbol":"AAPL","id":"DIVIDENDS","key":"AAPL","subkey":"2430900","date":1643932800000,"updated":1652531943175.202},{"amount":0.22,"currency":"USD","declaredDate":"2021-10-28","description":"Ordinary Shares","exDate":"2021-11-05","flag":"Cash","frequency":"quarterly","paymentDate":"2021-11-11","recordDate":"2021-11-08","refid":2345242,"symbol":"AAPL","id":"DIVIDENDS","key":"AAPL","subkey":"2345242","date":1636070400000,"updated":1652531943175.202}]
+  const financials = [
     {
-      "symbol": "AAPL",
-      "id": "0001104659-20-095098",
-      "adjHolding": 1315961000,
-      "adjMv": 120015645,
-      "entityProperName": "VANGUARD GROUP INC",
-      "reportDate": 1593475200000,
-      "filingDate": "2020-06-30",
-      "reportedHolding": 328990250,
-      "date": 1606608000000,
-      "updated": 1606622415000
-    },
-    {
-      "symbol": "AAPL",
-      "id": "00011044429-20-095098",
-      "adjHolding": 13151251261000,
-      "adjMv": 1162015645,
-      "entityProperName": "Silver Lake",
-      "reportDate": 15261475200000,
-      "filingDate": "2019-06-30",
-      "reportedHolding": 2448990250,
-      "date": 1606608000011,
-      "updated": 1606622415011
+      "accountsPayable": 0,
+      "capitalSurplus": null,
+      "cashChange": 12170000,
+      "cashFlow": 22422000,
+      "cashFlowFinancing": -20481000,
+      "changesInInventories": 0,
+      "changesInReceivables": 23916000,
+      "commonStock": 38368648,
+      "costOfRevenue": 0,
+      "currency": "USD",
+      "currentAssets": 64826000,
+      "currentCash": 12170000,
+      "currentDebt": 10000000,
+      "currentLongTermDebt": 10000000,
+      "depreciation": 7644000,
+      "dividendsPaid": null,
+      "ebit": 14007000,
+      "EBITDA": 21651000,
+      "exchangeRateEffect": null,
+      "filingType": "10-Q",
+      "fiscalDate": "2022-07-31",
+      "fiscalQuarter": 3,
+      "fiscalYear": 2022,
+      "goodwill": 0,
+      "grossProfit": 35484000,
+      "incomeTax": 0,
+      "intangibleAssets": 0,
+      "interestIncome": 3186000,
+      "inventory": 0,
+      "investingActivityOther": null,
+      "investments": null,
+      "longTermDebt": 304315000,
+      "longTermInvestments": 925498000,
+      "minorityInterest": 63243000,
+      "netBorrowings": 273405000,
+      "netIncome": 6630000,
+      "netIncomeBasic": 6630000,
+      "netTangibleAssets": 354132000,
+      "operatingExpense": 21701000,
+      "operatingIncome": 13783000,
+      "operatingRevenue": 35484000,
+      "otherAssets": 8810000,
+      "otherCurrentAssets": 28740000,
+      "otherCurrentLiabilities": 9923000,
+      "otherIncomeExpenseNet": 0,
+      "otherLiabilities": 23711000,
+      "pretaxIncome": 10924000,
+      "propertyPlantEquipment": 888436000,
+      "receivables": 23916000,
+      "reportDate": "2022-09-08",
+      "researchAndDevelopment": 0,
+      "retainedEarnings": -177103000,
+      "revenue": 35484000,
+      "sellingGeneralAndAdmin": 2485000,
+      "shareholderEquity": 579132000,
+      "shortTermDebt": 10000000,
+      "shortTermInvestments": 28740000,
+      "symbol": "UBA",
+      "totalAssets": 990324000,
+      "totalCash": 12170000,
+      "totalDebt": 314315000,
+      "totalInvestingCashFlows": -5664000,
+      "totalLiabilities": 411192000,
+      "totalRevenue": 35484000,
+      "treasuryStock": 0,
+      "id": "FINANCIALS",
+      "key": "UBA",
+      "subkey": "quarterly",
+      "date": 1659225600000,
+      "updated": 1662822641000
     }
-  ]
-  const peerGroup = [
-    "MSFT",
-    "NOK",
-    "IBM",
-    "BBRY",
-    "HPQ",
-    "GOOGL",
-    "XLK",
-    "AMD",
-    "ENPH",
-    "INTL",
-    "BBY",
-    "GS",
-    "JPM",
-    "XLF",
-    "GOOG",
-    "META",
-    "NVDA",
-    "PLTR",
-    "SPY",
-    "QQQ"
-  ]
+  ][0]
+  const fundamentalValuations = [
+    {
+      "accountsPayableTurnover": 0,
+      "accountsReceivableTurnover": 1.85208316862993,
+      "altmanZScore": 0.3733094181699172,
+      "asOfDate": "2022-09-09",
+      "assetsToEquity": 10.403310348633944,
+      "assetTurnover": 0.04882670234659531,
+      "bbgCompositeTicker": "AX US",
+      "bookValuePerShare": 27.60203150258353,
+      "cashConversionCycle": 197.075383104964,
+      "cik": "0001299709",
+      "companyName": "Axos Financial Inc.",
+      "companyStatusCurrent": "live",
+      "currentRatio": 1.0612075293916967,
+      "dataGenerationDate": "2022-09-09",
+      "dataType": "ANNUAL",
+      "daysInAccountsPayable": 0,
+      "daysInInventory": 0,
+      "daysInRevenueDeferred": 0,
+      "daysRevenueOutstanding": 197.075383104964,
+      "debtToAssets": 0,
+      "debtToCapitalization": 0,
+      "debtToEbitda": 2.01,
+      "debtToEquity": 4.56,
+      "dividendPerShare": null,
+      "dividendYield": null,
+      "earningsYield": 0.10848110728370446,
+      "ebitdaGrowth": 0.105157533187618,
+      "ebitdaMargin": 0.4715550950664281,
+      "ebitdaReported": 364555000,
+      "ebitGrowth": 0.11191098406177737,
+      "ebitReported": 339959000,
+      "ebitToInterestExpense": null,
+      "ebitToRevenue": 0.43973995299389074,
+      "enterpriseValue": 2741903947.86,
+      "evToEbit": 8.065395967925545,
+      "evToEbitda": 7.521235335847815,
+      "evToFcf": 14.524488806216826,
+      "evToInvestedCapital": 2.446108301500993,
+      "evToNopat": 11.390617773060375,
+      "evToOcf": 13.039175715753132,
+      "evToSales": 3.546676843812695,
+      "expenseOperating": 414632000,
+      "fcfYield": 0.08662879481856557,
+      "figi": "BBG000QPHD08",
+      "filingDate": "2022-09-08",
+      "filingType": "10-K",
+      "fiscalQuarter": 0,
+      "fiscalYear": 2022,
+      "fixedAssetTurnover": 1.1394908711436165,
+      "freeCashFlow": 188778000,
+      "freeCashFlowGrowth": -0.4520671648318397,
+      "freeCashFlowToRevenue": 0.24418600138922844,
+      "goodwillTotal": 156405000,
+      "incomeNetPerWabso": 4.04,
+      "incomeNetPerWabsoSplitAdjusted": 4.04404126858804,
+      "incomeNetPerWabsoSplitAdjustedYoyDeltaPercent": 0.111399150407989,
+      "incomeNetPerWadso": 3.97,
+      "incomeNetPerWadsoSplitAdjusted": 3.97149333765642,
+      "incomeNetPerWadsoSplitAdjustedYoyDeltaPercent": 0.115235070314584,
+      "incomeNetPreTax": 339959000,
+      "interestBurden": 1,
+      "interestMinority": 0,
+      "inventoryTurnover": 0,
+      "investedCapital": 1120925000,
+      "investedCapitalGrowth": 0.1871539442413357,
+      "investedCapitalTurnover": 0.6896902112094921,
+      "leverage": 10.403310348633944,
+      "marketCapPeriodEnd": 2179159947.86,
+      "netDebt": 562744000,
+      "netDebtToEbitda": 1.5436463633745252,
+      "netIncomeGrowth": 0.11691830844755424,
+      "netIncomeToRevenue": 0.31136826065754225,
+      "netWorkingCapital": 964520000,
+      "netWorkingCapitalGrowth": 0.16454167874046166,
+      "nibclRevenueDeferredTurnover": 0,
+      "nopat": 240715999.9999999,
+      "nopatGrowth": 0.11593967743281408,
+      "nopatMargin": 0.31136826065754214,
+      "operatingCashFlowGrowth": -0.4903267714054418,
+      "operatingCashFlowInterestCoverage": null,
+      "operatingCfToRevenue": 0.2720016142989635,
+      "operatingIncome": 339959000,
+      "operatingIncomeToRevenue": 0.43973995299389074,
+      "operatingReturnOnAssets": 0.02147105179473852,
+      "periodEndDate": "2022-06-30",
+      "ppAndENet": 0,
+      "preferredEquityToCapital": 0,
+      "pretaxIncomeMargin": 0.43973995299389074,
+      "priceAccountingPeriodEnd": 36.61,
+      "priceDateAccountingPeriodEnd": "2022-06-29",
+      "priceToRevenue": 2.8187625361826747,
+      "profitGrossToRevenue": 0.9760700874799992,
+      "pToBv": 1.3263516490289249,
+      "pToE": 9.05282551994882,
+      "quickRatio": 0.02648888908067626,
+      "researchDevelopmentToRevenue": 0,
+      "returnOnAssets": 0.0138333266766909,
+      "returnOnEquity": 3.239260648334761,
+      "revenueGrowth": 0.06909879909946293,
+      "roce": 0.20691697307259463,
+      "roic": 0.21474764145683245,
+      "scexhid": 7744712,
+      "secid": 232553,
+      "sgaToRevenue": 0.09109923670046605,
+      "stockExchange": "NYSE",
+      "symbol": "AX",
+      "taxBurden": 0.7080736206424892,
+      "ticker": "AX",
+      "totalCapital": 1642973000,
+      "totalDebt": 0,
+      "updateReason": "UPDATED_DATA",
+      "wabso": 59523626,
+      "wabsoSplitAdjusted": 59523626,
+      "wadso": 60610954,
+      "wadsoSplitAdjusted": 60610954,
+      "workingCapitalTurnover": 0.8624590017626453,
+      "id": "FUNDAMENTAL_VALUATIONS",
+      "key": "AX",
+      "subkey": "annual",
+      "date": 1662595200000,
+      "updated": 1662822000000
+    }
+  ][0]
+  const basicStats = {
+    "companyName": "Apple Inc.",
+    "marketcap": 760334287200,
+    "week52high": 156.65,
+    "week52low": 93.63,
+    "week52highSplitAdjustOnly": null,
+    "week52lowSplitAdjustOnly": null,
+    "week52change": 58.801903,
+    "sharesOutstanding": 5213840000,
+    "float": null,
+    "avg10Volume": 2774000,
+    "avg30Volume": 12774000,
+    "day200MovingAvg": 140.60541,
+    "day50MovingAvg": 156.49678,
+    "employees": 120000,
+    "ttmEPS": 16.5,
+    "ttmDividendRate": 2.25,
+    "dividendYield": .021,
+    "nextDividendDate": '2019-03-01',
+    "exDividendDate": '2019-02-08',
+    "nextEarningsDate": '2019-01-01',
+    "peRatio": 14,
+    "beta": 1.25,
+    "maxChangePercent": 153.021,
+    "year5ChangePercent": 0.5902546932200027,
+    "year2ChangePercent": 0.3777449874142869,
+    "year1ChangePercent": 0.39751716851558366,
+    "ytdChangePercent": 0.36659492036160124,
+    "month6ChangePercent": 0.12208398133748043,
+    "month3ChangePercent": 0.08466584665846649,
+    "month1ChangePercent": 0.009668596145283263,
+    "day30ChangePercent": -0.002762605699968781,
+    "day5ChangePercent": -0.005762605699968781
+  }
+  const stats = {"beta":1.267996246422266,"totalCash":48981618381,"currentDebt":133856010226,"revenue":395450341513,"grossProfit":167923759171,"totalRevenue":400212785103,"EBITDA":130755761377,"revenuePerShare":24.99,"revenuePerEmployee":2743134.29,"debtToEquity":5.934928092420203,"profitMargin":0.26536198622976687,"enterpriseValue":2689356946897,"enterpriseValueToRevenue":6.82,"priceToSales":6.66,"priceToBook":44.49,"forwardPERatio":26.72806801835187,"pegRatio":1.4103624014190055,"peHigh":28.653984807623633,"peLow":14.55282251914132,"week52highDate":"2021-12-31","week52lowDate":"2022-06-03","putCallRatio":0.4688321027624213,"companyName":"Apple Inc","marketcap":2563498285424,"week52high":188.81,"week52low":129.19,"week52highSplitAdjustOnly":191.33,"week52highDateSplitAdjustOnly":"2021-12-31","week52lowSplitAdjustOnly":131.44,"week52lowDateSplitAdjustOnly":"2022-06-16","week52change":0.0652808941399826,"sharesOutstanding":16672404808,"float":null,"avg10Volume":79358572,"avg30Volume":71633086,"day200MovingAvg":158.53,"day50MovingAvg":171.05,"employees":147526,"ttmEPS":6.07,"ttmDividendRate":0.9077723002922429,"dividendYield":0.005878987352792016,"nextDividendDate":null,"exDividendDate":"","nextEarningsDate":"2022-10-21","peRatio":26.064668035902226,"maxChangePercent":61.0443831275352,"year5ChangePercent":3.284713920088472,"year2ChangePercent":0.3719065153286917,"year1ChangePercent":0.02759725853439683,"ytdChangePercent":-0.1131231889408295,"month6ChangePercent":-0.03302000717424267,"month3ChangePercent":0.108734790890699,"month1ChangePercent":-0.04673357401282659,"day30ChangePercent":-0.0730086269997118,"day5ChangePercent":0.010109347928829398}
   const nextDiv = {
     "amount": 0.23,
     "currency": "USD",
@@ -386,12 +665,132 @@ export async function getServerSideProps(context) {
     "date": 1659657600000,
     "updated": 1697984825164
   }
+  const insiderTrading = [
+    {
+      "conversionOrExercisePrice": 0,
+      "directIndirect": "D",
+      "effectiveDate": "2047-06-07",
+      "filingDate": "2017-06-09",
+      "fullName": "KRA DOUGLAS I",
+      "is10b51": false,
+      "postShares": 3520,
+      "reportedTitle": "SVP, Global Customer Success",
+      "symbol": "PEGA",
+      "transactionCode": "B",
+      "transactionDate": "2047-06-07",
+      "transactionPrice": 22,
+      "transactionShares": 502,
+      "transactionValue": 111111,
+      "id": "INSIDER_TRANSACTIONS",
+      "key": "PEGA",
+      "subkey": "0001209191-17-038918",
+      "date": 0,
+      "updated": 1652531939238.962
+    },
+    {
+      "conversionOrExercisePrice": 0,
+      "directIndirect": "D",
+      "effectiveDate": "2047-06-07",
+      "filingDate": "2017-06-09",
+      "fullName": "KRA PETER I",
+      "is10b51": false,
+      "postShares": 35420,
+      "reportedTitle": "SVP, Global Customer Success",
+      "symbol": "PEGA",
+      "transactionCode": "B",
+      "transactionDate": "2047-06-07",
+      "transactionPrice": 23,
+      "transactionShares": 502,
+      "transactionValue": 12412411,
+      "id": "INSIDER_TRANSACTIONS",
+      "key": "PEGA",
+      "subkey": "0001209191-17-038918",
+      "date": 0,
+      "updated": 1652531939238.962
+    },
+    {
+      "conversionOrExercisePrice": 0,
+      "directIndirect": "D",
+      "effectiveDate": "2047-06-07",
+      "filingDate": "2017-06-09",
+      "fullName": "AS MARG I",
+      "is10b51": true,
+      "postShares": 1252,
+      "reportedTitle": "SVP, Global Customer Success",
+      "symbol": "PEGA",
+      "transactionCode": "S",
+      "transactionDate": "2047-06-07",
+      "transactionPrice": 44122,
+      "transactionShares": 11,
+      "transactionValue": 1111,
+      "id": "INSIDER_TRANSACTIONS",
+      "key": "PEGA",
+      "subkey": "0001209191-17-038918",
+      "date": 0,
+      "updated": 1652531939238.962
+    }
+  ]
+  const institutionalOwnership = [
+    {
+      "adjustedHolding": 1768286969,
+      "adjustedMarketValue": 872500,
+      "entityProperName": "Metatron Capital SICAV plc",
+      "id": "0001718013-22-000002",
+      "reportDate": "2021-12-31",
+      "reportedHolding": 1768286969,
+      "symbol": "ABT",
+      "key": "ABT",
+      "subkey": "0001718013-22-000002",
+      "date": 1662768000000,
+      "updated": 1662818270000
+    },
+    {
+      "adjustedHolding": 176828446969,
+      "adjustedMarketValue": 8725020,
+      "entityProperName": "Metatron Capital SICAV plc",
+      "id": "0001718013-22-000002",
+      "reportDate": "2019-01-22",
+      "reportedHolding": 176828556969,
+      "symbol": "ABT",
+      "key": "ABT",
+      "subkey": "0001718013-22-000002",
+      "date": 1662768000000,
+      "updated": 1662818270000
+    },
+    {
+      "adjustedHolding": 176828336969,
+      "adjustedMarketValue": 87222500,
+      "entityProperName": "Metatron Capital SICAV plc",
+      "id": "0001718013-22-000002",
+      "reportDate": "2022-09-11",
+      "reportedHolding": 1123768286969,
+      "symbol": "ABT",
+      "key": "ABT",
+      "subkey": "0001718013-22-000002",
+      "date": 1662768000000,
+      "updated": 1662818270000
+    }
+  ]
+  const peerGroup = [
+    "MSFT",
+    "NOK",
+    "IBM",
+    "BBRY",
+    "HPQ",
+    "GOOGL",
+    "XLK",
+    "AMD",
+    "ENPH",
+    "INTL",
+    "BBY"
+  ]
 
-  if (!stockInfo) {
+
+  if (!stockSymbol) {
     return {
       notFound: true
     }
   }
 
-  return { props: { stockSymbol, quote, advancedStats, previousDividends, nextDiv, insiderTrading, institutionalOwnership, peerGroup } }
+  return { props: { stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, peerGroup } }
 }
