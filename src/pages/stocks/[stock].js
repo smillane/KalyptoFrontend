@@ -3,13 +3,13 @@ import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 
 import Layout from "../../main/node/components/layout"
-import { transactionColor, typeOfTransaction, millionOrBillion, greenOrRed } from "../../main/node/util/formating"
+import { transactionColor, typeOfTransaction, reduceZerosToLetter, greenOrRed } from "../../main/node/util/formating"
 
 // implement scrollbar sideways for containers such as dividends, insider trading, institutional ownership etc, based on page width, for mobile
 // or restructure how data is displayed, what data is, format, etc
 // trailing ..., not finishing full name for people/companies for insider/institutions
 // if user is not logged in with an account, only show a basic quote and chart
-export default function Stock({ stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, peerGroup }) {
+export default function Stock({ stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, fundamentals, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, insiderSummary, peerGroup }) {
   return (
     <Layout>
       <Container size="xl">
@@ -40,15 +40,37 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Market Cap</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${millionOrBillion(quote["marketCap"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetter(quote["marketCap"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Enterprise Value</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${millionOrBillion(fundamentalValuations["enterpriseValue"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetter(fundamentalValuations["enterpriseValue"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Next Earnings Date</Text></td>
                   <td><Text transform="capitalize" align="right" weight={700}>{basicStats["nextEarningsDate"]}</Text></td>
+                </tr>
+              </tbody>
+            </Table>
+            <Table highlightOnHover sx={theme => ({
+              boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+            })}>
+              <tbody>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Total Assets</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{financials["totalAssets"]}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Total Liabilities</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{financials["totalLiabilities"]}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Shareholder Equity</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${(financials["shareholderEquity"])}</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Shares Outstanding</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${(basicStats["sharesOutstanding"])}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -58,36 +80,28 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
             })}>
               <tbody>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>EPS</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats["ttmEPS"]}</Text></td>
-                </tr>
-                <tr>
                   <td><Text transform="capitalize" weight={700}>P/E</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["pToE"].toFixed(2)}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{quote["peRatio"].toFixed(2)}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Forward P/E</Text></td>
                   <td><Text transform="capitalize" align="right" weight={700}>{stats["forwardPERatio"].toFixed(2)}</Text></td>
                 </tr>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>Price to Revenue</Text></td>
+                  <td><Text transform="capitalize" weight={700}>Price/Revenue</Text></td>
                   <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["priceToRevenue"].toFixed(2)}</Text></td>
                 </tr>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>EV to Sales</Text></td>
+                  <td><Text transform="capitalize" weight={700}>EV/Sales</Text></td>
                   <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["evToSales"].toFixed(2)}</Text></td>
                 </tr>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>Book per Share</Text></td>
+                  <td><Text transform="capitalize" weight={700}>Book/Share</Text></td>
                   <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["bookValuePerShare"].toFixed(2)}</Text></td>
                 </tr>
                 <tr>
-                  <td><Text transform="capitalize" weight={700}>Cash per Share</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>$ {Math.trunc(financials["totalCash"] / quote["latestPrice"]).toLocaleString()}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>FCF Share</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{Math.trunc(financials["cashFlow"] / quote["latestPrice"]).toLocaleString()}</Text></td>
+                  <td><Text transform="capitalize" weight={700}>Cash/Share</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${Math.trunc(financials["totalCash"] / quote["latestPrice"]).toLocaleString()}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -98,20 +112,24 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
             })}>
               <tbody>
                 <tr>
+                  <td><Text transform="capitalize" weight={700}>EPS</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats["ttmEPS"]}</Text></td>
+                </tr>
+                <tr>
                   <td><Text transform="capitalize" weight={700}>Revenue</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["revenueGrowth"])}>{millionOrBillion(financials["revenue"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["revenueGrowth"])}>{reduceZerosToLetter(financials["revenue"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>EBITDA</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["ebitdaGrowth"])}>{millionOrBillion(financials["EBITDA"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["ebitdaGrowth"])}>{reduceZerosToLetter(financials["EBITDA"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>GAAP Net Income</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["incomeNetYoyDelta"])}>{millionOrBillion(fundamentalValuations["incomeNet"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["incomeNetYoyDelta"])}>{reduceZerosToLetter(fundamentals["incomeNet"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Cash Flow</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["freeCashFlowGrowth"])}>{millionOrBillion(financials["cashFlow"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["freeCashFlowGrowth"])}>{reduceZerosToLetter(financials["cashFlow"])}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -121,37 +139,23 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
               <tbody>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Profit margin</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["profitGrossToRevenue"] * 100).toFixed(2)} %</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["profitGrossToRevenue"] * 100).toFixed(2)}%</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Oper. margin</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["operatingIncomeToRevenue"] * 100).toFixed(2)} %</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["operatingIncomeToRevenue"] * 100).toFixed(2)}%</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Gross margin</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["profitGrossToRevenue"] * 100).toFixed(2)} %</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["profitGrossToRevenue"] * 100).toFixed(2)}%</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>EBIT margin</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["ebitToRevenue"] * 100).toFixed(2)} %</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["ebitToRevenue"] * 100).toFixed(2)}%</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>EBITDA margin</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["ebitdaMargin"] * 100).toFixed(2)} %</Text></td>
-                </tr>
-              </tbody>
-            </Table>
-            <Table highlightOnHover sx={theme => ({
-              boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
-            })}>
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Return on Assets</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["returnOnAssets"] * 100).toFixed(2)} %</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Return on Equity</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["returnOnEquity"] * 100).toFixed(2)} %</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["ebitdaMargin"] * 100).toFixed(2)}%</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -169,6 +173,20 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                 </tr>
               </tbody>
             </Table>
+            <Table highlightOnHover sx={theme => ({
+              boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+            })}>
+              <tbody>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Return on Assets</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["returnOnAssets"] * 100).toFixed(2)}%</Text></td>
+                </tr>
+                <tr>
+                  <td><Text transform="capitalize" weight={700}>Return on Equity</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{(fundamentalValuations["returnOnEquity"] * 100).toFixed(2)}%</Text></td>
+                </tr>
+              </tbody>
+            </Table>
           </Grid.Col>
           <Grid.Col xs={6} sm={4} md={4} lg={4}>
             <Table highlightOnHover sx={theme => ({
@@ -177,11 +195,11 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
               <tbody>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Dividend</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${fundamentalValuations["dividendYield"] ? (fundamentalValuations["dividendYield"]).toFixed(2) : 0}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${basicStats["ttmDividendRate"] ? (basicStats["ttmDividendRate"]).toFixed(2) : 0}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Dividend Yield</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations["dividendYield"] ? (fundamentalValuations["dividendYield"] * 100).toFixed(2) : 0} %</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats["dividendYield"] ? (basicStats["dividendYield"] * 100).toFixed(2) : 0}%</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -204,7 +222,7 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>YTD Change</Text></td>
-                  <td><Text transform="capitalize" weight={700} color={greenOrRed(basicStats["ytdChangePercent"])} align="right">{(basicStats["ytdChangePercent"] * 100).toLocaleString()} %</Text></td>
+                  <td><Text transform="capitalize" weight={700} color={greenOrRed(quote["ytdChange"])} align="right">{(quote["ytdChange"] * 100).toLocaleString()} %</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -218,7 +236,7 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Revenue Per Employee</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>$ {stats["revenuePerEmployee"].toLocaleString()}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${stats["revenuePerEmployee"].toLocaleString()}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -239,6 +257,117 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
             { minWidth: 1200, cols: 1 },
             { minWidth: 1450, cols: 2 },
           ]} sx={{ margin: "2px" }}>
+          <Container sx={theme => ({
+            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+          })}>
+            <>
+              <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref>
+                <Button variant="outline" color="dark" sx={theme => ({background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]})}>
+                  <Title order={3}>Insider Trading</Title>
+                </Button>
+              </Link>
+              <Space h="md" />
+              <Table highlightOnHover>
+                <thead>
+                  <tr>
+                    <th><Title transform="capitalize" order={5}>Insider</Title></th>
+                    <th><Title transform="capitalize" order={5}>Transaction</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Price / Share</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Total Value</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Shares After</Title></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {insiderTrading.map(indTrade =>
+                    <tr key={uuidv4()}>
+                      <td>
+                        <Stack spacing={0}>
+                          <Text transform="capitalize" weight={700}>{indTrade["fullName"]}</Text>
+                          <Text transform="capitalize" weight={500} lineClamp={1}>{indTrade["reportedTitle"]}</Text>
+                        </Stack>
+                      </td>
+                      <td>
+                        <Stack spacing={0}>
+                          <Text transform="capitalize" color={transactionColor(indTrade["transactionCode"])} weight={700}>{typeOfTransaction(indTrade["transactionCode"])}</Text>
+                          <Text transform="capitalize" weight={500}>{indTrade["transactionDate"]}</Text>
+                        </Stack>
+                      </td>
+                      <td><Text align="right" transform="capitalize" weight={700}>${indTrade["transactionPrice"]}</Text></td>
+                      <td><Text align="right" transform="capitalize" weight={700}>${indTrade["transactionValue"].toLocaleString()}</Text></td>
+                      <td><Text align="right" transform="capitalize" weight={700}>{indTrade["postShares"].toLocaleString()}</Text></td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </>
+          </Container>
+          <Container sx={theme => ({
+            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+          })}>
+            <>
+              <Title order={3}>Insider Trading, Prev. 6 Months</Title>
+              <Space h="md" />
+              <Table highlightOnHover>
+                <thead>
+                  <tr>
+                    <th><Title transform="capitalize" order={5}>Insider</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Net Transacted</Title></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {insiderSummary.map(insider =>
+                    <tr key={insider["issuerCik"]}>
+                      <td>
+                        <Stack spacing={0}>
+                          <Text transform="capitalize" weight={700}>{insider["fullName"]}</Text>
+                          <Text transform="capitalize" weight={500} lineClamp={1}>{insider["reportedTitle"]}</Text>
+                        </Stack>
+                      </td>
+                      <td>
+                        <Text align="right" transform="capitalize" weight={700} color={greenOrRed(insider["netTransacted"])}>${insider["netTransacted"].toLocaleString()}</Text>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </>
+          </Container>
+          <Container sx={theme => ({
+            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+          })}>
+            <>
+              <Title order={3}>Insitutional Ownership</Title>
+              <Space h="md" />
+              <Table highlightOnHover>
+                <thead>
+                  <tr>
+                    <th><Title transform="capitalize" order={5}>Filing Date</Title></th>
+                    <th><Title transform="capitalize" order={5}>Shareholder</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Total Shares</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Value</Title></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {institutionalOwnership.map(institution =>
+                    <tr key={institution["entityProperName"]}>
+                      <td>
+                        <Text transform="capitalize" weight={700}>{institution["reportDate"]}</Text>
+                      </td>
+                      <td>
+                        <Text transform="capitalize" weight={700} lineClamp={1}>{institution["entityProperName"]}</Text>
+                      </td>
+                      <td>
+                        <Text align="right" transform="capitalize" weight={700}>{institution["adjustedHolding"].toLocaleString()}</Text>
+                      </td>
+                      <td>
+                        <Text align="right" transform="capitalize" weight={700}>${institution["adjustedMarketValue"].toLocaleString()}</Text>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </>
+          </Container>
           <Container sx={theme => ({
             boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
@@ -290,86 +419,6 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                       <td><Text align="right" transform="capitalize" weight={700}>{dividend["amount"]} {dividend["currency"]}</Text></td>
                       <td><Text align="right" transform="capitalize" weight={700}>{dividend["flag"]}</Text></td>
                       <td><Text align="right" transform="capitalize" weight={700}>{dividend["frequency"]}</Text></td>
-                    </tr>
-                  )}
-                </tbody>
-              </Table>
-            </>
-          </Container>
-          <Container sx={theme => ({
-            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
-          })}>
-            <>
-              <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref>
-                <Button variant="outline" color="dark" sx={theme => ({background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]})}>
-                  <Title order={3}>Insider Trading</Title>
-                </Button>
-              </Link>
-              <Space h="md" />
-              <Table highlightOnHover>
-                <thead>
-                  <tr>
-                    <th><Title transform="capitalize" order={5}>Insider</Title></th>
-                    <th><Title transform="capitalize" order={5}>Transaction</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Price / Share</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Total Value</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Shares After</Title></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {insiderTrading.map(indTrade =>
-                    <tr key={uuidv4()}>
-                      <td>
-                        <Stack spacing="xs">
-                          <Text transform="capitalize" weight={700}>{indTrade["fullName"]}</Text>
-                          <Text transform="capitalize" weight={500}>{indTrade["reportedTitle"]}</Text>
-                        </Stack>
-                      </td>
-                      <td>
-                        <Stack spacing="xs">
-                          <Text transform="capitalize" color={transactionColor(indTrade["transactionCode"])} weight={700}>{typeOfTransaction(indTrade["transactionCode"])}</Text>
-                          <Text transform="capitalize" weight={500}>{indTrade["transactionDate"]}</Text>
-                        </Stack>
-                      </td>
-                      <td><Text align="right" transform="capitalize" weight={700}>${indTrade["transactionPrice"]}</Text></td>
-                      <td><Text align="right" transform="capitalize" weight={700}>${indTrade["transactionValue"].toLocaleString()}</Text></td>
-                      <td><Text align="right" transform="capitalize" weight={700}>{indTrade["postShares"].toLocaleString()}</Text></td>
-                    </tr>
-                  )}
-                </tbody>
-              </Table>
-            </>
-          </Container>
-          <Container sx={theme => ({
-            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
-          })}>
-            <>
-              <Title order={3}>Insitutional Ownership</Title>
-              <Space h="md" />
-              <Table highlightOnHover>
-                <thead>
-                  <tr>
-                    <th><Title transform="capitalize" order={5}>Filing Date</Title></th>
-                    <th><Title transform="capitalize" order={5}>Shareholder</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Total Shares</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Value</Title></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {institutionalOwnership.map(institution =>
-                    <tr key={institution["entityProperName"]}>
-                      <td>
-                        <Text transform="capitalize" weight={700}>{institution["reportDate"]}</Text>
-                      </td>
-                      <td>
-                        <Text transform="capitalize" weight={700}>{institution["entityProperName"]}</Text>
-                      </td>
-                      <td>
-                        <Text align="right" transform="capitalize" weight={700}>{institution["adjustedHolding"].toLocaleString()}</Text>
-                      </td>
-                      <td>
-                        <Text align="right" transform="capitalize" weight={700}>${millionOrBillion(institution["adjustedMarketValue"])}</Text>
-                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -747,7 +796,7 @@ export async function getServerSideProps(context) {
     {
       "adjustedHolding": 176828446969,
       "adjustedMarketValue": 8725020,
-      "entityProperName": "Metatron Capital SICAV plc",
+      "entityProperName": "Vanguard Group Inc",
       "id": "0001718013-22-000002",
       "reportDate": "2019-01-22",
       "reportedHolding": 176828556969,
@@ -760,7 +809,7 @@ export async function getServerSideProps(context) {
     {
       "adjustedHolding": 176828336969,
       "adjustedMarketValue": 87222500,
-      "entityProperName": "Metatron Capital SICAV plc",
+      "entityProperName": "Morgan Stanley",
       "id": "0001718013-22-000002",
       "reportDate": "2022-09-11",
       "reportedHolding": 1123768286969,
@@ -784,6 +833,238 @@ export async function getServerSideProps(context) {
     "INTL",
     "BBY"
   ]
+  const insiderSummary = [
+    {
+      "date": "2022-09-11",
+      "fullName": "Murphy Christopher",
+      "issuerCik": "0001411058",
+      "netTransacted": -2000000,
+      "reportedTitle": "Director",
+      "symbol": "AARS",
+      "totalBought": 0,
+      "totalSold": -2000000,
+      "id": "INSIDER_SUMMARY",
+      "key": "AARS",
+      "subkey": "0001411058",
+      "updated": 1662936479000
+    },
+    {
+      "date": "2022-09-11",
+      "fullName": "Todd Christopher",
+      "issuerCik": "00011212058",
+      "netTransacted": 2000000,
+      "reportedTitle": "CFO",
+      "symbol": "AARS",
+      "totalBought": 2000000,
+      "totalSold": 0,
+      "id": "INSIDER_SUMMARY",
+      "key": "AARS",
+      "subkey": "0001411058",
+      "updated": 1662936479000
+    },
+    {
+      "date": "2022-09-11",
+      "fullName": "Rand Burt",
+      "issuerCik": "000142422058",
+      "netTransacted": 500000,
+      "reportedTitle": "CEO",
+      "symbol": "AARS",
+      "totalBought": 2000000,
+      "totalSold": 1500000,
+      "id": "INSIDER_SUMMARY",
+      "key": "AARS",
+      "subkey": "0001411058",
+      "updated": 1662936479000
+    }
+  ]
+  const fundamentals = [
+    {
+      "accountsPayable": 22074000,
+      "accountsPayableTurnover": 3.66422034973272,
+      "accountsReceivable": 37698000,
+      "accountsReceivableTurnover": 2.14557801474879,
+      "asOfDate": "2022-09-09",
+      "assetsCurrentCash": 197914000,
+      "assetsCurrentCashRestricted": 10000,
+      "assetsCurrentDeferredCompensation": 0,
+      "assetsCurrentDeferredTax": 0,
+      "assetsCurrentDiscontinuedOperations": 0,
+      "assetsCurrentInvestments": 0,
+      "assetsCurrentLeasesOperating": 0,
+      "assetsCurrentLoansNet": 0,
+      "assetsCurrentOther": 7138000,
+      "assetsCurrentSeparateAccounts": 0,
+      "assetsCurrentUnadjusted": 282863000,
+      "assetsFixed": 391557000,
+      "assetsFixedDeferredCompensation": 0,
+      "assetsFixedDeferredTax": 14159000,
+      "assetsFixedDiscontinuedOperations": 0,
+      "assetsFixedLeasesOperating": 10263000,
+      "assetsFixedOperatingDiscontinuedOperations": 0,
+      "assetsFixedOperatingSubsidiaryUnconsolidated": 0,
+      "assetsFixedOreo": 0,
+      "assetsFixedOther": 3504000,
+      "assetsFixedUnconsolidated": 0,
+      "assetsUnadjusted": 674420000,
+      "capex": -3387000,
+      "capexAcquisition": 0,
+      "capexMaintenance": 0,
+      "cashConversionCycle": 61.4991840166164,
+      "cashFlowFinancing": 1221000,
+      "cashFlowInvesting": -6359000,
+      "cashFlowOperating": -557000,
+      "cashFlowShareRepurchase": 0,
+      "cashLongTerm": 0,
+      "cashOperating": 0,
+      "cashPaidForIncomeTaxes": 661000,
+      "cashPaidForInterest": 0,
+      "cashRestricted": 0,
+      "chargeAfterTax": 0,
+      "chargeAfterTaxDiscontinuedOperations": 0,
+      "chargesAfterTaxOther": 0,
+      "cik": "0001280263",
+      "creditLossProvision": 0,
+      "dataGenerationDate": "2022-09-09",
+      "daysInAccountsPayable": 24.56184164977,
+      "daysInInventory": 44.6227931358489,
+      "daysInRevenueDeferred": 0.508506008604916,
+      "daysRevenueOutstanding": 41.9467385391425,
+      "debtFinancial": 0,
+      "debtShortTerm": 0,
+      "depreciationAndAmortizationAccumulated": 20756000,
+      "depreciationAndAmortizationCashFlow": 4687000,
+      "dividendsPreferred": 0,
+      "dividendsPreferredRedeemableMandatorily": 0,
+      "earningsRetained": 65400000,
+      "ebitdaReported": -15501000,
+      "ebitReported": -20188000,
+      "equityShareholder": 578111000,
+      "equityShareholderOther": 0,
+      "equityShareholderOtherDeferredCompensation": 0,
+      "equityShareholderOtherEquity": 0,
+      "equityShareholderOtherMezzanine": 0,
+      "expenses": 101098000,
+      "expensesAcquisitionMerger": 0,
+      "expensesCompensation": 0,
+      "expensesDepreciationAndAmortization": 0,
+      "expensesDerivative": 0,
+      "expensesDiscontinuedOperations": 0,
+      "expensesDiscontinuedOperationsReits": 0,
+      "expensesEnergy": 0,
+      "expensesForeignCurrency": 0,
+      "expensesInterest": 0,
+      "expensesInterestFinancials": 0,
+      "expensesInterestMinority": 0,
+      "expensesLegalRegulatoryInsurance": 0,
+      "expensesNonOperatingCompanyDefinedOther": 26000,
+      "expensesNonOperatingOther": 0,
+      "expensesNonOperatingSubsidiaryUnconsolidated": 0,
+      "expensesNonRecurringOther": 0,
+      "expensesOperating": 101072000,
+      "expensesOperatingOther": 0,
+      "expensesOperatingSubsidiaryUnconsolidated": 0,
+      "expensesOreo": 0,
+      "expensesOreoReits": 0,
+      "expensesOtherFinancing": 0,
+      "expensesRestructuring": 0,
+      "expensesSga": 18914000,
+      "expensesStockCompensation": 0,
+      "expensesWriteDown": 0,
+      "ffo": 0,
+      "figi": "BBG001QZCPJ2",
+      "filingDate": "2022-09-08",
+      "filingType": "10-Q",
+      "fiscalQuarter": 2,
+      "fiscalYear": 2023,
+      "goodwillAmortizationCashFlow": 0,
+      "goodwillAmortizationIncomeStatement": 0,
+      "goodwillAndIntangiblesNetOther": 49563000,
+      "goodwillNet": 303625000,
+      "incomeFromOperations": -20188000,
+      "incomeNet": -23650000,
+      "incomeNetPerRevenue": -0.292394045793977,
+      "incomeNetPerWabso": -0.62,
+      "incomeNetPerWabsoSplitAdjusted": -0.618165853035813,
+      "incomeNetPerWabsoSplitAdjustedYoyDeltaPercent": -2.14806195545393,
+      "incomeNetPerWadso": -0.62,
+      "incomeNetPerWadsoSplitAdjusted": -0.618165853035813,
+      "incomeNetPerWadsoSplitAdjustedYoyDeltaPercent": -2.14806195545393,
+      "incomeNetPreTax": -20214000,
+      "incomeNetYoyDelta": -16494000,
+      "incomeOperating": 0,
+      "incomeOperatingDiscontinuedOperations": 0,
+      "incomeOperatingOther": 0,
+      "incomeOperatingSubsidiaryUnconsolidated": 0,
+      "incomeOperatingSubsidiaryUnconsolidatedAfterTax": 0,
+      "incomeTax": 3436000,
+      "incomeTaxCurrent": 0,
+      "incomeTaxDeferred": 0,
+      "incomeTaxDiscontinuedOperations": 0,
+      "incomeTaxOther": 3436000,
+      "incomeTaxRate": -0.169981201147719,
+      "interestMinority": 0,
+      "inventory": 40103000,
+      "inventoryTurnover": 2.01690646585044,
+      "liabilities": 674420000,
+      "liabilitiesCurrent": 77543000,
+      "liabilitiesNonCurrentAndInterestMinorityTotal": 18766000,
+      "liabilitiesNonCurrentDebt": 0,
+      "liabilitiesNonCurrentDeferredCompensation": 0,
+      "liabilitiesNonCurrentDeferredTax": 1551000,
+      "liabilitiesNonCurrentDiscontinuedOperations": 0,
+      "liabilitiesNonCurrentLeasesOperating": 7024000,
+      "liabilitiesNonCurrentLongTerm": 10191000,
+      "liabilitiesNonCurrentOperatingDiscontinuedOperations": 0,
+      "liabilitiesNonCurrentOther": 10191000,
+      "nibclDeferredCompensation": 0,
+      "nibclDeferredTax": 0,
+      "nibclDiscontinuedOperations": 0,
+      "nibclLeasesOperating": 3506000,
+      "nibclOther": 51506000,
+      "nibclRestructuring": 0,
+      "nibclRevenueDeferred": 457000,
+      "nibclRevenueDeferredTurnover": 176.989059080963,
+      "nibclSeparateAccounts": 0,
+      "oci": -2000,
+      "periodEndDate": "2022-07-31",
+      "ppAndENet": 10443000,
+      "pricePerEarnings": -140.010968860465,
+      "pricePerEarningsPerRevenueYoyDeltaPercent": -71.3336552780611,
+      "profitGross": 51064000,
+      "profitGrossPerRevenue": 0.631323871222986,
+      "reportDate": "2022-09-08",
+      "researchAndDevelopmentExpense": 52338000,
+      "reserves": 0,
+      "reservesInventory": 0,
+      "reservesLifo": 0,
+      "reservesLoanLoss": 0,
+      "revenue": 80884000,
+      "revenueCostOther": 29820000,
+      "revenueIncomeInterest": 0,
+      "revenueOther": 80884000,
+      "revenueSubsidiaryUnconsolidated": 0,
+      "salesCost": 29820000,
+      "sharesIssued": 38406451,
+      "sharesOutstandingPeDateBs": 0,
+      "sharesTreasury": 0,
+      "stockCommon": 512713000,
+      "stockPreferred": 0,
+      "stockPreferredEquity": 0,
+      "stockPreferredMezzanine": 0,
+      "stockTreasury": 0,
+      "symbol": "AMBA",
+      "totalCashFlow": -5695000,
+      "wabso": 38258341,
+      "wabsoSplitAdjusted": 38258341,
+      "wadso": 38258341,
+      "wadsoSplitAdjusted": 38258341,
+      "id": "FUNDAMENTALS",
+      "key": "AMBA",
+      "subkey": "quarterly",
+      "date": 1659225600000,
+      "updated": 1662908599000
+    }
+  ][0]
 
 
   if (!stockSymbol) {
@@ -792,5 +1073,5 @@ export async function getServerSideProps(context) {
     }
   }
 
-  return { props: { stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, peerGroup } }
+  return { props: { stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, fundamentals, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, insiderSummary, peerGroup } }
 }

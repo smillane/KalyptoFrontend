@@ -1,7 +1,7 @@
 import yahooFinance from "yahoo-finance";
-import { format, sub } from 'date-fns'
+import { format, sub } from 'date-fns';
 
-function timeSpanParser(date: Date, timeSpanPeriod: string, timeSpanNumber: number) {
+function timeSpanParserForChartData(date: Date, timeSpanPeriod: string, timeSpanNumber: number) {
   return timeSpanPeriod.toLocaleLowerCase() === "years" 
     ? format(sub(date, {years: timeSpanNumber}), 'MM-dd-yyyy') 
       : "months" 
@@ -13,10 +13,10 @@ function timeSpanParser(date: Date, timeSpanPeriod: string, timeSpanNumber: numb
                   : format(sub(date, {years: timeSpanNumber}), 'MM-dd-yyyy')
 }
 
-export function chartData(symbol: string, timeSpanPeriod: string, timeSpanNumber: number, period: string) {
+export function getChartData(symbol: string, timeSpanPeriod: string, timeSpanNumber: number, period: string) {
   const newDate = new Date()
   const today = format(newDate, 'MM-dd-yyyy');
-  const todayMinusDuration = timeSpanParser(newDate, timeSpanPeriod, timeSpanNumber)
+  const todayMinusDuration = timeSpanParserForChartData(newDate, timeSpanPeriod, timeSpanNumber)
   const data = yahooFinance.historical({
     symbol: symbol,
     from: todayMinusDuration,
