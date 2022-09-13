@@ -1,4 +1,4 @@
-import { Table, Grid, Title, Text, Container, Button, Stack, Space, Group, SimpleGrid } from "@mantine/core";
+import { Table, Grid, Title, Text, Container, Button, Stack, Space, Group, SimpleGrid, Divider, Spoiler } from "@mantine/core";
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -58,19 +58,19 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
               <tbody>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Total Assets</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{financials["totalAssets"]}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${financials["totalAssets"].toLocaleString()}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Total Liabilities</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{financials["totalLiabilities"]}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${financials["totalLiabilities"].toLocaleString()}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Shareholder Equity</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${(financials["shareholderEquity"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${(financials["shareholderEquity"].toLocaleString())}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Shares Outstanding</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${(basicStats["sharesOutstanding"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${(basicStats["sharesOutstanding"].toLocaleString())}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -117,19 +117,19 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Revenue</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["revenueGrowth"])}>{reduceZerosToLetter(financials["revenue"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["revenueGrowth"])}>${reduceZerosToLetter(financials["revenue"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>EBITDA</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["ebitdaGrowth"])}>{reduceZerosToLetter(financials["EBITDA"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["ebitdaGrowth"])}>${reduceZerosToLetter(financials["EBITDA"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>GAAP Net Income</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["incomeNetYoyDelta"])}>{reduceZerosToLetter(fundamentals["incomeNet"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["incomeNetYoyDelta"])}>${reduceZerosToLetter(fundamentals["incomeNet"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Cash Flow</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["freeCashFlowGrowth"])}>{reduceZerosToLetter(financials["cashFlow"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["freeCashFlowGrowth"])}>${reduceZerosToLetter(financials["cashFlow"])}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -425,7 +425,25 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
               </Table>
             </>
           </Container>
+          <Container sx={theme => ({
+            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+          })}>
+              <Title order={3}>About</Title>
+              <Space h="md" />
+              <Spoiler maxHeight={150} showLabel="Show more" hideLabel="Hide">
+                <Text size="sm">{company["shortDescription"]}</Text>
+              </Spoiler>
+              <Space h="sm" />
+              <Text>CEO: {company["ceo"]}</Text>
+              <Divider my="xs" />
+              <Text>Industry: {company["industry"]}</Text>
+              <Divider my="xs" />
+              <Text>Headquarters: {company["city"]}, {company["state"]}</Text>
+              <Divider my="xs" />
+              <Link href={`${company["website"]}`} passHref><Text variant="link">{company["website"]}</Text></Link>
+          </Container>
         </SimpleGrid>
+        <Space h="xs" />
           <Container size="xl" sx={theme => ({
             boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
