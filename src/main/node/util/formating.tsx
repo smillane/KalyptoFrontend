@@ -1,4 +1,4 @@
-export function reduceZerosToLetter(number: number) {
+export function reduceZerosToLetters(number: number) {
   return Math.abs(Number(number)) >= 1.0e+12
     ? (Math.abs(Number(number)) / 1.0e+12).toFixed(2) + "T"
     : Math.abs(Number(number)) >= 1.0e+9

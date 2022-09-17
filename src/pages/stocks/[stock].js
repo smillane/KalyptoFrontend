@@ -3,13 +3,13 @@ import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 
 import Layout from "../../main/node/components/layout"
-import { transactionColor, typeOfTransaction, reduceZerosToLetter, greenOrRed } from "../../main/node/util/formating"
+import { transactionColor, typeOfTransaction, reduceZerosToLetters, greenOrRed } from "../../main/node/util/formating"
 
 // implement scrollbar sideways for containers such as dividends, insider trading, institutional ownership etc, based on page width, for mobile
 // or restructure how data is displayed, what data is, format, etc
 // trailing ..., not finishing full name for people/companies for insider/institutions
 // if user is not logged in with an account, only show a basic quote and chart
-export default function Stock({ stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, fundamentals, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, insiderSummary, peerGroup }) {
+export default function Stock({ stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, fundamentals, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, insiderSummary, peerGroup, news }) {
   return (
     <Layout>
       <Container size="xl">
@@ -40,11 +40,11 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Market Cap</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetter(quote["marketCap"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetters(quote["marketCap"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Enterprise Value</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetter(fundamentalValuations["enterpriseValue"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetters(fundamentalValuations["enterpriseValue"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Next Earnings Date</Text></td>
@@ -58,23 +58,22 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
               <tbody>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Total Assets</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${financials["totalAssets"].toLocaleString()}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetters(financials["totalAssets"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Total Liabilities</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${financials["totalLiabilities"].toLocaleString()}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetters(financials["totalLiabilities"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Shareholder Equity</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${(financials["shareholderEquity"].toLocaleString())}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetters(financials["shareholderEquity"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Shares Outstanding</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>${(basicStats["sharesOutstanding"].toLocaleString())}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700}>${reduceZerosToLetters(basicStats["sharesOutstanding"])}</Text></td>
                 </tr>
               </tbody>
             </Table>
-            <Space h={2} />
             <Table highlightOnHover sx={theme => ({
               boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
             })}>
@@ -117,19 +116,19 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Revenue</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["revenueGrowth"])}>${reduceZerosToLetter(financials["revenue"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["revenueGrowth"])}>${reduceZerosToLetters(financials["revenue"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>EBITDA</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["ebitdaGrowth"])}>${reduceZerosToLetter(financials["EBITDA"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["ebitdaGrowth"])}>${reduceZerosToLetters(financials["EBITDA"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>GAAP Net Income</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["incomeNetYoyDelta"])}>${reduceZerosToLetter(fundamentals["incomeNet"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["incomeNetYoyDelta"])}>${reduceZerosToLetters(fundamentals["incomeNet"])}</Text></td>
                 </tr>
                 <tr>
                   <td><Text transform="capitalize" weight={700}>Cash Flow</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["freeCashFlowGrowth"])}>${reduceZerosToLetter(financials["cashFlow"])}</Text></td>
+                  <td><Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations["freeCashFlowGrowth"])}>${reduceZerosToLetters(financials["cashFlow"])}</Text></td>
                 </tr>
               </tbody>
             </Table>
@@ -203,7 +202,6 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                 </tr>
               </tbody>
             </Table>
-            <Space h={2} />
             <Table highlightOnHover sx={theme => ({
               boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
             })}>
@@ -260,7 +258,24 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
           <Container sx={theme => ({
             boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
-            <>
+              <Title order={3}>News</Title>
+              <Space h="md" />
+                  {news.map(individualNews =>
+                    <div key={individualNews["uuid"]}>
+                      <a href={`${individualNews["qmUrl"]}`} rel="noopener noreferrer" target="_blank">
+                          <Grid justify="space-between" grow align="center">
+                            <Grid.Col span={3}><Text size="sm" lineClamp={1}>{individualNews["source"]}</Text></Grid.Col>
+                            <Grid.Col span={9}><Text size="sm" lineClamp={2}>{individualNews["headline"]}</Text></Grid.Col>
+                          </Grid>
+                      </a>
+                    <Space h="xs" />
+                    </div>
+                  )}
+          </Container>
+          <div>
+          <Container sx={theme => ({
+            boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
+          })}>
               <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref>
                 <Button variant="outline" color="dark" sx={theme => ({background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]})}>
                   <Title order={3}>Insider Trading</Title>
@@ -299,12 +314,10 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                   )}
                 </tbody>
               </Table>
-            </>
           </Container>
           <Container sx={theme => ({
             boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
-            <>
               <Title order={3}>Insider Trading, Prev. 6 Months</Title>
               <Space h="md" />
               <Table highlightOnHover>
@@ -330,12 +343,10 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                   )}
                 </tbody>
               </Table>
-            </>
-          </Container>
+          </Container></div>
           <Container sx={theme => ({
             boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
-            <>
               <Title order={3}>Insitutional Ownership</Title>
               <Space h="md" />
               <Table highlightOnHover>
@@ -366,12 +377,10 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                   )}
                 </tbody>
               </Table>
-            </>
           </Container>
           <Container sx={theme => ({
             boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
           })}>
-            <>
               <Link href={`/stocks/${stockSymbol.symbol}/dividends`} passHref>
                 <Button variant="outline" color="dark" sx={theme => ({background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]})}>
                   <Title order={3}>Dividends</Title>
@@ -423,7 +432,6 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                   )}
                 </tbody>
               </Table>
-            </>
           </Container>
           <Container sx={theme => ({
             boxShadow: theme.shadows.sm, padding: "10px", borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
@@ -434,13 +442,13 @@ export default function Stock({ stockSymbol, company, quote, last4Dividends, fin
                 <Text size="sm">{company["shortDescription"]}</Text>
               </Spoiler>
               <Space h="sm" />
-              <Text>CEO: {company["ceo"]}</Text>
+              <Text size="sm">CEO: {company["ceo"]}</Text>
               <Divider my="xs" />
-              <Text>Industry: {company["industry"]}</Text>
+              <Text size="sm">Industry: {company["industry"]}</Text>
               <Divider my="xs" />
-              <Text>Headquarters: {company["city"]}, {company["state"]}</Text>
+              <Text size="sm">Headquarters: {company["city"]}, {company["state"]}</Text>
               <Divider my="xs" />
-              <Link href={`${company["website"]}`} passHref><Text variant="link">{company["website"]}</Text></Link>
+              <Link href={`${company["website"]}`} passHref><Text variant="link" size="sm">{company["website"]}</Text></Link>
           </Container>
         </SimpleGrid>
         <Space h="xs" />
@@ -1083,6 +1091,219 @@ export async function getServerSideProps(context) {
       "updated": 1662908599000
     }
   ][0]
+  const news = [
+    {
+      "datetime": 1663087125000,
+      "hasPaywall": false,
+      "headline": "Apple And Goldman Sachs Have Very Different News Days",
+      "image": "https://cloud.iexapis.com/v1/news/image/DRRa6XXqs1MZguYzjvgTN6xSJTo5JkqGxS6A3GW4CtM",
+      "imageUrl": "https://cdn.benzinga.com/files/imagecache/1456x800/images/story/2022/09/13/shutterstock_206196790_2.jpg",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://www.benzinga.com/markets/22/09/28852642/apple-and-goldman-sachs-have-very-different-news-days",
+      "related": "AAPL,GS,GS-A,GS-C,GS-D,GS-J,GS-K,DJIA",
+      "source": "Benzinga",
+      "summary": "(Tuesday Market Open) Equity index futures were pointing to a higher open before the Consumer Price Index (CPI) was released. And then what a change. Investors who convinced themselves that the CPI numbers were going to be softer and that the Federal Reserve was only going to hike the overnight rate just 50 basis points this month got a rude awakening. Potential Market Movers The CPI rose at a much hotter-than-expected 0.1% in August against the decline of 0.1% analysts forecasted. Year over year (YOY), CPI grew at a pace of 8.3%, similarly hotter than the forecasted 8.1%. Core CPI was projected to be 0.3% month over month and 6.1% YOY but came in at 0.6% and 6.3% respectively. Equity index futures flipped on the news as the Dow futures went from more than 250 points higher to 500 points lower. In Europe, inflation numbers were mixed with the Spanish CPI also coming in hotter than expected at a staggering 10.5% YOY and the German CPI coming in on target with 7.9%. Additionally, the German ZEW Economic Sentiment survey found that the German institutional investors were more negative than expected on the German economy.",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/DRRa6XXqs1MZguYzjvgTN6xSJTo5JkqGxS6A3GW4CtM",
+      "uuid": "DRRa6XXqs1MZguYzjvgTN6xSJTo5JkqGxS6A3GW4CtM",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "DRRa6XXqs1MZguYzjvgTN6xSJTo5JkqGxS6A3GW4CtM",
+      "date": 1663087125000,
+      "updated": 1663090760000
+    },
+    {
+      "datetime": 1663085949000,
+      "hasPaywall": false,
+      "headline": "Apple rolling out edit feature for iMessages in new iOS update",
+      "image": "https://cloud.iexapis.com/v1/news/image/2aJuzhfcqoSeeDa7JtcMiV71pFVzSz1FYStZ7Hoqgv1I",
+      "imageUrl": "https://media.socastsrm.com/wordpress/wp-content/blogs.dir/3041/files//2022/09/8039874280_2ab902e6eb_b.jpg",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://www.ckbw.ca/2022/09/13/apple-rolling-out-edit-feature-for-imessages-in-new-ios-update/",
+      "related": "AAPL",
+      "source": "CKBW Radio",
+      "summary": "You can now edit iMessages if you''ve sent that cringy late night text. If you have an iPhone and have upgraded to iOS 16, you can now edit and even un…",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/2aJuzhfcqoSeeDa7JtcMiV71pFVzSz1FYStZ7Hoqgv1I",
+      "uuid": "2aJuzhfcqoSeeDa7JtcMiV71pFVzSz1FYStZ7Hoqgv1I",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "2aJuzhfcqoSeeDa7JtcMiV71pFVzSz1FYStZ7Hoqgv1I",
+      "date": 1663085949000,
+      "updated": 1663089580000
+    },
+    {
+      "datetime": 1663085948000,
+      "hasPaywall": false,
+      "headline": "Apple rolling out edit feature for iMessages in new iOS update",
+      "image": "https://cloud.iexapis.com/v1/news/image/QaDCBHGt03yczHFztZE4guye5brvePmTc5cJqi778R5",
+      "imageUrl": "https://media.socastsrm.com/wordpress/wp-content/blogs.dir/3041/files//2022/09/8039874280_2ab902e6eb_b.jpg",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://www.thewave.ca/2022/09/13/apple-rolling-out-edit-feature-for-imessages-in-new-ios-update/",
+      "related": "AAPL",
+      "source": "The Wave",
+      "summary": "You can now edit iMessages if you''ve sent that cringy late night text. If you have an iPhone and have upgraded to iOS 16, you can now edit and even un…",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/QaDCBHGt03yczHFztZE4guye5brvePmTc5cJqi778R5",
+      "uuid": "QaDCBHGt03yczHFztZE4guye5brvePmTc5cJqi778R5",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "QaDCBHGt03yczHFztZE4guye5brvePmTc5cJqi778R5",
+      "date": 1663085948000,
+      "updated": 1663089580000
+    },
+    {
+      "datetime": 1663085700000,
+      "hasPaywall": false,
+      "headline": "Apple''s Most-Shorted Status Is a Tell",
+      "image": "https://cloud.iexapis.com/v1/news/image/xx8m4t2IFizkW02YGk3ebQgAQVBiP7seHo7Eg6A4cyi",
+      "imageUrl": "https://s.thestreet.com/files/tsc/v2008/photos/contrib/uploads/4b15e83d-60eb-11eb-97e3-e32e4aa1fc64.jpg",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://realmoney.thestreet.com/investing/stocks/apple-s-most-shorted-status-is-a-tell-16096685",
+      "related": "AAPL,TSLA,TL0-GD,TL0-GS,TL0-GH,TL0-GM,TL0-GF,TL0-GB,TL0-GY,TL0-GI",
+      "source": "The Street RealMoney",
+      "summary": "The rationale behind a Tesla short is understandable. Apple is a different story entirely.",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/xx8m4t2IFizkW02YGk3ebQgAQVBiP7seHo7Eg6A4cyi",
+      "uuid": "xx8m4t2IFizkW02YGk3ebQgAQVBiP7seHo7Eg6A4cyi",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "xx8m4t2IFizkW02YGk3ebQgAQVBiP7seHo7Eg6A4cyi",
+      "date": 1663085700000,
+      "updated": 1663089300000
+    },
+    {
+      "datetime": 1663085150000,
+      "hasPaywall": false,
+      "headline": "Apple (NASDAQ:AAPL) – Netflix’s Squid Game Creates History At Emmy Awards — ‘Ted Lasso’ Wins Best Comedy Series For Apple TV+",
+      "image": "https://cloud.iexapis.com/v1/news/image/2b73UTGJFGF9oTjtWIu8jVtBGsFiijS1UNSCqY29FKHK",
+      "imageUrl": "",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://techtelegraph.co.uk/apple-nasdaqaapl-netflixs-squid-game-creates-history-at-emmy-awards-ted-lasso-wins-best-comedy-series-for-apple-tv/",
+      "related": "AAPL,WBD",
+      "source": "Techtelegraph",
+      "summary": "Warner Bros. Discovery Inc. (WBD)-owned HBO had a rich haul at the 2022 Primetime Emmy Awards announced late on Monday, while Apple, Inc’s AAPL TV+ also made its presence felt at the event that recognizes the best artistical and technical talent in the television industry. What Happened: HBO’s smash hit “The White Lotus” won the best-limited […] The post Apple (NASDAQ:AAPL) – Netflix’s Squid Game Creates History At Emmy Awards — ‘Ted Lasso’ Wins Best Comedy Series For Apple TV+ appeared first on TECHTELEGRAPH .",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/2b73UTGJFGF9oTjtWIu8jVtBGsFiijS1UNSCqY29FKHK",
+      "uuid": "2b73UTGJFGF9oTjtWIu8jVtBGsFiijS1UNSCqY29FKHK",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "2b73UTGJFGF9oTjtWIu8jVtBGsFiijS1UNSCqY29FKHK",
+      "date": 1663085150000,
+      "updated": 1663088780000
+    },
+    {
+      "datetime": 1663084800000,
+      "hasPaywall": false,
+      "headline": "Apple’s (AAPL) iPhone 14 Satellite Feature Benefits MDA (TSX:MDA)",
+      "image": "https://cloud.iexapis.com/v1/news/image/aisHmHGoDdKIE8tuXQzrvpLLcY3cFfFHHgVGXoJAaCj",
+      "imageUrl": "https://www.fool.ca/wp-content/uploads/2019/02/Spacecraft.jpg",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://www.fool.ca/2022/09/13/apples-aapl-iphone-14-satellite-feature-benefits-mda-tsxmda/",
+      "related": "AAPL,MDA-CT",
+      "source": "The Motley Fool Canada",
+      "summary": "Apple''s (NASDAQ:AAPL) iPhone 14 satellite emergency features are powered by units manufactured by MDA (TSX:MDA). The post Apple’s (AAPL) iPhone 14 Satellite Feature Benefits MDA (TSX:MDA) appeared first on The Motley Fool Canada .",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/aisHmHGoDdKIE8tuXQzrvpLLcY3cFfFHHgVGXoJAaCj",
+      "uuid": "aisHmHGoDdKIE8tuXQzrvpLLcY3cFfFHHgVGXoJAaCj",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "aisHmHGoDdKIE8tuXQzrvpLLcY3cFfFHHgVGXoJAaCj",
+      "date": 1663084800000,
+      "updated": 1663088400000
+    },
+    {
+      "datetime": 1663084295000,
+      "hasPaywall": false,
+      "headline": "Apple Stock: What Catalysts Should Investors Watch For After Apple Event? (NASDAQ:AAPL)",
+      "image": "https://cloud.iexapis.com/v1/news/image/eyRQn5SHR9UmXVp4EQyTJYyoJVhr61KPk7N05842yR3",
+      "imageUrl": "https://static.seekingalpha.com/cdn/s3/uploads/getty_images/1363326235/image_1363326235.jpg?io=getty-c-w750",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://seekingalpha.com/article/4540682-apple-stock-what-catalysts-should-investors-watch-for?source=feed_f",
+      "related": "AAPL",
+      "source": "Seeking Alpha",
+      "summary": "Apple unveiled new iPhone and Apple Watch models and came up with an updated version of the AirPods Pro at the recent event. See what this means for AAPL stock.",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/eyRQn5SHR9UmXVp4EQyTJYyoJVhr61KPk7N05842yR3",
+      "uuid": "eyRQn5SHR9UmXVp4EQyTJYyoJVhr61KPk7N05842yR3",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "eyRQn5SHR9UmXVp4EQyTJYyoJVhr61KPk7N05842yR3",
+      "date": 1663084295000,
+      "updated": 1663087920000
+    },
+    {
+      "datetime": 1663084214000,
+      "hasPaywall": false,
+      "headline": "iPhone users say Apple''s new iOS 16 update is RUINING their battery life",
+      "image": "https://cloud.iexapis.com/v1/news/image/3ND1me1z0K283kTSB3nSLIkuGLgN5i36H8DYicbR0ASF",
+      "imageUrl": "https://i.dailymail.co.uk/1s/2022/07/26/10/55422163-0-image-m-15_1658828770288.jpg",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://www.dailymail.co.uk/sciencetech/article-11206463/iPhone-users-say-Apples-new-iOS-16-update-RUINING-battery-life.html?ito=1490&ns_campaign=1490&ns_mchannel=rss",
+      "related": "AAPL",
+      "source": "Daily Mail Online",
+      "summary": "While many iPhone users have eagerly downloaded the update already, several have reported that iOS 16 is affecting their battery life.",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/3ND1me1z0K283kTSB3nSLIkuGLgN5i36H8DYicbR0ASF",
+      "uuid": "3ND1me1z0K283kTSB3nSLIkuGLgN5i36H8DYicbR0ASF",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "3ND1me1z0K283kTSB3nSLIkuGLgN5i36H8DYicbR0ASF",
+      "date": 1663084214000,
+      "updated": 1663087841000
+    },
+    {
+      "datetime": 1663083960000,
+      "hasPaywall": false,
+      "headline": "Apple’s global phenomenon “Ted Lasso” joins ranks of the most celebrated comedies in history with back-to-back Emmy wins for Outstanding Comedy Series at the 74th Primetime Emmy Awards",
+      "image": "https://cloud.iexapis.com/v1/news/image/bL7RbbDrwWUN0LWEkNxqmRZvqQq8H99ZPtq75eE12Md",
+      "imageUrl": "http://mms.businesswire.com/media/20220913005794/en/1569743/21/TedLasso_212_01205F.jpg",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://www.businesswire.com/news/home/20220913005794/en/Apple%E2%80%99s-global-phenomenon-%E2%80%9CTed-Lasso%E2%80%9D-joins-ranks-of-the-most-celebrated-comedies-in-history-with-back-to-back-Emmy-wins-for-Outstanding-Comedy-Series-at-the-74th-Primetime-Emmy-Awards/?feedref=JjAwJuNHiystnCoBq_hl-YChnX-dlxR7bnql9VXy9e5cS3CA0Bo2lHArOQl-PHrIrCOi9QzgjCezTS3Nw_X6kJUrpSBm-Hav1w-UkdSlG3k-cHwnfBrk8h_RXgEUlyPTLkaZDLiczsahzEklD3R10Q%3D%3D",
+      "related": "AAPL",
+      "source": "Business Wire",
+      "summary": "CULVER CITY, Calif.--(BUSINESS WIRE)--At the 74th Primetime Emmy Awards, the beloved Apple TV+ hit series “Ted Lasso” joined the ranks of comedy legends with its win for Outstanding Comedy Series for its first and second seasons, becoming only the eighth series in the genre in 74 years of Emmy history to do so. The second season of “Ted Lasso” also became the most Emmy-winning comedy for the second year in a row with four total wins, including Emmy Awards for Outstanding Lead Actor in a Comedy",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/bL7RbbDrwWUN0LWEkNxqmRZvqQq8H99ZPtq75eE12Md",
+      "uuid": "bL7RbbDrwWUN0LWEkNxqmRZvqQq8H99ZPtq75eE12Md",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "bL7RbbDrwWUN0LWEkNxqmRZvqQq8H99ZPtq75eE12Md",
+      "date": 1663083960000,
+      "updated": 1663087580000
+    },
+    {
+      "datetime": 1663083770000,
+      "hasPaywall": false,
+      "headline": "Apple releases iOS and macOS fixes to patch a new zero-day under attack • TechCrunch",
+      "image": "https://cloud.iexapis.com/v1/news/image/114NxH1FhT9g8B1exjxh2nxJ75gCGCpDcwTN1SC5tddX",
+      "imageUrl": "https://i1.wp.com/techcrunch.com/wp-content/uploads/2022/09/GettyImages-1404252885.jpg?w=696&#038;ssl=1",
+      "lang": "en",
+      "provider": "CityFalcon",
+      "qmUrl": "https://techtelegraph.co.uk/apple-releases-ios-and-macos-fixes-to-patch-a-new-zero-day-under-attack-techcrunch/",
+      "related": "AAPL",
+      "source": "Techtelegraph",
+      "summary": "Apple has released another round of security updates to address vulnerabilities in iOS and macOS, including a new zero-day flaw that is being actively exploited by attackers. The zero-day flaw, tracked as CVE-2022-32917, allows a malicious app to run arbitrary code on an affected device with kernel privileges, Apple said in a security advisory on Monday, […] The post Apple releases iOS and macOS fixes to patch a new zero-day under attack • TechCrunch appeared first on TECHTELEGRAPH .",
+      "symbol": "AAPL",
+      "url": "https://cloud.iexapis.com/v1/news/article/114NxH1FhT9g8B1exjxh2nxJ75gCGCpDcwTN1SC5tddX",
+      "uuid": "114NxH1FhT9g8B1exjxh2nxJ75gCGCpDcwTN1SC5tddX",
+      "id": "NEWS",
+      "key": "AAPL",
+      "subkey": "114NxH1FhT9g8B1exjxh2nxJ75gCGCpDcwTN1SC5tddX",
+      "date": 1663083770000,
+      "updated": 1663087400000
+    }
+  ]
+  
 
 
   if (!stockSymbol) {
@@ -1091,5 +1312,5 @@ export async function getServerSideProps(context) {
     }
   }
 
-  return { props: { stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, fundamentals, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, insiderSummary, peerGroup } }
+  return { props: { stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations, fundamentals, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership, insiderSummary, peerGroup, news } }
 }
