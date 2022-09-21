@@ -1,7 +1,9 @@
-import { LineChart } from "recharts";
+import {
+  LineChart, XAxis, Tooltip, CartesianGrid, Line,
+} from 'recharts';
 
-import Layout from "../main/node/components/layout"
-import getChartData from "../main/node/components/charts"
+import Layout from '../main/node/components/layout.tsx';
+import GetChartData from '../main/node/components/charts.tsx';
 
 export default function Index({ data }) {
   return (
@@ -10,7 +12,9 @@ export default function Index({ data }) {
         width={400}
         height={400}
         data={data}
-        margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+        margin={{
+          top: 5, right: 20, left: 10, bottom: 5,
+        }}
       >
         <XAxis dataKey="Price" />
         <Tooltip />
@@ -19,10 +23,10 @@ export default function Index({ data }) {
       </LineChart>
     </Layout>
   );
-};
+}
 
 export async function getServerSideProps() {
-  const data = getChartData("amd", "years", 1, "d");
+  const data = GetChartData('amd', 'years', 1, 'd');
 
-  return { props: { data }}
+  return { props: { data } };
 }

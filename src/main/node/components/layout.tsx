@@ -6,15 +6,15 @@ import {
   useMantineTheme,
   Container,
   Space,
-  Button
+  Button,
 } from '@mantine/core';
-import Link from 'next/link'
+import Link from 'next/link';
 import Watchlist from '../redux/features/userLists/Watchlist';
 
-import Meta from './meta'
+import Meta from './meta';
 import SearchBar from './search';
 
-const Layout = ({ children }) => {
+function Layout({ children }) {
   const theme = useMantineTheme();
 
   return (
@@ -24,31 +24,31 @@ const Layout = ({ children }) => {
           background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[2],
         },
       }}
-      footer={  
+      footer={(
         <Footer height={60} p="md">
           Application footer
         </Footer>
-      }
-      header={
+      )}
+      header={(
         <Header height={60} p="xs">
           <Grid align="center">
-            <Grid.Col span={1}><Link href="/"><Button variant="subtle" color="dark">Kalypto</Button></Link></Grid.Col>
+            <Grid.Col span={1}><Link href="/" passHref><Button variant="subtle" color="dark">Kalypto</Button></Link></Grid.Col>
             <Grid.Col span={2}><SearchBar /></Grid.Col>
-            <Grid.Col span={1}><Link href="/about"><Button variant="subtle" color="dark">About</Button></Link></Grid.Col>
+            <Grid.Col span={1}><Link href="/about" passHref><Button variant="subtle" color="dark">About</Button></Link></Grid.Col>
           </Grid>
         </Header>
-      }
+      )}
     >
       <Meta />
-        <Grid grow>
-          <Container size="xl">
-            <Space h="xl" />
-            {children}
-          </Container>
-          <Watchlist />
-        </Grid>
+      <Grid grow>
+        <Container size="xl">
+          <Space h="xl" />
+          {children}
+        </Container>
+        <Watchlist />
+      </Grid>
     </AppShell>
-  )
+  );
 }
 
-export default Layout
+export default Layout;
