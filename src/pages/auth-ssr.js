@@ -1,7 +1,9 @@
 import React from 'react';
-import { withAuthUser, AuthAction } from 'next-firebase-auth';
-import { Button } from '@mantine/core';
-
+import {
+  withAuthUser,
+  withAuthUserTokenSSR,
+  AuthAction,
+} from 'next-firebase-auth';
 import FirebaseAuth from '../main/node/auth/FirebaseAuth';
 
 const styles = {
@@ -18,14 +20,15 @@ const styles = {
 function Auth() {
   return (
     <div style={styles.content}>
-      <Button>Sign in</Button>
+      <h3>Sign in</h3>
       <div style={styles.textContainer}>
         <p>
           This auth page is
           {' '}
-          <b>static</b>
-          . It will redirect on the client side if
-          the user is already authenticated.
+          <b>not</b>
+          {' '}
+          static. It will server-side redirect to the
+          app if the user is already authenticated.
         </p>
       </div>
       <div>
@@ -35,8 +38,10 @@ function Auth() {
   );
 }
 
+export const getServerSideProps = withAuthUserTokenSSR({
+  whenAuthed: AuthAction.REDIRECT_TO_APP,
+})();
+
 export default withAuthUser({
   whenAuthed: AuthAction.REDIRECT_TO_APP,
-  whenUnauthedBeforeInit: AuthAction.RETURN_NULL,
-  whenUnauthedAfterInit: AuthAction.RENDER,
 })(Auth);

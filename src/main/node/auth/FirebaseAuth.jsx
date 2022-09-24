@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 
 // Note that next-firebase-auth inits Firebase for us,
 // so we don't need to.
@@ -22,19 +22,6 @@ const firebaseAuthConfig = {
         prompt: 'select_account',
       },
     },
-    {
-      provider: firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-      scopes: [
-        'public_profile',
-        'email',
-        'user_likes',
-        'user_friends',
-      ],
-      customParameters: {
-        // Forces password re-entry.
-        auth_type: 'reauthenticate',
-      },
-    },
     firebase.auth.TwitterAuthProvider.PROVIDER_ID,
     // Other providers don't need to be given as object.
     firebase.auth.EmailAuthProvider.PROVIDER_ID,
@@ -43,10 +30,9 @@ const firebaseAuthConfig = {
   credentialHelper: 'none',
   callbacks: {
     // https://github.com/firebase/firebaseui-web#signinsuccesswithauthresultauthresult-redirecturl
-    signInSuccessWithAuthResult: () =>
-      // Don't automatically redirect. We handle redirects using
-      // `next-firebase-auth`.
-      false,
+    signInSuccessWithAuthResult: () => false,
+    // Don't automatically redirect. We handle redirects using
+    // `next-firebase-auth`.
   },
 };
 
