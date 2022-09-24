@@ -9,12 +9,21 @@ import {
   Button,
 } from '@mantine/core';
 import Link from 'next/link';
-import Watchlist from '../redux/features/userLists/Watchlist';
+import { useAuthUser } from 'next-firebase-auth';
 
 import Meta from './meta';
-import SearchBar from './search';
+import SearchBar from './search.tsx';
+import Watchlist from '../redux/features/userLists/Watchlist.tsx';
+
+function profileOrLogin(session) {
+  if (session) {
+    return (<Grid.Col span={1}><Link href="/profile" passHref><Button variant="subtle" color="dark">Profile</Button></Link></Grid.Col>);
+  }
+  return (<Grid.Col span={1}><Link href="/login" passHref><Button variant="subtle" color="dark">Login</Button></Link></Grid.Col>);
+}
 
 function Layout({ children }) {
+  const AuthUser = useAuthUser();
   const theme = useMantineTheme();
 
   return (
@@ -35,6 +44,7 @@ function Layout({ children }) {
             <Grid.Col span={1}><Link href="/" passHref><Button variant="subtle" color="dark">Kalypto</Button></Link></Grid.Col>
             <Grid.Col span={2}><SearchBar /></Grid.Col>
             <Grid.Col span={1}><Link href="/about" passHref><Button variant="subtle" color="dark">About</Button></Link></Grid.Col>
+            {profileOrLogin(AuthUser)}
           </Grid>
         </Header>
       )}

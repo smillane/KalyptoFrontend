@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/main/node/auth/FirebaseAuth.jsx"  ],
   "exclude": [
     "node_modules"
   ]
