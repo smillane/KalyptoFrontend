@@ -8,6 +8,7 @@ import Layout from '../../main/node/components/layout.tsx';
 import {
   transactionColor, typeOfTransaction, reduceZerosToLetters, greenOrRed,
 } from '../../main/node/util/formating.tsx';
+import Watchlist from '../../main/node/redux/features/userLists/Watchlist.tsx';
 
 // implement scrollbar sideways for containers such as dividends, insider trading,
 // institutional ownership etc, based on page width, for mobile
@@ -21,467 +22,609 @@ export default function Stock({
 }) {
   return (
     <Layout>
-      <Container size="xl">
-        <Group>
-          <Title order={1} transform="uppercase">{stockSymbol.symbol}</Title>
-          <Title order={1} transform="uppercase">{company.symbol}</Title>
-          <Title order={1} weight={100} transform="capitalize">{company.companyName}</Title>
-        </Group>
-        <Space h="sm" />
-        <Group>
-          <Title transform="capitalize" order={4}>{quote.latestPrice}</Title>
-          <Title transform="capitalize" order={4} color={greenOrRed(quote.change)}>{quote.change}</Title>
-          <Title transform="capitalize" order={4} color={greenOrRed(quote.changePercent)}>
-            {(quote.changePercent * 100).toFixed(2)}
-            %
-          </Title>
-        </Group>
-        <Space h="lg" />
-        <Grid>
-          <Grid.Col xs={6} sm={4} md={4} lg={4}>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Todays Volume</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{quote.volume.toLocaleString()}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Avg Volume</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{quote.avgTotalVolume.toLocaleString()}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Market Cap</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      $
-                      {reduceZerosToLetters(quote.marketCap)}
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Enterprise Value</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      $
-                      {reduceZerosToLetters(fundamentalValuations.enterpriseValue)}
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Next Earnings Date</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats.nextEarningsDate}</Text></td>
-                </tr>
-              </tbody>
-            </Table>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Total Assets</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      $
-                      {reduceZerosToLetters(financials.totalAssets)}
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Total Liabilities</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      $
-                      {reduceZerosToLetters(financials.totalLiabilities)}
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Shareholder Equity</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      $
-                      {reduceZerosToLetters(financials.shareholderEquity)}
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Shares Outstanding</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      $
-                      {reduceZerosToLetters(basicStats.sharesOutstanding)}
-                    </Text>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>P/E</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{quote.peRatio.toFixed(2)}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Forward P/E</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{stats.forwardPERatio.toFixed(2)}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Price/Revenue</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.priceToRevenue.toFixed(2)}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>EV/Sales</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.evToSales.toFixed(2)}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Book/Share</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.bookValuePerShare.toFixed(2)}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Cash/Share</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      $
-                      {Math.trunc(financials.totalCash / quote.latestPrice).toLocaleString()}
-                    </Text>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-          </Grid.Col>
-          <Grid.Col xs={6} sm={4} md={4} lg={4}>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>EPS</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats.ttmEPS}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Revenue</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations.revenueGrowth)}>
-                      $
-                      {reduceZerosToLetters(financials.revenue)}
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>EBITDA</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations.ebitdaGrowth)}>
-                      $
-                      {reduceZerosToLetters(financials.EBITDA)}
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>GAAP Net Income</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations.incomeNetYoyDelta)}>
-                      $
-                      {reduceZerosToLetters(fundamentals.incomeNet)}
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Cash Flow</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations.freeCashFlowGrowth)}>
-                      $
-                      {reduceZerosToLetters(financials.cashFlow)}
-                    </Text>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Profit margin</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      {(fundamentalValuations.profitGrossToRevenue * 100).toFixed(2)}
-                      %
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Oper. margin</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      {(fundamentalValuations.operatingIncomeToRevenue * 100).toFixed(2)}
-                      %
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Gross margin</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      {(fundamentalValuations.profitGrossToRevenue * 100).toFixed(2)}
-                      %
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>EBIT margin</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      {(fundamentalValuations.ebitToRevenue * 100).toFixed(2)}
-                      %
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>EBITDA margin</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      {(fundamentalValuations.ebitdaMargin * 100).toFixed(2)}
-                      %
-                    </Text>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Debt to Equity</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.debtToEquity}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Debt to EBITDA</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.debtToEbitda}</Text></td>
-                </tr>
-              </tbody>
-            </Table>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Return on Assets</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      {(fundamentalValuations.returnOnAssets * 100).toFixed(2)}
-                      %
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Return on Equity</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      {(fundamentalValuations.returnOnEquity * 100).toFixed(2)}
-                      %
-                    </Text>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-          </Grid.Col>
-          <Grid.Col xs={6} sm={4} md={4} lg={4}>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Dividend</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      $
-                      {basicStats.ttmDividendRate ? (basicStats.ttmDividendRate).toFixed(2) : 0}
-                    </Text>
-                  </td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Dividend Yield</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      {basicStats.dividendYield ? (basicStats.dividendYield * 100).toFixed(2) : 0}
-                      %
-                    </Text>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>52 week high</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats.week52high}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>52 week low</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{basicStats.week52low}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>52 week change</Text></td>
-                  <td><Text transform="capitalize" weight={700} color={greenOrRed(basicStats.week52change)} align="right">{(basicStats.week52change).toFixed(2)}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>YTD Change</Text></td>
-                  <td>
-                    <Text transform="capitalize" weight={700} color={greenOrRed(quote.ytdChange)} align="right">
-                      {(quote.ytdChange * 100).toLocaleString()}
-                      {' '}
-                      %
-                    </Text>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Total Employees</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{stats.employees.toLocaleString()}</Text></td>
-                </tr>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Revenue Per Employee</Text></td>
-                  <td>
-                    <Text transform="capitalize" align="right" weight={700}>
-                      $
-                      {stats.revenuePerEmployee.toLocaleString()}
-                    </Text>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-            <Table
-              highlightOnHover
-              sx={(theme) => ({
-                boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-              })}
-            >
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>Put/Call Ratio</Text></td>
-                  <td><Text transform="capitalize" align="right" weight={700}>{stats.putCallRatio.toFixed(2)}</Text></td>
-                </tr>
-              </tbody>
-            </Table>
-          </Grid.Col>
-        </Grid>
-        <SimpleGrid
-          breakpoints={[
-            { minWidth: 'sm', cols: 1 },
-            { minWidth: 1200, cols: 1 },
-            { minWidth: 1450, cols: 2 },
-          ]}
-          sx={{ margin: '2px' }}
-        >
-          <Container sx={(theme) => ({
-            boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-          })}
+      <Grid grow>
+        <Container size="xl">
+          <Group>
+            <Title order={1} transform="uppercase">{stockSymbol.symbol}</Title>
+            <Title order={1} transform="uppercase">{company.symbol}</Title>
+            <Title order={1} weight={100} transform="capitalize">{company.companyName}</Title>
+          </Group>
+          <Space h="sm" />
+          <Group>
+            <Title transform="capitalize" order={4}>{quote.latestPrice}</Title>
+            <Title transform="capitalize" order={4} color={greenOrRed(quote.change)}>{quote.change}</Title>
+            <Title transform="capitalize" order={4} color={greenOrRed(quote.changePercent)}>
+              {(quote.changePercent * 100).toFixed(2)}
+              %
+            </Title>
+          </Group>
+          <Space h="lg" />
+          <Grid>
+            <Grid.Col xs={6} sm={4} md={4} lg={4}>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Todays Volume</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{quote.volume.toLocaleString()}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Avg Volume</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{quote.avgTotalVolume.toLocaleString()}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Market Cap</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        $
+                        {reduceZerosToLetters(quote.marketCap)}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Enterprise Value</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        $
+                        {reduceZerosToLetters(fundamentalValuations.enterpriseValue)}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Next Earnings Date</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{basicStats.nextEarningsDate}</Text></td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Total Assets</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        $
+                        {reduceZerosToLetters(financials.totalAssets)}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Total Liabilities</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        $
+                        {reduceZerosToLetters(financials.totalLiabilities)}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Shareholder Equity</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        $
+                        {reduceZerosToLetters(financials.shareholderEquity)}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Shares Outstanding</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        $
+                        {reduceZerosToLetters(basicStats.sharesOutstanding)}
+                      </Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>P/E</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{quote.peRatio.toFixed(2)}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Forward P/E</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{stats.forwardPERatio.toFixed(2)}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Price/Revenue</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.priceToRevenue.toFixed(2)}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>EV/Sales</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.evToSales.toFixed(2)}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Book/Share</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.bookValuePerShare.toFixed(2)}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Cash/Share</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        $
+                        {Math.trunc(financials.totalCash / quote.latestPrice).toLocaleString()}
+                      </Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Grid.Col>
+            <Grid.Col xs={6} sm={4} md={4} lg={4}>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>EPS</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{basicStats.ttmEPS}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Revenue</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations.revenueGrowth)}>
+                        $
+                        {reduceZerosToLetters(financials.revenue)}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>EBITDA</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations.ebitdaGrowth)}>
+                        $
+                        {reduceZerosToLetters(financials.EBITDA)}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>GAAP Net Income</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations.incomeNetYoyDelta)}>
+                        $
+                        {reduceZerosToLetters(fundamentals.incomeNet)}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Cash Flow</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700} color={greenOrRed(fundamentalValuations.freeCashFlowGrowth)}>
+                        $
+                        {reduceZerosToLetters(financials.cashFlow)}
+                      </Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Profit margin</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        {(fundamentalValuations.profitGrossToRevenue * 100).toFixed(2)}
+                        %
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Oper. margin</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        {(fundamentalValuations.operatingIncomeToRevenue * 100).toFixed(2)}
+                        %
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Gross margin</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        {(fundamentalValuations.profitGrossToRevenue * 100).toFixed(2)}
+                        %
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>EBIT margin</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        {(fundamentalValuations.ebitToRevenue * 100).toFixed(2)}
+                        %
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>EBITDA margin</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        {(fundamentalValuations.ebitdaMargin * 100).toFixed(2)}
+                        %
+                      </Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Debt to Equity</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.debtToEquity}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Debt to EBITDA</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{fundamentalValuations.debtToEbitda}</Text></td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Return on Assets</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        {(fundamentalValuations.returnOnAssets * 100).toFixed(2)}
+                        %
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Return on Equity</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        {(fundamentalValuations.returnOnEquity * 100).toFixed(2)}
+                        %
+                      </Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Grid.Col>
+            <Grid.Col xs={6} sm={4} md={4} lg={4}>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Dividend</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        $
+                        {basicStats.ttmDividendRate ? (basicStats.ttmDividendRate).toFixed(2) : 0}
+                      </Text>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Dividend Yield</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        {basicStats.dividendYield ? (basicStats.dividendYield * 100).toFixed(2) : 0}
+                        %
+                      </Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>52 week high</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{basicStats.week52high}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>52 week low</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{basicStats.week52low}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>52 week change</Text></td>
+                    <td><Text transform="capitalize" weight={700} color={greenOrRed(basicStats.week52change)} align="right">{(basicStats.week52change).toFixed(2)}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>YTD Change</Text></td>
+                    <td>
+                      <Text transform="capitalize" weight={700} color={greenOrRed(quote.ytdChange)} align="right">
+                        {(quote.ytdChange * 100).toLocaleString()}
+                        {' '}
+                        %
+                      </Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Total Employees</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{stats.employees.toLocaleString()}</Text></td>
+                  </tr>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Revenue Per Employee</Text></td>
+                    <td>
+                      <Text transform="capitalize" align="right" weight={700}>
+                        $
+                        {stats.revenuePerEmployee.toLocaleString()}
+                      </Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Table
+                highlightOnHover
+                sx={(theme) => ({
+                  boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                })}
+              >
+                <tbody>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>Put/Call Ratio</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{stats.putCallRatio.toFixed(2)}</Text></td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Grid.Col>
+          </Grid>
+          <SimpleGrid
+            breakpoints={[
+              { minWidth: 'sm', cols: 1 },
+              { minWidth: 1200, cols: 1 },
+              { minWidth: 1450, cols: 2 },
+            ]}
+            sx={{ margin: '2px' }}
           >
-            <Title order={3}>News</Title>
-            <Space h="md" />
-            {news.map((individualNews) => (
-              <div key={individualNews.uuid}>
-                <a href={`${individualNews.qmUrl}`} rel="noopener noreferrer" target="_blank">
-                  <Grid justify="space-between" grow align="center">
-                    <Grid.Col span={3}><Text size="sm" lineClamp={1}>{individualNews.source}</Text></Grid.Col>
-                    <Grid.Col span={9}><Text size="sm" lineClamp={2}>{individualNews.headline}</Text></Grid.Col>
-                  </Grid>
-                </a>
-                <Space h="xs" />
-              </div>
-            ))}
-          </Container>
-          <div>
             <Container sx={(theme) => ({
               boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
             })}
             >
-              <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref>
+              <Title order={3}>News</Title>
+              <Space h="md" />
+              {news.map((individualNews) => (
+                <div key={individualNews.uuid}>
+                  <a href={`${individualNews.qmUrl}`} rel="noopener noreferrer" target="_blank">
+                    <Grid justify="space-between" grow align="center">
+                      <Grid.Col span={3}><Text size="sm" lineClamp={1}>{individualNews.source}</Text></Grid.Col>
+                      <Grid.Col span={9}><Text size="sm" lineClamp={2}>{individualNews.headline}</Text></Grid.Col>
+                    </Grid>
+                  </a>
+                  <Space h="xs" />
+                </div>
+              ))}
+            </Container>
+            <div>
+              <Container sx={(theme) => ({
+                boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+              })}
+              >
+                <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref>
+                  <Button variant="outline" color="dark" sx={(theme) => ({ background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1] })}>
+                    <Title order={3}>Insider Trading</Title>
+                  </Button>
+                </Link>
+                <Space h="md" />
+                <Table highlightOnHover>
+                  <thead>
+                    <tr>
+                      <th><Title transform="capitalize" order={5}>Insider</Title></th>
+                      <th><Title transform="capitalize" order={5}>Transaction</Title></th>
+                      <th><Title align="right" transform="capitalize" order={5}>Price / Share</Title></th>
+                      <th><Title align="right" transform="capitalize" order={5}>Total Value</Title></th>
+                      <th><Title align="right" transform="capitalize" order={5}>Shares After</Title></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {insiderTrading.map((indTrade) => (
+                      <tr key={uuidv4()}>
+                        <td>
+                          <Stack spacing={0}>
+                            <Text transform="capitalize" weight={700}>{indTrade.fullName}</Text>
+                            <Text transform="capitalize" weight={500} lineClamp={1}>{indTrade.reportedTitle}</Text>
+                          </Stack>
+                        </td>
+                        <td>
+                          <Stack spacing={0}>
+                            <Text transform="capitalize" color={transactionColor(indTrade.transactionCode)} weight={700}>{typeOfTransaction(indTrade.transactionCode)}</Text>
+                            <Text transform="capitalize" weight={500}>{indTrade.transactionDate}</Text>
+                          </Stack>
+                        </td>
+                        <td>
+                          <Text align="right" transform="capitalize" weight={700}>
+                            $
+                            {indTrade.transactionPrice}
+                          </Text>
+                        </td>
+                        <td>
+                          <Text align="right" transform="capitalize" weight={700}>
+                            $
+                            {indTrade.transactionValue.toLocaleString()}
+                          </Text>
+                        </td>
+                        <td><Text align="right" transform="capitalize" weight={700}>{indTrade.postShares.toLocaleString()}</Text></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Container>
+              <Container sx={(theme) => ({
+                boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+              })}
+              >
+                <Title order={3}>Insider Trading, Prev. 6 Months</Title>
+                <Space h="md" />
+                <Table highlightOnHover>
+                  <thead>
+                    <tr>
+                      <th><Title transform="capitalize" order={5}>Insider</Title></th>
+                      <th><Title align="right" transform="capitalize" order={5}>Net Transacted</Title></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {insiderSummary.map((insider) => (
+                      <tr key={insider.issuerCik}>
+                        <td>
+                          <Stack spacing={0}>
+                            <Text transform="capitalize" weight={700}>{insider.fullName}</Text>
+                            <Text transform="capitalize" weight={500} lineClamp={1}>{insider.reportedTitle}</Text>
+                          </Stack>
+                        </td>
+                        <td>
+                          <Text align="right" transform="capitalize" weight={700} color={greenOrRed(insider.netTransacted)}>
+                            $
+                            {insider.netTransacted.toLocaleString()}
+                          </Text>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Container>
+
+            </div>
+            <Container sx={(theme) => ({
+              boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+            })}
+            >
+              <Title order={3}>Insitutional Ownership</Title>
+              <Space h="md" />
+              <Table highlightOnHover>
+                <thead>
+                  <tr>
+                    <th><Title transform="capitalize" order={5}>Filing Date</Title></th>
+                    <th><Title transform="capitalize" order={5}>Shareholder</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Total Shares</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Value</Title></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {institutionalOwnership.map((institution) => (
+                    <tr key={institution.entityProperName}>
+                      <td>
+                        <Text transform="capitalize" weight={700}>{institution.reportDate}</Text>
+                      </td>
+                      <td>
+                        <Text transform="capitalize" weight={700} lineClamp={1}>{institution.entityProperName}</Text>
+                      </td>
+                      <td>
+                        <Text align="right" transform="capitalize" weight={700}>{institution.adjustedHolding.toLocaleString()}</Text>
+                      </td>
+                      <td>
+                        <Text align="right" transform="capitalize" weight={700}>
+                          $
+                          {institution.adjustedMarketValue.toLocaleString()}
+                        </Text>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Container>
+            <Container sx={(theme) => ({
+              boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+            })}
+            >
+              <Link href={`/stocks/${stockSymbol.symbol}/dividends`} passHref>
                 <Button variant="outline" color="dark" sx={(theme) => ({ background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1] })}>
-                  <Title order={3}>Insider Trading</Title>
+                  <Title order={3}>Dividends</Title>
                 </Button>
               </Link>
               <Space h="md" />
+              <Title order={5}>Next Dividend</Title>
               <Table highlightOnHover>
                 <thead>
                   <tr>
-                    <th><Title transform="capitalize" order={5}>Insider</Title></th>
-                    <th><Title transform="capitalize" order={5}>Transaction</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Price / Share</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Total Value</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Shares After</Title></th>
+                    <th><Title transform="capitalize" order={5}>Payment Date</Title></th>
+                    <th><Title transform="capitalize" order={5}>Ex Date</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Amount</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Payment Type</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Frequency</Title></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {insiderTrading.map((indTrade) => (
-                    <tr key={uuidv4()}>
-                      <td>
-                        <Stack spacing={0}>
-                          <Text transform="capitalize" weight={700}>{indTrade.fullName}</Text>
-                          <Text transform="capitalize" weight={500} lineClamp={1}>{indTrade.reportedTitle}</Text>
-                        </Stack>
-                      </td>
-                      <td>
-                        <Stack spacing={0}>
-                          <Text transform="capitalize" color={transactionColor(indTrade.transactionCode)} weight={700}>{typeOfTransaction(indTrade.transactionCode)}</Text>
-                          <Text transform="capitalize" weight={500}>{indTrade.transactionDate}</Text>
-                        </Stack>
-                      </td>
+                  <tr>
+                    <td><Text transform="capitalize" weight={700}>{nextDiv.paymentDate}</Text></td>
+                    <td><Text transform="capitalize" weight={700}>{nextDiv.exDate}</Text></td>
+                    <td>
+                      <Text align="right" transform="capitalize" weight={700}>
+                        {nextDiv.amount}
+                        {' '}
+                        {nextDiv.currency}
+                      </Text>
+                    </td>
+                    <td><Text align="right" transform="capitalize" weight={700}>{nextDiv.flag}</Text></td>
+                    <td><Text align="right" transform="capitalize" weight={700}>{nextDiv.frequency}</Text></td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Space h="sm" />
+              <Title order={5}>Previous Dividends</Title>
+              <Table highlightOnHover>
+                <thead>
+                  <tr>
+                    <th><Title transform="capitalize" order={5}>Payment Date</Title></th>
+                    <th><Title transform="capitalize" order={5}>Ex Date</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Amount</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Payment Type</Title></th>
+                    <th><Title align="right" transform="capitalize" order={5}>Frequency</Title></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {last4Dividends.map((dividend) => (
+                    <tr key={dividend.paymentDate}>
+                      <td><Text transform="capitalize" weight={700}>{dividend.paymentDate}</Text></td>
+                      <td><Text transform="capitalize" weight={700}>{dividend.exDate}</Text></td>
                       <td>
                         <Text align="right" transform="capitalize" weight={700}>
-                          $
-                          {indTrade.transactionPrice}
+                          {dividend.amount}
+                          {' '}
+                          {dividend.currency}
                         </Text>
                       </td>
-                      <td>
-                        <Text align="right" transform="capitalize" weight={700}>
-                          $
-                          {indTrade.transactionValue.toLocaleString()}
-                        </Text>
-                      </td>
-                      <td><Text align="right" transform="capitalize" weight={700}>{indTrade.postShares.toLocaleString()}</Text></td>
+                      <td><Text align="right" transform="capitalize" weight={700}>{dividend.flag}</Text></td>
+                      <td><Text align="right" transform="capitalize" weight={700}>{dividend.frequency}</Text></td>
                     </tr>
                   ))}
                 </tbody>
@@ -491,198 +634,59 @@ export default function Stock({
               boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
             })}
             >
-              <Title order={3}>Insider Trading, Prev. 6 Months</Title>
+              <Title order={3}>About</Title>
               <Space h="md" />
-              <Table highlightOnHover>
-                <thead>
-                  <tr>
-                    <th><Title transform="capitalize" order={5}>Insider</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Net Transacted</Title></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {insiderSummary.map((insider) => (
-                    <tr key={insider.issuerCik}>
-                      <td>
-                        <Stack spacing={0}>
-                          <Text transform="capitalize" weight={700}>{insider.fullName}</Text>
-                          <Text transform="capitalize" weight={500} lineClamp={1}>{insider.reportedTitle}</Text>
-                        </Stack>
-                      </td>
-                      <td>
-                        <Text align="right" transform="capitalize" weight={700} color={greenOrRed(insider.netTransacted)}>
-                          $
-                          {insider.netTransacted.toLocaleString()}
-                        </Text>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+              <Spoiler maxHeight={150} showLabel="Show more" hideLabel="Hide">
+                <Text size="sm">{company.shortDescription}</Text>
+              </Spoiler>
+              <Space h="sm" />
+              <Text size="sm">
+                CEO:
+                {' '}
+                {company.ceo}
+              </Text>
+              <Divider my="xs" />
+              <Text size="sm">
+                Industry:
+                {' '}
+                {company.industry}
+              </Text>
+              <Divider my="xs" />
+              <Text size="sm">
+                Headquarters:
+                {' '}
+                {company.city}
+                ,
+                {' '}
+                {company.state}
+              </Text>
+              <Divider my="xs" />
+              <Link href={`${company.website}`} passHref><Text variant="link" size="sm">{company.website}</Text></Link>
             </Container>
-
-          </div>
-          <Container sx={(theme) => ({
-            boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-          })}
-          >
-            <Title order={3}>Insitutional Ownership</Title>
-            <Space h="md" />
-            <Table highlightOnHover>
-              <thead>
-                <tr>
-                  <th><Title transform="capitalize" order={5}>Filing Date</Title></th>
-                  <th><Title transform="capitalize" order={5}>Shareholder</Title></th>
-                  <th><Title align="right" transform="capitalize" order={5}>Total Shares</Title></th>
-                  <th><Title align="right" transform="capitalize" order={5}>Value</Title></th>
-                </tr>
-              </thead>
-              <tbody>
-                {institutionalOwnership.map((institution) => (
-                  <tr key={institution.entityProperName}>
-                    <td>
-                      <Text transform="capitalize" weight={700}>{institution.reportDate}</Text>
-                    </td>
-                    <td>
-                      <Text transform="capitalize" weight={700} lineClamp={1}>{institution.entityProperName}</Text>
-                    </td>
-                    <td>
-                      <Text align="right" transform="capitalize" weight={700}>{institution.adjustedHolding.toLocaleString()}</Text>
-                    </td>
-                    <td>
-                      <Text align="right" transform="capitalize" weight={700}>
-                        $
-                        {institution.adjustedMarketValue.toLocaleString()}
-                      </Text>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Container>
-          <Container sx={(theme) => ({
-            boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-          })}
-          >
-            <Link href={`/stocks/${stockSymbol.symbol}/dividends`} passHref>
-              <Button variant="outline" color="dark" sx={(theme) => ({ background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1] })}>
-                <Title order={3}>Dividends</Title>
-              </Button>
-            </Link>
-            <Space h="md" />
-            <Title order={5}>Next Dividend</Title>
-            <Table highlightOnHover>
-              <thead>
-                <tr>
-                  <th><Title transform="capitalize" order={5}>Payment Date</Title></th>
-                  <th><Title transform="capitalize" order={5}>Ex Date</Title></th>
-                  <th><Title align="right" transform="capitalize" order={5}>Amount</Title></th>
-                  <th><Title align="right" transform="capitalize" order={5}>Payment Type</Title></th>
-                  <th><Title align="right" transform="capitalize" order={5}>Frequency</Title></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><Text transform="capitalize" weight={700}>{nextDiv.paymentDate}</Text></td>
-                  <td><Text transform="capitalize" weight={700}>{nextDiv.exDate}</Text></td>
-                  <td>
-                    <Text align="right" transform="capitalize" weight={700}>
-                      {nextDiv.amount}
-                      {' '}
-                      {nextDiv.currency}
-                    </Text>
-                  </td>
-                  <td><Text align="right" transform="capitalize" weight={700}>{nextDiv.flag}</Text></td>
-                  <td><Text align="right" transform="capitalize" weight={700}>{nextDiv.frequency}</Text></td>
-                </tr>
-              </tbody>
-            </Table>
-            <Space h="sm" />
-            <Title order={5}>Previous Dividends</Title>
-            <Table highlightOnHover>
-              <thead>
-                <tr>
-                  <th><Title transform="capitalize" order={5}>Payment Date</Title></th>
-                  <th><Title transform="capitalize" order={5}>Ex Date</Title></th>
-                  <th><Title align="right" transform="capitalize" order={5}>Amount</Title></th>
-                  <th><Title align="right" transform="capitalize" order={5}>Payment Type</Title></th>
-                  <th><Title align="right" transform="capitalize" order={5}>Frequency</Title></th>
-                </tr>
-              </thead>
-              <tbody>
-                {last4Dividends.map((dividend) => (
-                  <tr key={dividend.paymentDate}>
-                    <td><Text transform="capitalize" weight={700}>{dividend.paymentDate}</Text></td>
-                    <td><Text transform="capitalize" weight={700}>{dividend.exDate}</Text></td>
-                    <td>
-                      <Text align="right" transform="capitalize" weight={700}>
-                        {dividend.amount}
-                        {' '}
-                        {dividend.currency}
-                      </Text>
-                    </td>
-                    <td><Text align="right" transform="capitalize" weight={700}>{dividend.flag}</Text></td>
-                    <td><Text align="right" transform="capitalize" weight={700}>{dividend.frequency}</Text></td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Container>
-          <Container sx={(theme) => ({
-            boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-          })}
-          >
-            <Title order={3}>About</Title>
-            <Space h="md" />
-            <Spoiler maxHeight={150} showLabel="Show more" hideLabel="Hide">
-              <Text size="sm">{company.shortDescription}</Text>
-            </Spoiler>
-            <Space h="sm" />
-            <Text size="sm">
-              CEO:
-              {' '}
-              {company.ceo}
-            </Text>
-            <Divider my="xs" />
-            <Text size="sm">
-              Industry:
-              {' '}
-              {company.industry}
-            </Text>
-            <Divider my="xs" />
-            <Text size="sm">
-              Headquarters:
-              {' '}
-              {company.city}
-              ,
-              {' '}
-              {company.state}
-            </Text>
-            <Divider my="xs" />
-            <Link href={`${company.website}`} passHref><Text variant="link" size="sm">{company.website}</Text></Link>
-          </Container>
-        </SimpleGrid>
-        <Space h="xs" />
-        <Container
-          size="xl"
-          sx={(theme) => ({
-            boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-          })}
-        >
-          <Title order={4}>People also viewed</Title>
-          <Space h="md" />
-          <SimpleGrid breakpoints={[
-            { minWidth: 350, cols: 2 },
-            { minWidth: 500, cols: 3 },
-            { minWidth: 'xs', cols: 4 },
-            { minWidth: 'sm', cols: 4 },
-            { minWidth: 'md', cols: 6 },
-            { minWidth: 1200, cols: 6 }]}
-          >
-            {peerGroup.map((it) => <Link href={`/stocks/${it}`} key={it} passHref><Button variant="outline" color="dark">{it}</Button></Link>)}
           </SimpleGrid>
+          <Space h="xs" />
+          <Container
+            size="xl"
+            sx={(theme) => ({
+              boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+            })}
+          >
+            <Title order={4}>People also viewed</Title>
+            <Space h="md" />
+            <SimpleGrid breakpoints={[
+              { minWidth: 350, cols: 2 },
+              { minWidth: 500, cols: 3 },
+              { minWidth: 'xs', cols: 4 },
+              { minWidth: 'sm', cols: 4 },
+              { minWidth: 'md', cols: 6 },
+              { minWidth: 1200, cols: 6 }]}
+            >
+              {peerGroup.map((it) => <Link href={`/stocks/${it}`} key={it} passHref><Button variant="outline" color="dark">{it}</Button></Link>)}
+            </SimpleGrid>
+          </Container>
         </Container>
-      </Container>
+        <Watchlist />
+      </Grid>
     </Layout>
   );
 }

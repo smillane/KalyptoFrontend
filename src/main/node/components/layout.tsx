@@ -12,14 +12,7 @@ import Link from 'next/link';
 
 import Meta from './meta';
 import SearchBar from './search.tsx';
-import Watchlist from '../redux/features/userLists/Watchlist.tsx';
-
-function profileOrLogin(session) {
-  if (session) {
-    return (<Grid.Col span={1}><Link href="/profile" passHref><Button variant="subtle" color="dark">Profile</Button></Link></Grid.Col>);
-  }
-  return (<Grid.Col span={1}><Link href="/login" passHref><Button variant="subtle" color="dark">Login</Button></Link></Grid.Col>);
-}
+import AuthStateButton from '../auth/authStateButton.tsx';
 
 function Layout({ children }) {
   const theme = useMantineTheme();
@@ -41,20 +34,19 @@ function Layout({ children }) {
           <Grid align="center">
             <Grid.Col span={1}><Link href="/" passHref><Button variant="subtle" color="dark">Kalypto</Button></Link></Grid.Col>
             <Grid.Col span={2}><SearchBar /></Grid.Col>
-            <Grid.Col span={1}><Link href="/about" passHref><Button variant="subtle" color="dark">About</Button></Link></Grid.Col>
-            {profileOrLogin('AuthUser')}
+            {/* <Grid.Col span={1}><Link href="/about" passHref>
+            <Button variant="subtle" color="dark">About</Button></Link></Grid.Col> */}
+            <Grid.Col span={1}><Link href="/auth" passHref><Button variant="subtle" color="dark">auth</Button></Link></Grid.Col>
+            <AuthStateButton />
           </Grid>
         </Header>
       )}
     >
       <Meta />
-      <Grid grow>
-        <Container size="xl">
-          <Space h="xl" />
-          {children}
-        </Container>
-        <Watchlist />
-      </Grid>
+      <Container size={1800}>
+        <Space h="xl" />
+        {children}
+      </Container>
     </AppShell>
   );
 }

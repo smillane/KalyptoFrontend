@@ -14,13 +14,14 @@ import {
   useMantineTheme,
   Text,
   Table,
+  Paper,
 } from '@mantine/core';
 import { IconDots, IconSettings } from '@tabler/icons';
-
-import AddWatchlist from './AddWatchlist';
-import DeleteWatchlist from './DeleteWatchlist';
-import { updateListName } from './WatchlistSlice';
 import Link from 'next/link';
+
+import AddWatchlist from './AddWatchlist.tsx';
+import DeleteWatchlist from './DeleteWatchlist.tsx';
+import { updateListName } from './WatchlistSlice.tsx';
 
 function AccordionControl(props) {
   const [opened, setOpened] = useState(false);
@@ -38,6 +39,7 @@ function AccordionControl(props) {
     const list = props.lists.find((obj) => Object.keys(obj) == props.listname);
     console.log('found', list);
     if (listName.length !== 0) {
+      // eslint-disable-next-line no-use-before-define
       updateListNameHandler(props.userID, listName, props.lists)
         .then(() => {
           dispatch(
@@ -95,7 +97,7 @@ function AccordionControl(props) {
             <Menu.Item icon={<IconSettings size={14} />} onClick={() => setOpened(true)}>
               Rename
             </Menu.Item>
-            <Link href={`/watchlists/${props.listname}`}><Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item></Link>
+            <Link href={`/watchlists/${props.listname}`} passHref><Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item></Link>
             <DeleteWatchlist userID="userID" listname={props.listname} />
           </Menu.Dropdown>
         </Menu>
@@ -109,16 +111,20 @@ export default function Watchlist() {
   const lists: listFromDBType = useSelector((state) => state.watchlists);
 
   if (!Array.isArray(lists) || !lists.length) {
-    return <AddWatchlist
-      space={<Space h="xl" />}
-      theme={theme => ({
-        boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
-      })} />
+    return (
+      <AddWatchlist
+        space={<Space h="xl" />}
+        theme={(theme) => ({
+          boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+        })}
+      />
+    );
   }
   return (
-    <Container sx={theme => ({
-      boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: "2px", background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]
-    })}>
+    <Container sx={(theme) => ({
+      boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content',
+    })}
+    >
       <Space h="xl" />
       <AddWatchlist />
       <Accordion multiple sx={{ width: 200 }} mx="auto">
@@ -133,7 +139,7 @@ export default function Watchlist() {
               <Table highlightOnHover>
                 <tbody>
                   {values.map((stock) => (
-                    <Link href={`/stocks/${stock}`} key={stock}><tr><td><Text transform="capitalize">{stock}</Text></td></tr></Link>
+                    <Link href={`/stocks/${stock}`} key={stock} passHref><tr><td><Text transform="capitalize">{stock}</Text></td></tr></Link>
                   ))}
                 </tbody>
               </Table>

@@ -5,16 +5,20 @@ import {
   withAuthUserTokenSSR,
 } from 'next-firebase-auth';
 
+import Layout from '../main/node/components/layout.tsx';
+import AuthStateButton from '../main/node/auth/authStateButton';
+
 function Demo() {
   const AuthUser = useAuthUser();
   return (
-    <div>
+    <Layout>
       <p>
         Your email is
-        {AuthUser.email ? AuthUser.email : 'unknown'}
+        {AuthUser.email ? AuthUser.email : ' unknown'}
         .
       </p>
-    </div>
+      <AuthStateButton />
+    </Layout>
   );
 }
 

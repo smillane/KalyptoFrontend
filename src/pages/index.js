@@ -1,10 +1,8 @@
 import React from 'react';
 import {
-  useAuthUser,
   withAuthUser,
   withAuthUserTokenSSR,
 } from 'next-firebase-auth';
-import { Button } from '@mantine/core';
 
 import Layout from '../main/node/components/layout.tsx';
 
@@ -18,10 +16,8 @@ const styles = {
 };
 
 function Demo() {
-  const AuthUser = useAuthUser();
   return (
     <Layout>
-      <Button onClick={() => AuthUser.signOut}>Sign Out</Button>
       <div style={styles.content}>
         <div style={styles.infoTextContainer}>
           <h3>Home</h3>

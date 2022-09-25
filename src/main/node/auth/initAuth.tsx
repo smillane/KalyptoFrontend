@@ -14,15 +14,6 @@ const initAuth = () => {
     onLogoutRequestError: (err) => {
       console.error(err);
     },
-    firebaseAdminInitConfig: {
-      credential: {
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-        clientEmail: process.env.NEXT_PUBLIC_FIREBASE_EMAIL,
-        // The private key must not be accessible on the client side.
-        privateKey: process.env.FIREBASE_PRIVATE_KEY,
-      },
-      databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DB_URL,
-    },
     // Use application default credentials (takes precedence over firebaseAdminInitConfig if set)
     // useFirebaseAdminDefaultCredential: false,
     firebaseClientInitConfig: {
