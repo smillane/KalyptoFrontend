@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from '@mantine/core';
+import { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
-import Link from 'next/link';
 
-export default function AuthStateButton() {
+export default function IsUserSignedIn() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
 
   // Listen to the Firebase Auth state and set the local state.
@@ -18,12 +16,10 @@ export default function AuthStateButton() {
 
   if (!isSignedIn) {
     return (
-      <Link href="/login" passHref>
-        <Button>Sign In</Button>
-      </Link>
+      false
     );
   }
   return (
-    <Button onClick={() => firebase.auth().signOut()}>Sign Out</Button>
+    true
   );
 }

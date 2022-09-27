@@ -4,12 +4,12 @@ import {
 import Link from 'next/link';
 import { v4 as uuidv4 } from 'uuid';
 
-import Layout from '../../../main/node/components/layout';
+import LayoutWithAuth from '../../../main/node/components/layout';
 import { transactionColor, typeOfTransaction } from '../../../main/node/util/formating';
 
 export default function InsiderTrading({ stockSymbol, insiderTrading }) {
   return (
-    <Layout>
+    <LayoutWithAuth>
       <Container sx={(theme) => ({
         boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
       })}
@@ -63,7 +63,7 @@ export default function InsiderTrading({ stockSymbol, insiderTrading }) {
           </tbody>
         </Table>
       </Container>
-    </Layout>
+    </LayoutWithAuth>
   );
 }
 

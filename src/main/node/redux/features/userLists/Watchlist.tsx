@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Menu,
@@ -14,7 +14,6 @@ import {
   useMantineTheme,
   Text,
   Table,
-  Paper,
 } from '@mantine/core';
 import { IconDots, IconSettings } from '@tabler/icons';
 import Link from 'next/link';
@@ -22,6 +21,8 @@ import Link from 'next/link';
 import AddWatchlist from './AddWatchlist.tsx';
 import DeleteWatchlist from './DeleteWatchlist.tsx';
 import { updateListName } from './WatchlistSlice.tsx';
+import DisabledWatchList from '../../../components/disabledAddWatchlist.tsx';
+import { AuthStateContext } from '../../../components/layout.tsx';
 
 function AccordionControl(props) {
   const [opened, setOpened] = useState(false);
@@ -107,22 +108,32 @@ function AccordionControl(props) {
 }
 
 export default function Watchlist() {
+  const authState: boolean = useContext(AuthStateContext);
   type listFromDBType = Array<Record<string, Array<string>>>;
   const lists: listFromDBType = useSelector((state) => state.watchlists);
-
+  if (authState === false) {
+    return (
+      <DisabledWatchList
+        space={<Space h="xl" />}
+        theme={(theme) => ({
+          boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', padding: '20px 20px 40px 20px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content',
+        })}
+      />
+    );
+  }
   if (!Array.isArray(lists) || !lists.length) {
     return (
       <AddWatchlist
         space={<Space h="xl" />}
         theme={(theme) => ({
-          boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+          boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', padding: '20px 20px 40px 20px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content',
         })}
       />
     );
   }
   return (
     <Container sx={(theme) => ({
-      boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content',
+      boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', padding: '20px 20px 40px 20px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content',
     })}
     >
       <Space h="xl" />

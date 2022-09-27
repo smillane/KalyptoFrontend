@@ -14,7 +14,7 @@ function Meta({ title, keywords, description }) {
 }
 
 Meta.defaultProps = {
-  title: 'Kalypto App',
+  title: 'Kalypto',
   keywords: 'stocks, stock market, markets, commodities, treasuries, stonks, wsb, wallstreetbets, gme, gamestop, amc, to the moon',
   description: 'Keep up to date with the markets',
 };

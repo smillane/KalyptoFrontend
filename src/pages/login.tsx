@@ -2,7 +2,7 @@ import React from 'react';
 import { withAuthUser, AuthAction } from 'next-firebase-auth';
 
 import FirebaseAuth from '../main/node/auth/FirebaseAuth';
-import Layout from '../main/node/components/layout.tsx';
+import LayoutWithAuth from '../main/node/components/layout.tsx';
 
 const styles = {
   content: {
@@ -17,7 +17,7 @@ const styles = {
 
 function Auth() {
   return (
-    <Layout>
+    <LayoutWithAuth>
       <div style={styles.textContainer}>
         <p>
           This auth page is
@@ -30,7 +30,7 @@ function Auth() {
       <div>
         <FirebaseAuth />
       </div>
-    </Layout>
+    </LayoutWithAuth>
   );
 }
 

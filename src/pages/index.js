@@ -5,12 +5,12 @@ import {
 } from 'next-firebase-auth';
 import { Container, Grid, Text } from '@mantine/core';
 
-import Layout from '../main/node/components/layout.tsx';
+import LayoutWithAuth from '../main/node/components/layout.tsx';
 import Watchlist from '../main/node/redux/features/userLists/Watchlist.tsx';
 
 function Demo() {
   return (
-    <Layout>
+    <LayoutWithAuth>
       <Grid grow>
         <Container size="xl">
           <h3>Home</h3>
@@ -25,7 +25,7 @@ function Demo() {
         </Container>
         <Watchlist />
       </Grid>
-    </Layout>
+    </LayoutWithAuth>
   );
 }
 

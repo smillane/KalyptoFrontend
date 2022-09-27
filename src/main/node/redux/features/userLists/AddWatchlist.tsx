@@ -1,43 +1,45 @@
-import React from 'react';
-import { useState } from 'react';
-import { useDispatch  } from 'react-redux';
-import { Container, ActionIcon, Group, Space, Button, TextInput, Collapse, Title } from '@mantine/core';
+import React, { useState } from 'react';
+
+import { useDispatch } from 'react-redux';
+import {
+  Container, ActionIcon, Group, Space, Button, TextInput, Collapse, Title,
+} from '@mantine/core';
 import { IconPlus } from '@tabler/icons';
 
 import { addListHandler } from './Watchlist';
-import { addList } from './WatchlistSlice'
+import { addList } from './WatchlistSlice';
 
 export default function AddWatchlist(props) {
   const [opened, setOpened] = useState(false);
-  const [error, setError] = useState<string>('')
+  const [error, setError] = useState<string>('');
   const [listName, setListName] = useState<string>('');
 
   const dispatch = useDispatch();
-  
-  const onNewListNameChange = e => setListName(e.currentTarget.value);
+
+  const onNewListNameChange = (e) => setListName(e.currentTarget.value);
 
   const onSaveListClicked = () => {
     if (listName) {
-      const newWatchlist = {}
-      newWatchlist[listName] = []
-      addListHandler("userId", listName)
-      .then(() => {
-        dispatch(
-          addList(
-            newWatchlist
-          )
-        )
+      const newWatchlist = {};
+      newWatchlist[listName] = [];
+      addListHandler('userId', listName)
+        .then(() => {
+          dispatch(
+            addList(
+              newWatchlist,
+            ),
+          );
 
-        setListName('');
-        setOpened(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setOpened(true);
-        setError("There was an error, please try again");
-      })
+          setListName('');
+          setOpened(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setOpened(true);
+          setError('There was an error, please try again');
+        });
     }
-  }
+  };
 
   return (
     <Container sx={props.theme}>
@@ -46,12 +48,16 @@ export default function AddWatchlist(props) {
         <Title order={3} align="center" transform="capitalize">Lists</Title>
         <Space w="md" />
         <ActionIcon color="dark" onClick={() => setOpened(true)}>
-          <IconPlus size={16}/>
+          <IconPlus size={16} />
         </ActionIcon>
       </Group>
       <Collapse in={opened} sx={{ width: 200 }}>
-        <TextInput placeholder="Name your list!" error={error} value={listName} 
-        onChange={onNewListNameChange} />
+        <TextInput
+          placeholder="Name your list!"
+          error={error}
+          value={listName}
+          onChange={onNewListNameChange}
+        />
         <Space h="xs" />
         <Group position="apart">
           <Button variant="outline" color="dark" onClick={() => setOpened(false)}>Cancel</Button>
