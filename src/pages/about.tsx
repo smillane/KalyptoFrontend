@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
 import {
-  useAuthUser,
   withAuthUser,
   withAuthUserTokenSSR,
 } from 'next-firebase-auth';
@@ -9,14 +8,10 @@ import { Text } from '@mantine/core';
 
 import LayoutWithAuth from '../main/node/components/layout.tsx';
 
-function Demo() {
-  const AuthUser = useAuthUser();
+function about() {
   return (
     <LayoutWithAuth>
-      <Text transform="capitalize">Hello, {AuthUser.displayName}.</Text>
-      <Text align="center">
-        Your email is {AuthUser.email}.
-      </Text>
+      <Text transform="capitalize">About page</Text>
     </LayoutWithAuth>
   );
 }
@@ -24,4 +19,4 @@ function Demo() {
 // Note that this is a higher-order function.
 export const getServerSideProps = withAuthUserTokenSSR()();
 
-export default withAuthUser()(Demo);
+export default withAuthUser()(about);

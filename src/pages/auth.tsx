@@ -23,8 +23,8 @@ function Auth() {
           This auth page is
           {' '}
           <b>static</b>
-          . It will redirect on the client side if
-          the user is already authenticated.
+          . It will redirect to login if you are not
+          logged in.
         </p>
       </div>
       <div>
@@ -37,5 +37,5 @@ function Auth() {
 export default withAuthUser({
   whenAuthed: AuthAction.REDIRECT_TO_APP,
   whenUnauthedBeforeInit: AuthAction.RETURN_NULL,
-  whenUnauthedAfterInit: AuthAction.RENDER,
+  whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(Auth);

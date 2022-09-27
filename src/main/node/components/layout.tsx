@@ -2,19 +2,15 @@ import {
   AppShell,
   Header,
   Footer,
-  Grid,
   useMantineTheme,
   Container,
   Space,
-  Button,
 } from '@mantine/core';
-import Link from 'next/link';
 import { createContext } from 'react';
 
 import Meta from './meta';
-import SearchBar from './search.tsx';
-import LoginButton from './loginButton.tsx';
 import IsUserSignedIn from '../auth/authState.tsx';
+import HeaderMenu from './header';
 
 export const AuthStateContext = createContext(null);
 function AuthStateContextProvider({ children }) {
@@ -41,16 +37,7 @@ function Layout({ children }) {
         </Footer>
       )}
       header={(
-        <Header height={60} p="xs">
-          <Grid align="center">
-            <Grid.Col span={1}><Link href="/" passHref><Button variant="subtle" color="dark">Kalypto</Button></Link></Grid.Col>
-            <Grid.Col span={2}><SearchBar /></Grid.Col>
-            {/* <Grid.Col span={1}><Link href="/about" passHref>
-            <Button variant="subtle" color="dark">About</Button></Link></Grid.Col> */}
-            <Grid.Col span={1}><Link href="/auth" passHref><Button variant="subtle" color="dark">auth</Button></Link></Grid.Col>
-            <LoginButton />
-          </Grid>
-        </Header>
+        <HeaderMenu />
       )}
     >
       <Meta />

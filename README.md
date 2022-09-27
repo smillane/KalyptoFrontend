@@ -13,3 +13,7 @@ https://iexcloud.io/docs/api/#u-s-holidays-and-trading-dates just create dict wi
 https://iexcloud.io/docs/api/#list create endpoint for mostactive, gainers, losers
 
 Add logic for if nothing found in db, populate with last 4, 8, etc for endpoints such as past dividends, insider transactions
+
+create logic for a skeleton loading screen when logging in
+
+create logic for skeleton loading containers for when assets are loading from backend
