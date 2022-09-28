@@ -5,7 +5,6 @@ import {
   Center,
   Burger,
   Group,
-  Container,
   Menu,
 } from '@mantine/core';
 import Link from 'next/link';
@@ -31,6 +30,14 @@ const useStyles = createStyles((theme) => ({
 
   burger: {
     [theme.fn.largerThan('sm')]: {
+      display: 'none',
+    },
+  },
+
+  logoAndSearch: {
+    width: 260,
+
+    [theme.fn.smallerThan('sm')]: {
       display: 'none',
     },
   },
@@ -91,16 +98,16 @@ export default function HeaderMenu() {
       return (
         <Menu key={link.label} trigger="hover" exitTransitionDuration={0}>
           <Menu.Target>
-            <a
+            <Link
               href={link.link}
               className={classes.link}
-              onClick={(event) => event.preventDefault()}
+              passHref
             >
               <Center>
                 <span className={classes.linkLabel}>{link.label}</span>
                 <IconChevronDown size={12} stroke={1.5} />
               </Center>
-            </a>
+            </Link>
           </Menu.Target>
           <Menu.Dropdown>{menuItems}</Menu.Dropdown>
         </Menu>
@@ -108,30 +115,32 @@ export default function HeaderMenu() {
     }
 
     return (
-      <a
+      <Link
         key={link.label}
         href={link.link}
         className={classes.link}
-        onClick={(event) => event.preventDefault()}
+        passHref
       >
-        {link.label}
-      </a>
+        <Button variant="subtle" color="dark">
+          {link.label}
+        </Button>
+      </Link>
     );
   });
 
   return (
-    <Header height={56} mb={120}>
-      <Container>
-        <Link href="/" passHref><Button variant="subtle" color="dark">Kalypto</Button></Link>
-        <SearchBar />
-        <div className={classes.inner}>
-          <Group spacing={5} className={classes.links}>
-            {items}
-          </Group>
-          <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm" />
-        </div>
-        <LoginLogoutButton />
-      </Container>
+    <Header height={56}>
+      <div className={classes.inner}>
+        <Group spacing={15} className={classes.links} position="left" noWrap sx={{ paddingLeft: '10%' }}>
+          <Link href="/" passHref><Button variant="subtle" color="dark">Kalypto</Button></Link>
+          <SearchBar />
+        </Group>
+        <Group spacing={5} className={classes.links} position="right" noWrap sx={{ paddingRight: '10%' }}>
+          {items}
+          <LoginLogoutButton />
+        </Group>
+        <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm" />
+      </div>
     </Header>
   );
 }

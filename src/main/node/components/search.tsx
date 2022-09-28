@@ -17,6 +17,9 @@ export default function SearchBar() {
 
   return (
     <Autocomplete
+      sx={{ width: '400px' }}
+      radius="md"
+      limit={5}
       value={value}
       onChange={setValue}
       placeholder="Search"
