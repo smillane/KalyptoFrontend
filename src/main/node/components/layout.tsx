@@ -1,6 +1,5 @@
 import {
   AppShell,
-  Header,
   Footer,
   useMantineTheme,
   Container,
@@ -11,6 +10,7 @@ import { createContext } from 'react';
 import Meta from './meta';
 import IsUserSignedIn from '../auth/authState.tsx';
 import HeaderMenu from './header';
+import FooterLinks from './footer.tsx';
 
 export const AuthStateContext = createContext(null);
 function AuthStateContextProvider({ children }) {
@@ -32,9 +32,7 @@ function Layout({ children }) {
         },
       }}
       footer={(
-        <Footer height={60} p="md">
-          Application footer
-        </Footer>
+        <FooterLinks />
       )}
       header={(
         <HeaderMenu />
