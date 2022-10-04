@@ -118,11 +118,12 @@ const footerLinks: FooterLinksProps = {
       { label: 'DPA', link: '/dpa' },
     ],
   }, {
-    title: 'News',
+    title: 'News and Reports',
     links: [
       { label: 'Market News', link: '/news' },
       { label: 'Congressional Filings', link: '/congress' },
       { label: 'SEC Filings', link: '/sec' },
+      { label: 'Reports', link: '/reports' },
     ],
   }, {
     title: 'Support',
