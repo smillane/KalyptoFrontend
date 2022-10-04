@@ -9,8 +9,8 @@ import {
 } from '@mantine/core';
 import Link from 'next/link';
 import { IconChevronDown } from '@tabler/icons';
-
 import { useDisclosure } from '@mantine/hooks';
+
 import SearchBar from './search.tsx';
 import LoginLogoutButton from './loginLogoutButton.tsx';
 

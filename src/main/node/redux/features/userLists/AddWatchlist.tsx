@@ -6,6 +6,7 @@ import {
 } from '@mantine/core';
 import { IconPlus } from '@tabler/icons';
 
+// eslint-disable-next-line import/no-cycle
 import { addListHandler } from './Watchlist';
 import { addList } from './WatchlistSlice';
 

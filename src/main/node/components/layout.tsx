@@ -7,11 +7,12 @@ import {
 import { createContext } from 'react';
 
 import Meta from './meta';
-import IsUserSignedIn from '../auth/authState.tsx';
-import HeaderMenu from './header';
+import HeaderMenu from './header.tsx';
 import FooterLinks from './footer.tsx';
+import Banner from './banner.tsx';
+import IsUserSignedIn from '../auth/authState.tsx';
 
-export const AuthStateContext = createContext(null);
+const AuthStateContext = createContext(null);
 function AuthStateContextProvider({ children }) {
   return (
     <AuthStateContext.Provider value={IsUserSignedIn()}>
@@ -38,6 +39,7 @@ function Layout({ children }) {
       )}
     >
       <Meta />
+      <Banner />
       <Container size={1800}>
         <Space h="xl" />
         {children}

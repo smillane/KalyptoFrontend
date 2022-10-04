@@ -8,16 +8,16 @@ interface markestData {
   }[];
 }
 
-function filterData(data: markestData, key: string) {
-  return (data.markets.find((e) => e.value === key));
+function filterData(prop: markestData, key: string) {
+  return (prop.markets.find((e) => e.value === key));
 }
 
-export default function BannerButtons(props: markestData) {
-  if (filterData(props, 'us')) {
+export default function BannerButtons(props: markestData, key: string) {
+  if (key === 'us') {
     const buttons = filterData(props, 'us').data.map((it) => (
       <Link
         key={it.label}
-        href={`/stocks/${it.label}`}
+        href={`/stocks/${it.individualData.symbol}`}
         passHref
       >
         <Button>
@@ -32,11 +32,11 @@ export default function BannerButtons(props: markestData) {
       </div>
     );
   }
-  if (filterData(props, 'europe')) {
+  if (key === 'europe') {
     const buttons = filterData(props, 'europe').data.map((it) => (
       <Link
         key={it.label}
-        href={`/stocks/${it.label}`}
+        href={`/stocks/${it.individualData.symbol}`}
         passHref
       >
         <Button>
@@ -51,11 +51,11 @@ export default function BannerButtons(props: markestData) {
       </div>
     );
   }
-  if (filterData(props, 'asia')) {
+  if (key === 'asia') {
     const buttons = filterData(props, 'asia').data.map((it) => (
       <Link
         key={it.label}
-        href={`/stocks/${it.label}`}
+        href={`/stocks/${it.individualData.symbol}`}
         passHref
       >
         <Button>
@@ -70,11 +70,11 @@ export default function BannerButtons(props: markestData) {
       </div>
     );
   }
-  if (filterData(props, 'treasuries')) {
+  if (key === 'treasuries') {
     const buttons = filterData(props, 'treasuries').data.map((it) => (
       <Link
         key={it.label}
-        href={`/treasuries/${it.label}`}
+        href={`/treasuries/${it.individualData.key}`}
         passHref
       >
         <Button>
@@ -89,11 +89,11 @@ export default function BannerButtons(props: markestData) {
       </div>
     );
   }
-  if (filterData(props, 'currencies')) {
+  if (key === 'currencies') {
     const buttons = filterData(props, 'currencies').data.map((it) => (
       <Link
         key={it.label}
-        href={`/currencies/${it.label}`}
+        href={`/currencies/${it.individualData.symbol}`}
         passHref
       >
         <Button>
@@ -108,11 +108,11 @@ export default function BannerButtons(props: markestData) {
       </div>
     );
   }
-  if (filterData(props, 'commodities')) {
+  if (key === 'commodities') {
     const buttons = filterData(props, 'commodities').data.map((it) => (
       <Link
         key={it.label}
-        href={`/commodities/${it.label}`}
+        href={`/commodities/${it.individualData.key}`}
         passHref
       >
         <Button>
@@ -127,11 +127,11 @@ export default function BannerButtons(props: markestData) {
       </div>
     );
   }
-  if (filterData(props, 'crypto')) {
+  if (key === 'crypto') {
     const buttons = filterData(props, 'crypto').data.map((it) => (
       <Link
         key={it.label}
-        href={`/crypto/${it.label}`}
+        href={`/crypto/${it.individualData.symbol}`}
         passHref
       >
         <Button>

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Menu,
@@ -18,11 +18,14 @@ import {
 import { IconDots, IconSettings } from '@tabler/icons';
 import Link from 'next/link';
 
+// eslint-disable-next-line import/no-cycle
 import AddWatchlist from './AddWatchlist.tsx';
+// eslint-disable-next-line import/no-cycle
 import DeleteWatchlist from './DeleteWatchlist.tsx';
 import { updateListName } from './WatchlistSlice.tsx';
 import DisabledWatchList from '../../../components/disabledAddWatchlist.tsx';
-import { AuthStateContext } from '../../../components/layout.tsx';
+
+const AuthStateContext = createContext(null);
 
 function AccordionControl(props) {
   const [opened, setOpened] = useState(false);
@@ -36,9 +39,6 @@ function AccordionControl(props) {
   const dispatch = useDispatch();
 
   const onUpdateListClicked = () => {
-    console.log('old name is', props.listname);
-    const list = props.lists.find((obj) => Object.keys(obj) == props.listname);
-    console.log('found', list);
     if (listName.length !== 0) {
       // eslint-disable-next-line no-use-before-define
       updateListNameHandler(props.userID, listName, props.lists)

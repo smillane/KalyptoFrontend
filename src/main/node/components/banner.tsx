@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import {
-  SegmentedControl, Button, Title, Stack,
+  SegmentedControl, Title, Stack,
 } from '@mantine/core';
-import Link from 'next/link';
+
+import BannerButtons from './bannerButtons.tsx';
 
 interface markestData {
   markets: {
@@ -10,8 +11,9 @@ interface markestData {
     data: { label: string; individualData: object }[];
   }[];
 }
+
 const tempData: markestData = {
-  data: [
+  markets: [
     {
       value: 'us',
       data: [
@@ -194,32 +196,6 @@ const tempData: markestData = {
 export default function Banner() {
   const [value, setValue] = useState('react');
 
-  const buttons = () => (
-    <Button>
-      temp
-    </Button>
-  );
-
-  const groups = tempData.markets.map((it) => {
-    const links = it.data.map((ind) => (
-      <Link
-        key={ind.label}
-        href={ind.label}
-        passHref
-      >
-        <Button>
-          {ind.label}
-        </Button>
-      </Link>
-    ));
-
-    return (
-      <div key={it.value}>
-        {links}
-      </div>
-    );
-  });
-
   return (
     <Stack>
       <Title order={4}>Markets</Title>
@@ -236,6 +212,7 @@ export default function Banner() {
           { label: 'Crypto', value: 'crypto' },
         ]}
       />
+      {BannerButtons(tempData, value)}
     </Stack>
   );
 }
