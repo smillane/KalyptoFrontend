@@ -74,7 +74,7 @@ export default function BannerButtons(props: markestData) {
     const buttons = filterData(props, 'treasuries').data.map((it) => (
       <Link
         key={it.label}
-        href={`/treasury/${it.label}`}
+        href={`/treasuries/${it.label}`}
         passHref
       >
         <Button>
@@ -93,7 +93,7 @@ export default function BannerButtons(props: markestData) {
     const buttons = filterData(props, 'currencies').data.map((it) => (
       <Link
         key={it.label}
-        href={`/currency/${it.label}`}
+        href={`/currencies/${it.label}`}
         passHref
       >
         <Button>
