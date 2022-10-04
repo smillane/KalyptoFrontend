@@ -108,8 +108,8 @@ export default function BannerButtons(props: markestData) {
       </div>
     );
   }
-  if (props.markets.find((e) => e.value === 'commodities')) {
-    const buttons = props.markets.find((e) => e.value === 'europe').data.map((it) => (
+  if (filterData(props, 'commodities')) {
+    const buttons = filterData(props, 'commodities').data.map((it) => (
       <Link
         key={it.label}
         href={`/commodities/${it.label}`}
@@ -127,8 +127,8 @@ export default function BannerButtons(props: markestData) {
       </div>
     );
   }
-  if (props.markets.find((e) => e.value === 'crypto')) {
-    const buttons = props.markets.find((e) => e.value === 'europe').data.map((it) => (
+  if (filterData(props, 'crypto')) {
+    const buttons = filterData(props, 'crypto').data.map((it) => (
       <Link
         key={it.label}
         href={`/crypto/${it.label}`}
