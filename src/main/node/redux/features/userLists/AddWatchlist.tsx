@@ -52,7 +52,7 @@ export default function AddWatchlist(props) {
           <IconPlus size={16} />
         </ActionIcon>
       </Group>
-      <Collapse in={opened} sx={{ width: 200 }}>
+      <Collapse in={opened} sx={{ width: 200, marginBottom: '5px' }}>
         <TextInput
           placeholder="Name your list!"
           error={error}

@@ -13,6 +13,7 @@ import { useDisclosure } from '@mantine/hooks';
 
 import SearchBar from './search.tsx';
 import LoginLogoutButton from './loginLogoutButton.tsx';
+import Banner from './banner';
 
 const useStyles = createStyles((theme) => ({
   inner: {

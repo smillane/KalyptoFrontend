@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  SegmentedControl, Title, Stack,
+  SegmentedControl, Title, Stack, Group, Center, Box,
 } from '@mantine/core';
 
 import BannerButtons from './bannerButtons.tsx';
@@ -194,25 +194,35 @@ const tempData: markestData = {
 };
 
 export default function Banner() {
-  const [value, setValue] = useState('react');
+  const [value, setValue] = useState('us');
 
   return (
-    <Stack>
-      <Title order={4}>Markets</Title>
-      <SegmentedControl
-        value={value}
-        onChange={setValue}
-        data={[
-          { label: 'US', value: 'us' },
-          { label: 'Europe', value: 'europe' },
-          { label: 'Asia', value: 'asia' },
-          { label: 'Treasuries', value: 'treasuries' },
-          { label: 'Currencies', value: 'currencies' },
-          { label: 'Commodities', value: 'commodities' },
-          { label: 'Crypto', value: 'crypto' },
-        ]}
-      />
-      {BannerButtons(tempData, value)}
-    </Stack>
+    <Box sx={(theme) => ({
+      paddingTop: '1em', paddingBottom: '1em', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], minWidth: '100%',
+    })}
+    >
+      <Center>
+        <Stack>
+          <Group>
+            <Title order={4}>Markets</Title>
+            <SegmentedControl
+              radius="md"
+              value={value}
+              onChange={setValue}
+              data={[
+                { label: 'US', value: 'us' },
+                { label: 'Europe', value: 'europe' },
+                { label: 'Asia', value: 'asia' },
+                { label: 'Treasuries', value: 'treasuries' },
+                { label: 'Currencies', value: 'currencies' },
+                { label: 'Commodities', value: 'commodities' },
+                { label: 'Crypto', value: 'crypto' },
+              ]}
+            />
+          </Group>
+          {BannerButtons(tempData, value)}
+        </Stack>
+      </Center>
+    </Box>
   );
 }

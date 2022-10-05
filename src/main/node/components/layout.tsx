@@ -9,8 +9,8 @@ import { createContext } from 'react';
 import Meta from './meta';
 import HeaderMenu from './header.tsx';
 import FooterLinks from './footer.tsx';
-import Banner from './banner.tsx';
 import IsUserSignedIn from '../auth/authState.tsx';
+import Banner from './banner';
 
 const AuthStateContext = createContext(null);
 function AuthStateContextProvider({ children }) {
@@ -26,9 +26,10 @@ function Layout({ children }) {
 
   return (
     <AppShell
+      padding={0}
       styles={{
         main: {
-          background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[2],
+          background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0], minHeight: 'auto',
         },
       }}
       footer={(
@@ -40,7 +41,7 @@ function Layout({ children }) {
     >
       <Meta />
       <Banner />
-      <Container size={1800}>
+      <Container size={1800} sx={{ minHeight: '50vh' }}>
         <Space h="xl" />
         {children}
       </Container>
