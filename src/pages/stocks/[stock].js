@@ -441,7 +441,7 @@ export default function Stock({
               })}
               >
                 <Link href={`/stocks/${stockSymbol.symbol}/insider-trading`} passHref>
-                  <Button variant="outline" color="dark" sx={(theme) => ({ background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1] })}>
+                  <Button variant="outline" color="dark">
                     <Title order={3}>Insider Trading</Title>
                   </Button>
                 </Link>

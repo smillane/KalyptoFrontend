@@ -27,7 +27,7 @@ export default function BannerButtons(props: markestData, key: string) {
         passHref
       >
         <Button
-          variant="white"
+          variant="default"
           radius="md"
           color="dark"
           sx={{
@@ -108,7 +108,7 @@ export default function BannerButtons(props: markestData, key: string) {
         passHref
       >
         <Button
-          variant="white"
+          variant="default"
           radius="md"
           color="dark"
           sx={{
@@ -138,7 +138,7 @@ export default function BannerButtons(props: markestData, key: string) {
         passHref
       >
         <Button
-          variant="white"
+          variant="default"
           radius="md"
           color="dark"
           sx={{
@@ -168,7 +168,7 @@ export default function BannerButtons(props: markestData, key: string) {
         passHref
       >
         <Button
-          variant="white"
+          variant="default"
           radius="md"
           color="dark"
           sx={{
@@ -198,7 +198,7 @@ export default function BannerButtons(props: markestData, key: string) {
         passHref
       >
         <Button
-          variant="white"
+          variant="default"
           radius="md"
           color="dark"
           sx={{
