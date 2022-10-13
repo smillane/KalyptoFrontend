@@ -3,9 +3,7 @@ import {
 } from '@mantine/core';
 import Link from 'next/link';
 
-import {
-  transactionColor, typeOfTransaction, reduceZerosToLetters, greenOrRed,
-} from '../util/formating';
+import { greenOrRed } from '../util/formating';
 
 interface markestData {
   markets: {

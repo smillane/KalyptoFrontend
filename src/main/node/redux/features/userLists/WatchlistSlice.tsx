@@ -2,7 +2,45 @@ import { createSlice } from '@reduxjs/toolkit';
 
 // will initially fetch from async server-side api call to get initial state, which is users lists
 // if no lists created, will create an empty list for initial state
-const initialState = [{ tech: ['amd', 'nvda', 'net', 'crwd'] }, { oil: ['bp', 'shel', 'shell', 'oxy'] }];
+const initialState = [{
+  tech: {
+    amd: {
+      latestPrice: 62.12,
+      changePercent: -0.0048,
+    },
+    nvda: {
+      latestPrice: 120.02,
+      changePercent: -0.0148,
+    },
+    net: {
+      latestPrice: 89.02,
+      changePercent: -0.0341,
+    },
+    crwd: {
+      latestPrice: 198.00,
+      changePercent: -0.0018,
+    },
+  },
+}, {
+  oil: {
+    bp: {
+      latestPrice: 42.61,
+      changePercent: 0.0348,
+    },
+    shel: {
+      latestPrice: 52.57,
+      changePercent: 0.0241,
+    },
+    eog: {
+      latestPrice: 130.10,
+      changePercent: 0.0097,
+    },
+    oxy: {
+      latestPrice: 45.91,
+      changePercent: 0.0122,
+    },
+  },
+}];
 
 // add an async thunk functionality for when the list is
 // updated/changeOrder/addList to call API with necessary information

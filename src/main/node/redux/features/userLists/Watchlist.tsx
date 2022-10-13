@@ -14,6 +14,7 @@ import {
   useMantineTheme,
   Text,
   Table,
+  Stack,
 } from '@mantine/core';
 import { IconDots, IconSettings } from '@tabler/icons';
 import Link from 'next/link';
@@ -24,6 +25,7 @@ import AddWatchlist from './AddWatchlist.tsx';
 import DeleteWatchlist from './DeleteWatchlist.tsx';
 import { updateListName } from './WatchlistSlice.tsx';
 import DisabledWatchList from '../../../components/disabledAddWatchlist.tsx';
+import { greenOrRed } from '../../../util/formating';
 
 const AuthStateContext = createContext(null);
 
@@ -32,28 +34,19 @@ function AccordionControl(props) {
   const [error, setError] = useState<string>('');
   const [listName, setListName] = useState<string>('');
 
-  const onNewListNameChange = (e) => setListName(e.currentTarget.value);
+  const onNewListNameInput = (e) => setListName(e.currentTarget.value);
 
   const theme = useMantineTheme();
 
   const dispatch = useDispatch();
 
-  const onUpdateListClicked = () => {
+  const onUpdateListName = () => {
     if (listName.length !== 0) {
-      // eslint-disable-next-line no-use-before-define
-      updateListNameHandler(props.userID, listName, props.lists)
-        .then(() => {
-          dispatch(
-            updateListName({ oldName: props.listname, newName: listName }),
-          );
-          setListName('');
-          setOpened(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setOpened(true);
-          setError('There was an error, please try again');
-        });
+      dispatch(
+        updateListName({ oldName: props.listname, newName: listName }),
+      );
+      setListName('');
+      setOpened(false);
     } else {
       setError('Please input a name');
     }
@@ -73,20 +66,24 @@ function AccordionControl(props) {
           data-autofocus
           error={error}
           value={listName}
-          onChange={onNewListNameChange}
+          onChange={onNewListNameInput}
         />
         <Space h="xs" />
         <Group position="apart">
           <Button variant="outline" color="dark" onClick={() => setOpened(false)}>
             Cancel
           </Button>
-          <Button variant="outline" color="dark" onClick={onUpdateListClicked}>
+          <Button variant="outline" color="dark" onClick={onUpdateListName}>
             Update
           </Button>
         </Group>
       </Modal>
 
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box
+        sx={(theme) => ({
+          background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], display: 'flex', alignItems: 'center',
+        })}
+      >
         <Accordion.Control {...props} />
         <Menu>
           <Menu.Target>
@@ -109,7 +106,7 @@ function AccordionControl(props) {
 
 export default function Watchlist() {
   const authState: boolean = useContext(AuthStateContext);
-  type listFromDBType = Array<Record<string, Array<string>>>;
+  type listFromDBType = Array<Record<string, Record<string, any>>>;
   const lists: listFromDBType = useSelector((state) => state.watchlists);
   if (authState === false) {
     return (
@@ -138,19 +135,64 @@ export default function Watchlist() {
     >
       <Space h="xl" />
       <AddWatchlist />
-      <Accordion variant="filled" multiple sx={{ width: 200 }} mx="auto">
+      <Accordion
+        variant="filled"
+        multiple
+        sx={{ width: 200 }}
+        mx="auto"
+      >
         {lists.map((it) => Object.entries(it).map(([key, values]) => (
           <Accordion.Item value={key} key={key}>
-            <AccordionControl lists={lists} listname={key}>
+            <AccordionControl
+              lists={lists}
+              listname={key}
+              sx={(theme) => ({
+                background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+              })}
+            >
               <Text weight={700}>
                 {key}
               </Text>
             </AccordionControl>
-            <Accordion.Panel>
+            <Accordion.Panel
+              sx={(theme) => ({
+                background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+              })}
+            >
               <Table highlightOnHover>
                 <tbody>
-                  {values.map((stock) => (
-                    <Link href={`/stocks/${stock}`} key={stock} passHref><tr><td><Text transform="capitalize">{stock}</Text></td></tr></Link>
+                  {Object.entries(values).map(([stock, quote]) => (
+                    <Link href={`/stocks/${stock}`} key={stock} passHref>
+                      <Box
+                        sx={(theme) => ({
+                          height: '70px',
+                          width: '180px',
+                          padding: '0px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+
+                          '&:hover': {
+                            backgroundColor:
+                              theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3],
+                          },
+                        })}
+                      >
+                        <Text align="left" transform="uppercase" weight={500}>
+                          {stock}
+                        </Text>
+                        <Stack sx={{ gap: 0 }}>
+                          <Text weight={500} align="right">
+                            $
+                            {quote.latestPrice}
+                          </Text>
+                          <Text weight={500} align="right" color={greenOrRed(quote.change)}>
+                            {(quote.changePercent * 100).toFixed(2)}
+                          </Text>
+                        </Stack>
+                      </Box>
+                    </Link>
                   ))}
                 </tbody>
               </Table>
