@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { useDispatch } from 'react-redux';
 import {
-  Container, ActionIcon, Group, Space, Button, TextInput, Collapse, Title,
+  Container, ActionIcon, Group, Space, Button, TextInput, Collapse, Title, Divider,
 } from '@mantine/core';
 import { IconPlus } from '@tabler/icons';
 
@@ -45,7 +45,7 @@ export default function AddWatchlist(props) {
   return (
     <Container sx={props.theme}>
       {props.space}
-      <Group position="apart" sx={{ width: 180 }}>
+      <Group position="apart">
         <Title order={4} align="center" transform="capitalize">Lists</Title>
         <ActionIcon color="dark" onClick={() => setOpened(true)}>
           <IconPlus size={16} />

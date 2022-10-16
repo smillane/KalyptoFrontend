@@ -15,6 +15,7 @@ import {
   Text,
   Table,
   Stack,
+  Divider,
 } from '@mantine/core';
 import { IconDots, IconSettings } from '@tabler/icons';
 import Link from 'next/link';
@@ -130,16 +131,20 @@ export default function Watchlist() {
   }
   return (
     <Container sx={(theme) => ({
-      boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', padding: '20px 20px 40px 20px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content',
+      boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', padding: '0px 0px 15px 0px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content', width: '240px',
     })}
     >
       <Space h="xl" />
       <AddWatchlist />
+      <Space h="xs" />
+      <Divider />
       <Accordion
         variant="filled"
         multiple
-        sx={{ width: 200 }}
-        mx="auto"
+        sx={{
+          width: 'auto',
+        }}
+        styles={{ content: { padding: '0px' } }}
       >
         {lists.map((it) => Object.entries(it).map(([key, values]) => (
           <Accordion.Item value={key} key={key}>
@@ -148,6 +153,11 @@ export default function Watchlist() {
               listname={key}
               sx={(theme) => ({
                 background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+
+                '&:hover': {
+                  backgroundColor:
+                    theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3],
+                },
               })}
             >
               <Text weight={700}>
@@ -156,7 +166,7 @@ export default function Watchlist() {
             </AccordionControl>
             <Accordion.Panel
               sx={(theme) => ({
-                background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], panel: { padding: '0px' },
               })}
             >
               <Table highlightOnHover>
@@ -166,7 +176,7 @@ export default function Watchlist() {
                       <Box
                         sx={(theme) => ({
                           height: '70px',
-                          width: '180px',
+                          width: '100%',
                           padding: '0px',
                           cursor: 'pointer',
                           display: 'flex',
@@ -179,10 +189,10 @@ export default function Watchlist() {
                           },
                         })}
                       >
-                        <Text align="left" transform="uppercase" weight={500}>
+                        <Text align="left" transform="uppercase" weight={500} sx={{ paddingLeft: '1em' }}>
                           {stock}
                         </Text>
-                        <Stack sx={{ gap: 0 }}>
+                        <Stack sx={{ gap: 0, paddingRight: '1em' }}>
                           <Text weight={500} align="right">
                             $
                             {quote.latestPrice}
@@ -202,63 +212,4 @@ export default function Watchlist() {
       </Accordion>
     </Container>
   );
-}
-
-// need to get a uuid from creation of user acc, if not, just show empty list with "create an account to create watch lists"
-// if no lists, create an empty list with something such as "create a list to start tracking stocks"
-export async function getServerSideProps(userID, context) {
-  // const res = await fetch(`http://localhost:8080/users/${userID}/list`);
-  // const lists = await res.json();
-
-  // const tempList: Array<Record<string, Array<string>>> = [{"tech": ["amd", "nvda", "net", "crwd"]}, {"oil": ["bp", "shel", "shell", "oxy"]}];
-
-  // if (!lists) {
-  //   return {
-
-  //   }
-  // }
-
-  return { props: {} };
-}
-
-export async function addListHandler(userID, lists) {
-  console.log(userID, lists);
-  // fetch(`http://localhost:8080/users/${userID}/list`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify(lists),
-  // });
-}
-
-export async function updateListHandler(userID, list) {
-  fetch(`http://localhost:8080/users/${userID}/list/`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(list),
-  });
-}
-
-export async function updateListNameHandler(userID, newName, oldList) {
-  console.log(userID, newName, oldList);
-  // fetch(`http://localhost:8080/users/${userID}/list/${name}`, {
-  //   method: 'PUT',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   }
-  // });
-}
-
-export async function deleteListNameHandler(userID, name) {
-  console.log(userID, name);
-
-  // fetch(`http://localhost:8080/users/${userID}/list/${name}`, {
-  //   method: 'DELETE',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   }
-  // });
 }

@@ -203,7 +203,7 @@ export default function Banner() {
     >
       <Center>
         <Stack>
-          <Group>
+          <Group position="center">
             <Title order={4}>Markets</Title>
             <SegmentedControl
               radius="md"
