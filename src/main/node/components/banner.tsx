@@ -106,13 +106,16 @@ const tempData: markestData = {
       data: [
         {
           label: 'Bitcoin',
-          individualData:
-          { price: '19407.27', symbol: 'BTCUSD' },
+          individualData: {
+            symbol: 'BTCUSDT', primaryExchange: '', sector: 'nccyrpecorrtyu', calculationPrice: 'realtime', latestPrice: '19899.98', latestSource: 'Real time price', latestUpdate: 1698401714043, latestVolume: '262192.17931', bidPrice: '19509.68', bidSize: '0.007', askPrice: '19580.58', askSize: '0.13324', high: '20577.64', low: '19775', previousClose: '20331.6', change: -226.1690025537868, changePercent: -0.011778921298007455,
+          },
+
         },
         {
           label: 'Ethereum',
-          individualData:
-          { price: '1346.66', symbol: 'ETHUSD' },
+          individualData: {
+            symbol: 'ETHUSD', primaryExchange: '', sector: 'cynrytprrecuco', calculationPrice: 'realtime', high: null, low: null, latestPrice: '1389.79', latestSource: 'Real time price', latestUpdate: 1738586634783, latestVolume: '1.318436', previousClose: null,
+          },
         },
       ],
     },

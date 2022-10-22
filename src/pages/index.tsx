@@ -4,7 +4,7 @@ import {
   withAuthUserTokenSSR,
 } from 'next-firebase-auth';
 import {
-  Box, Container, Grid, Text, Title, Table, Group, Stack,
+  Box, Container, Grid, Text, Title, Table, Group, Stack, Divider, Space,
 } from '@mantine/core';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -225,6 +225,76 @@ const dummyData = [
   },
 ];
 
+const dummyDataEarnings = [
+  {
+    symbol: 'aapl',
+    docs: {
+      companyName: 'Apple Inc.',
+      marketcap: 760334287200,
+      week52high: 156.65,
+      week52low: 93.63,
+      week52highSplitAdjustOnly: null,
+      week52lowSplitAdjustOnly: null,
+      week52change: 58.801903,
+      sharesOutstanding: 5213840000,
+      float: null,
+      avg10Volume: 2774000,
+      avg30Volume: 12774000,
+      day200MovingAvg: 140.60541,
+      day50MovingAvg: 156.49678,
+      employees: 120000,
+      ttmEPS: 16.5,
+      ttmDividendRate: 2.25,
+      dividendYield: 0.021,
+      nextDividendDate: '2019-03-01',
+      exDividendDate: '2019-02-08',
+      nextEarningsDate: '2019-01-01',
+      peRatio: 14,
+      beta: 1.25,
+      maxChangePercent: 153.021,
+      year5ChangePercent: 0.5902546932200027,
+      year2ChangePercent: 0.3777449874142869,
+      year1ChangePercent: 0.39751716851558366,
+      ytdChangePercent: 0.36659492036160124,
+      month6ChangePercent: 0.12208398133748043,
+      month3ChangePercent: 0.08466584665846649,
+      month1ChangePercent: 0.009668596145283263,
+      day30ChangePercent: -0.002762605699968781,
+      day5ChangePercent: -0.005762605699968781,
+    },
+  },
+  {
+    symbol: 'amd',
+    docs: {
+      companyName: 'Advanced Micro Devices Inc.', marketcap: 95790872508, week52high: 167.91, week52low: 55.18, week52highSplitAdjustOnly: 170.63, week52lowSplitAdjustOnly: 57.06, week52change: -0.5142043604442, sharesOutstanding: 1627788560, float: 0, avg10Volume: 104002039, avg30Volume: 94792307, day200MovingAvg: 89.67, day50MovingAvg: 73.1, employees: 13049, ttmEPS: 2.33, ttmDividendRate: 0, dividendYield: 0, nextDividendDate: '', exDividendDate: '', nextEarningsDate: '2022-10-31', peRatio: 30.40415376468924, beta: 2.128288699698357, maxChangePercent: 1.904231609807934, year5ChangePercent: 3.166661714897502, year2ChangePercent: -0.3164315304762121, year1ChangePercent: -0.490230221729946, ytdChangePercent: -0.5992799179833103, month6ChangePercent: -0.3813357464182368, month3ChangePercent: -0.28934585276668, month1ChangePercent: -0.25350127383198, day30ChangePercent: -0.253768601484404, day5ChangePercent: 0.002654992464526248,
+    },
+  },
+  {
+    symbol: 'jnj',
+    docs: {
+      companyName: 'Johnson & Johnson', marketcap: 454848045982, week52high: 184.32, week52low: 153.21, week52highSplitAdjustOnly: 195.91, week52lowSplitAdjustOnly: 158.57, week52change: 0.0695321204836934, sharesOutstanding: 2708215810, float: 0, avg10Volume: 5957593, avg30Volume: 7138185, day200MovingAvg: 172, day50MovingAvg: 171.62, employees: 139952, ttmEPS: 6.97, ttmDividendRate: 4.465630718907226, dividendYield: 0.026838607231768796, nextDividendDate: '', exDividendDate: '2022-08-10', nextEarningsDate: '2023-01-13', peRatio: 24.15791111474674, beta: 0.2898634677540382, maxChangePercent: 2.73607686411836, year5ChangePercent: 0.3616388272624196, year2ChangePercent: 0.1875208682178701, year1ChangePercent: 0.06117662816376745, ytdChangePercent: -0.007042894526420395, month6ChangePercent: -0.06367618202671464, month3ChangePercent: -0.0602657937444, month1ChangePercent: -0.006243459638506896, day30ChangePercent: -0.006073640301584383, day5ChangePercent: 0.03921569425682941,
+    },
+  },
+  {
+    symbol: 'gs',
+    docs: {
+      companyName: 'Goldman Sachs Group, Inc.', marketcap: 108378800030, week52high: 424.77, week52low: 277.24, week52highSplitAdjustOnly: 431.61, week52lowSplitAdjustOnly: 279.72, week52change: -0.2534480738652615, sharesOutstanding: 353419668, float: 0, avg10Volume: 2288778, avg30Volume: 2125656, day200MovingAvg: 326.33, day50MovingAvg: 315.4, employees: 40533, ttmEPS: 44.89, ttmDividendRate: 8.71047739410816, dividendYield: 0.02874202373190391, nextDividendDate: '', exDividendDate: '2022-08-27', nextEarningsDate: '2022-12-01', peRatio: 6.906054631922569, beta: 0.9883593579999245, maxChangePercent: 0.881028069993295, year5ChangePercent: 0.4214161284985186, year2ChangePercent: 0.5502791105276305, year1ChangePercent: -0.2318480371711538, ytdChangePercent: -0.1925278104193155, month6ChangePercent: -0.0406917401745345, month3ChangePercent: 0.05201498989981991, month1ChangePercent: -0.06128220868952221, day30ChangePercent: -0.06050347691424875, day5ChangePercent: 0.02054813360970599,
+    },
+  },
+  {
+    symbol: 't',
+    docs: {
+      companyName: 'AT&T, Inc.', marketcap: 114444725694, week52high: 21.86, week52low: 14.57, week52highSplitAdjustOnly: 22.44, week52lowSplitAdjustOnly: 14.46, week52change: -0.15528564378302315, sharesOutstanding: 7253178138, float: 0, avg10Volume: 50441522, avg30Volume: 47568103, day200MovingAvg: 18.64, day50MovingAvg: 16.14, employees: 2121, ttmEPS: 2.68, ttmDividendRate: 1.2549805501359554, dividendYield: 0.0799586324088831, nextDividendDate: '', exDividendDate: '2022-09-27', nextEarningsDate: '2022-10-19', peRatio: 5.799874957852096, beta: 0.5022967298586535, maxChangePercent: 0.2291516535002168, year5ChangePercent: -0.2530286025931694, year2ChangePercent: -0.1704333250552636, year1ChangePercent: -0.16854352719471014, ytdChangePercent: -0.125015412231712, month6ChangePercent: -0.192465060953832, month3ChangePercent: -0.2499135345062827, month1ChangePercent: -0.06932189793912649, day30ChangePercent: -0.06936829557513927, day5ChangePercent: 0.028062858814932232,
+    },
+  },
+  {
+    symbol: 'enph',
+    docs: {
+      companyName: 'Enphase Energy Inc', marketcap: 34379812413, week52high: 337.18, week52low: 115, week52highSplitAdjustOnly: 329.06, week52lowSplitAdjustOnly: 117.3, week52change: 0.36295089444770734, sharesOutstanding: 136030788, float: 0, avg10Volume: 3470932, avg30Volume: 4029248, day200MovingAvg: 231.25, day50MovingAvg: 294.73, employees: 886, ttmEPS: 1.43, ttmDividendRate: 0, dividendYield: 0, nextDividendDate: '', exDividendDate: '', nextEarningsDate: '2022-10-21', peRatio: 163.26991516397584, beta: 1.78602690155092, maxChangePercent: 32.98056746770953, year5ChangePercent: 178.2654968922321, year2ChangePercent: 1.214868683269034, year1ChangePercent: 0.4078109375943462, ytdChangePercent: 0.3405485359503106, month6ChangePercent: 0.274417668979663, month3ChangePercent: 0.24919564374201672, month1ChangePercent: -0.23903690561913032, day30ChangePercent: -0.24648101257437385, day5ChangePercent: -0.06278173230163714,
+    },
+  },
+];
+
 function imageQueryCheck(imageUrl: string) {
   if (imageUrl.length == null || imageUrl.length === 0) {
     return false;
@@ -238,8 +308,8 @@ function imageQuerySetter(imageUrl: string, image: string) {
       <Image
         src={`https://res.cloudinary.com/demo/image/fetch/${image}`}
         alt="news article picture"
-        width={100}
-        height={100}
+        width={130}
+        height={130}
       />
     );
   }
@@ -292,6 +362,27 @@ function Demo() {
               ))}
             </tbody>
           </Table>
+        </Container>
+        <Container>
+          <Container sx={(theme) => ({
+            boxShadow: theme.shadows.sm, borderRadius: theme.radius.md, margin: '4px', height: 'min-content',
+          })}
+          >
+            <Text size="lg" weight={700}>Earnings Calender</Text>
+            <Text>Based off your lists</Text>
+            <Space h="md" />
+            {dummyDataEarnings.map((it) => (
+              <Box key={it.symbol}>
+                <Divider />
+                <Space h="xs" />
+                <Stack spacing={0}>
+                  <Link href={`/stocks/${it.symbol}`} passHref><Text variant="link" sx={{ cursor: 'pointer' }}>{it.docs.companyName}</Text></Link>
+                  <Text>{it.docs.nextEarningsDate}</Text>
+                </Stack>
+                <Space h="xs" />
+              </Box>
+            ))}
+          </Container>
         </Container>
         <Watchlist />
       </Grid>

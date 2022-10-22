@@ -8,7 +8,7 @@ import { greenOrRed } from '../util/formating';
 interface markestData {
   markets: {
     value: string;
-    data: { label: string; individualData: object }[];
+    data: { label: string; individualData: any }[];
   }[];
 }
 
@@ -205,7 +205,7 @@ export default function BannerButtons(props: markestData, key: string) {
         >
           <Group>
             <Text weight={700}>{it.label}</Text>
-            <Text>{it.individualData.price}</Text>
+            <Text>{it.individualData.latestPrice}</Text>
           </Group>
         </Button>
       </Link>
