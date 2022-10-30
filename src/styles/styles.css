@@ -48,6 +48,14 @@ code {
         DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
 }
 
+.marketTrendsTR {
+    width: max-content;
+}
+
+.marketTrendsTD {
+    padding-left: 1em;
+}
+
 .grid {
     display: flex;
     align-items: center;
