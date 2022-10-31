@@ -1,5 +1,6 @@
 import {
-  Table, Grid, Title, Text, Container, Button, Stack, Space, Group, SimpleGrid, Divider, Spoiler,
+  Table, Box, Grid, Title, Text, Container,
+  Button, Stack, Space, Group, SimpleGrid, Divider, Spoiler,
 } from '@mantine/core';
 import Link from 'next/link';
 import { v4 as uuidv4 } from 'uuid';
@@ -381,14 +382,14 @@ export default function Stock({
                 <tbody>
                   <tr>
                     <td><Text transform="capitalize" weight={700}>Total Employees</Text></td>
-                    <td><Text transform="capitalize" align="right" weight={700}>{stats.employees.toLocaleString()}</Text></td>
+                    <td><Text transform="capitalize" align="right" weight={700}>{basicStats.employees.toLocaleString()}</Text></td>
                   </tr>
                   <tr>
                     <td><Text transform="capitalize" weight={700}>Revenue Per Employee</Text></td>
                     <td>
                       <Text transform="capitalize" align="right" weight={700}>
                         $
-                        {stats.revenuePerEmployee.toLocaleString()}
+                        {(financials.revenue / basicStats.employees).toLocaleString()}
                       </Text>
                     </td>
                   </tr>
@@ -425,12 +426,32 @@ export default function Stock({
               <Space h="md" />
               {news.map((individualNews) => (
                 <div key={individualNews.uuid}>
-                  <a href={`${individualNews.qmUrl}`} rel="noopener noreferrer" target="_blank">
-                    <Grid justify="space-between" grow align="center">
-                      <Grid.Col span={3}><Text size="sm" lineClamp={1}>{individualNews.source}</Text></Grid.Col>
-                      <Grid.Col span={9}><Text size="sm" lineClamp={2}>{individualNews.headline}</Text></Grid.Col>
-                    </Grid>
-                  </a>
+                  <Link
+                    href={{
+                      pathname: '/news/',
+                      query: { key: individualNews.key, subkey: individualNews.subkey },
+                    }}
+                    passHref
+                    key={individualNews.uuid}
+                  >
+                    <Box
+                      sx={(theme) => ({
+                        cursor: 'pointer',
+                        marginBottom: '1em',
+                        '&:hover': {
+                          backgroundColor:
+              theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3],
+                        },
+                      })}
+                    >
+                      <Divider />
+                      <Group noWrap>
+                        <Stack>
+                          <Text weight={700} lineClamp={1}>{individualNews.headline}</Text>
+                        </Stack>
+                      </Group>
+                    </Box>
+                  </Link>
                   <Space h="xs" />
                 </div>
               ))}
@@ -522,46 +543,45 @@ export default function Stock({
                   </tbody>
                 </Table>
               </Container>
-
-            </div>
-            <Container sx={(theme) => ({
-              boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
-            })}
-            >
-              <Title order={3}>Insitutional Ownership</Title>
-              <Space h="md" />
-              <Table highlightOnHover>
-                <thead>
-                  <tr>
-                    <th><Title transform="capitalize" order={5}>Filing Date</Title></th>
-                    <th><Title transform="capitalize" order={5}>Shareholder</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Total Shares</Title></th>
-                    <th><Title align="right" transform="capitalize" order={5}>Value</Title></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {institutionalOwnership.map((institution) => (
-                    <tr key={institution.entityProperName}>
-                      <td>
-                        <Text transform="capitalize" weight={700}>{institution.reportDate}</Text>
-                      </td>
-                      <td>
-                        <Text transform="capitalize" weight={700} lineClamp={1}>{institution.entityProperName}</Text>
-                      </td>
-                      <td>
-                        <Text align="right" transform="capitalize" weight={700}>{institution.adjustedHolding.toLocaleString()}</Text>
-                      </td>
-                      <td>
-                        <Text align="right" transform="capitalize" weight={700}>
-                          $
-                          {institution.adjustedMarketValue.toLocaleString()}
-                        </Text>
-                      </td>
+              <Container sx={(theme) => ({
+                boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+              })}
+              >
+                <Title order={3}>Insitutional Ownership</Title>
+                <Space h="md" />
+                <Table highlightOnHover>
+                  <thead>
+                    <tr>
+                      <th><Title transform="capitalize" order={5}>Filing Date</Title></th>
+                      <th><Title transform="capitalize" order={5}>Shareholder</Title></th>
+                      <th><Title align="right" transform="capitalize" order={5}>Total Shares</Title></th>
+                      <th><Title align="right" transform="capitalize" order={5}>Value</Title></th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Container>
+                  </thead>
+                  <tbody>
+                    {institutionalOwnership.map((institution) => (
+                      <tr key={institution.entityProperName}>
+                        <td>
+                          <Text transform="capitalize" weight={700}>{institution.reportDate}</Text>
+                        </td>
+                        <td>
+                          <Text transform="capitalize" weight={700} lineClamp={1}>{institution.entityProperName}</Text>
+                        </td>
+                        <td>
+                          <Text align="right" transform="capitalize" weight={700}>{institution.adjustedHolding.toLocaleString()}</Text>
+                        </td>
+                        <td>
+                          <Text align="right" transform="capitalize" weight={700}>
+                            $
+                            {institution.adjustedMarketValue.toLocaleString()}
+                          </Text>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Container>
+            </div>
             <Container sx={(theme) => ({
               boxShadow: theme.shadows.sm, padding: '10px', borderRadius: theme.radius.sm, margin: '2px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
             })}

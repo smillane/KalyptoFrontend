@@ -78,10 +78,6 @@ const headerLinks: HeaderSearchProps = {
         link: '/auth',
         label: 'Auth',
         links: null,
-      }, {
-        link: '/profile',
-        label: 'Profile',
-        links: null,
       },
     ],
 };

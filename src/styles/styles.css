@@ -52,10 +52,6 @@ code {
     width: max-content;
 }
 
-.marketTrendsTD {
-    padding-left: 1em;
-}
-
 .grid {
     display: flex;
     align-items: center;

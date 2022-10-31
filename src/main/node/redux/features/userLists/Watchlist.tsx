@@ -197,7 +197,7 @@ export default function Watchlist() {
                             $
                             {quote.latestPrice}
                           </Text>
-                          <Text weight={500} align="right" color={greenOrRed(quote.change)}>
+                          <Text weight={500} align="right" color={greenOrRed(quote.changePercent)}>
                             {(quote.changePercent * 100).toFixed(2)}
                           </Text>
                         </Stack>

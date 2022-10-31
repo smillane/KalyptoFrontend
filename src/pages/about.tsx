@@ -4,14 +4,26 @@ import {
   withAuthUser,
   withAuthUserTokenSSR,
 } from 'next-firebase-auth';
-import { Text } from '@mantine/core';
+import {
+  Center, Container, Space, Text, Title,
+} from '@mantine/core';
 
 import LayoutWithAuth from '../main/node/components/layout.tsx';
 
 function about() {
   return (
     <LayoutWithAuth>
-      <Text transform="capitalize">About page</Text>
+      <Container>
+        <Center>
+          <Title>About</Title>
+        </Center>
+        <Space h="md" />
+        <Title order={3}>Future features to be added:</Title>
+        <Space h="md" />
+        <Text>SEC Filings</Text>
+        <Text>Congressional Trades</Text>
+        <Text>Crypto, Commoddities, Bonds</Text>
+      </Container>
     </LayoutWithAuth>
   );
 }
