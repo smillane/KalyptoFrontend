@@ -17,3 +17,9 @@ Add logic for if nothing found in db, populate with last 4, 8, etc for endpoints
 create logic for a skeleton loading screen when logging in
 
 create logic for skeleton loading containers for when assets are loading from backend
+
+create logic for fetching data from backend
+
+use caching to to not fetch data for daily lists more than once every 5 minutes, empty cache after 5 minutes and refetch data
+
+have display on index page for pre/post market gainers/losers, display pre market movers if time is between 4am and 4pm Eastern, else show post market movers by default

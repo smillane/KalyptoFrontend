@@ -1,8 +1,13 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import React, { createContext, useContext } from 'react';
+import 'firebase/compat/auth';
+import { useAuthUser } from 'next-firebase-auth';
+
+import client from '../../../api/client.tsx';
 
 // will initially fetch from async server-side api call to get initial state, which is users lists
 // if no lists created, will create an empty list for initial state
-const initialState = [{
+const initialStateDummyData = [{
   tech: {
     amd: {
       latestPrice: 62.12,
@@ -42,6 +47,26 @@ const initialState = [{
   },
 }];
 
+const initialState = {
+  data: [],
+  status: 'idle',
+  error: null,
+};
+
+const AuthStateContext = createContext(null);
+
+export function fetchWatchlists() {
+  const authState: boolean = useContext(AuthStateContext);
+  if (authState !== false) {
+    const user = useAuthUser();
+    createAsyncThunk('users/lists', async () => {
+      const response = await client(user.firebaseUser.uid, 'GET');
+      return response.data;
+    });
+  }
+  return [];
+}
+
 // add an async thunk functionality for when the list is
 // updated/changeOrder/addList to call API with necessary information
 const WatchlistSlice = createSlice({
@@ -49,17 +74,17 @@ const WatchlistSlice = createSlice({
   initialState,
   reducers: {
     addList(state, action) {
-      state.push(action.payload);
+      state.data.push(action.payload);
     },
     removeList(state, action) {
-      const newState = state.filter(
+      const newState = state.data.filter(
         (i) => !Object.prototype.hasOwnProperty.call(i, action.payload),
       );
       return newState;
     },
     updateListName(state, action) {
       const { oldName, newName } = action.payload;
-      const newState = state.map((obj) => Object.fromEntries(
+      const newState = state.data.map((obj) => Object.fromEntries(
         Object.entries(obj).map(([key, value]) => {
           if (key === oldName) {
             return [newName, value];
