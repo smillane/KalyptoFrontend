@@ -24,7 +24,10 @@ const firebaseAuthConfig = {
     },
     firebase.auth.TwitterAuthProvider.PROVIDER_ID,
     // Other providers don't need to be given as object.
-    firebase.auth.EmailAuthProvider.PROVIDER_ID,
+    {
+      provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+      requireDisplayName: false,
+    },
   ],
   signInSuccessUrl: '/',
   credentialHelper: 'none',

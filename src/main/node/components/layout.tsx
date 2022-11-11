@@ -51,11 +51,9 @@ function Layout({ children }) {
 
 function LayoutWithAuth({ children }) {
   return (
-    <AuthStateContextProvider>
-      <Layout>
-        { children }
-      </Layout>
-    </AuthStateContextProvider>
+    <Layout>
+      { children }
+    </Layout>
   );
 }
 

@@ -1,7 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import React, { createContext, useContext } from 'react';
-import 'firebase/compat/auth';
-import { useAuthUser } from 'next-firebase-auth';
 
 import client from '../../../api/client.tsx';
 
@@ -47,25 +44,42 @@ const initialStateDummyData = [{
   },
 }];
 
+interface UsersState {
+  data: []
+  loading: 'idle' | 'pending' | 'succeeded' | 'failed'
+}
+
 const initialState = {
   data: [],
   status: 'idle',
-  error: null,
-};
+} as UsersState;
 
-const AuthStateContext = createContext(null);
-
-export function fetchWatchlists() {
-  const authState: boolean = useContext(AuthStateContext);
-  if (authState !== false) {
-    const user = useAuthUser();
-    createAsyncThunk('users/lists', async () => {
-      const response = await client(user.firebaseUser.uid, 'GET');
+export const FetchWatchlistsQuery = createAsyncThunk(
+  'users/fetchLists',
+  async (data, thunkAPI) => {
+    const { user } = data;
+    if (user.id === null) {
+      const response = await client(`users/lists/${user.id}`, 'GET');
       return response.data;
-    });
-  }
-  return [];
-}
+    }
+    return [];
+  },
+);
+
+export const AddWatchlistQuery = createAsyncThunk(
+  'users/addNewList',
+  async (data, thunkAPI) => {
+    const {
+      user, listName, position,
+    } = data;
+    if (user.id === null) {
+      console.log(user.firebaseUser.uid, listName, position);
+      const response = await client(`users/lists/${user.id}/watchlist/${listName}/position/${position}`, 'POST');
+      return response.data;
+    }
+    return null;
+  },
+);
 
 // add an async thunk functionality for when the list is
 // updated/changeOrder/addList to call API with necessary information
@@ -73,9 +87,9 @@ const WatchlistSlice = createSlice({
   name: 'watchlists',
   initialState,
   reducers: {
-    addList(state, action) {
-      state.data.push(action.payload);
-    },
+    // addList(state, action) {
+    //   state.data.push(action.payload);
+    // },
     removeList(state, action) {
       const newState = state.data.filter(
         (i) => !Object.prototype.hasOwnProperty.call(i, action.payload),
@@ -99,10 +113,37 @@ const WatchlistSlice = createSlice({
       return newState;
     },
   },
+  extraReducers(builder) {
+    builder
+      .addCase(FetchWatchlistsQuery.pending, (state, action) => {
+        state.status = 'loading';
+      })
+      .addCase(FetchWatchlistsQuery.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        // Add any fetched posts to the array
+        state.watchlists = state.watchlists.concat(action.payload);
+      })
+      .addCase(FetchWatchlistsQuery.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+      .addCase(AddWatchlistQuery.pending, (state, action) => {
+        state.status = 'loading';
+      })
+      .addCase(AddWatchlistQuery.fulfilled, (state, action) => {
+        state.data.push(action.payload);
+      })
+      .addCase(AddWatchlistQuery.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      });
+  },
 });
 
 export const {
-  addList, removeList, updateListName, changeOrder,
+  removeList, updateListName, changeOrder,
 } = WatchlistSlice.actions;
 
 export default WatchlistSlice.reducer;
+
+export const selectAllWatchlists = (state) => state.watchlists.data;

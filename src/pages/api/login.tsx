@@ -1,6 +1,6 @@
 import { setAuthCookies } from 'next-firebase-auth';
 
-import initAuth from '../../main/node/auth/initAuth';
+import initAuth from '../../main/node/auth/initAuth.tsx';
 
 initAuth();
 

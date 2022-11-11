@@ -1,20 +1,21 @@
-import React, { createContext, useContext } from 'react';
+import React from 'react';
 import { Button } from '@mantine/core';
-import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import Link from 'next/link';
+import { useAuthUser, withAuthUser } from 'next-firebase-auth';
 
-const AuthStateContext = createContext(null);
-export default function LoginLogoutButton() {
-  const authState: boolean = useContext(AuthStateContext);
-  if (authState === false) {
+function LoginLogoutButton() {
+  const AuthUser = useAuthUser();
+  if (AuthUser.id === null) {
     return (
-      <Link href="/login" passHref>
+      <Link href="/auth" passHref>
         <Button variant="outline" color="dark">Sign In</Button>
       </Link>
     );
   }
   return (
-    <Button variant="outline" color="dark" onClick={() => firebase.auth().signOut()}>Sign Out</Button>
+    <Button variant="outline" color="dark" onClick={() => AuthUser.signOut()}>Sign Out</Button>
   );
 }
+
+export default withAuthUser()(LoginLogoutButton);

@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, {
+  createContext, useContext, useEffect, useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Menu,
@@ -19,26 +21,22 @@ import {
 } from '@mantine/core';
 import { IconDots, IconSettings } from '@tabler/icons';
 import Link from 'next/link';
+import { useAuthUser, withAuthUser } from 'next-firebase-auth';
 
 // eslint-disable-next-line import/no-cycle
 import AddWatchlist from './AddWatchlist.tsx';
 // eslint-disable-next-line import/no-cycle
 import DeleteWatchlist from './DeleteWatchlist.tsx';
-import { updateListName } from './WatchlistSlice.tsx';
+import { updateListName, selectAllWatchlists, FetchWatchlistsQuery } from './WatchlistSlice.tsx';
 import DisabledWatchList from '../../../components/disabledAddWatchlist.tsx';
-import { greenOrRed } from '../../../util/formating';
-
-const AuthStateContext = createContext(null);
+import { greenOrRed } from '../../../util/formating.tsx';
 
 function AccordionControl(props) {
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState<string>('');
   const [listName, setListName] = useState<string>('');
-
   const onNewListNameInput = (e) => setListName(e.currentTarget.value);
-
   const theme = useMantineTheme();
-
   const dispatch = useDispatch();
 
   const onUpdateListName = () => {
@@ -105,11 +103,10 @@ function AccordionControl(props) {
   );
 }
 
-export default function Watchlist() {
-  const authState: boolean = useContext(AuthStateContext);
-  type listFromDBType = Array<Record<string, Record<string, any>>>;
-  const lists: listFromDBType = useSelector((state) => state.watchlists);
-  if (authState === false) {
+function Watchlist() {
+  const user = useAuthUser();
+
+  if (user.id === null) {
     return (
       <DisabledWatchList
         space={<Space h="xl" />}
@@ -119,9 +116,20 @@ export default function Watchlist() {
       />
     );
   }
-  if (!Array.isArray(lists) || !lists.length) {
+
+  const dispatch = useDispatch();
+  const lists: Array<Object> = useSelector(selectAllWatchlists);
+  const listsStatus = useSelector((state) => state.watchlists.status);
+  useEffect(() => {
+    if (listsStatus === 'idle') {
+      dispatch(FetchWatchlistsQuery({ user }));
+    }
+  }, [listsStatus, dispatch, user]);
+  if (user.id === null && (!Array.isArray(lists) || !lists.length)) {
     return (
       <AddWatchlist
+        user={user}
+        position={0}
         space={<Space h="xl" />}
         theme={(theme) => ({
           boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', padding: '20px 20px 40px 20px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content',
@@ -135,7 +143,10 @@ export default function Watchlist() {
     })}
     >
       <Space h="xl" />
-      <AddWatchlist />
+      <AddWatchlist
+        user={user}
+        position={lists.length}
+      />
       <Space h="xs" />
       <Divider />
       <Accordion
@@ -150,6 +161,7 @@ export default function Watchlist() {
           <Accordion.Item value={key} key={key}>
             <AccordionControl
               lists={lists}
+              auth={authState}
               listname={key}
               sx={(theme) => ({
                 background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
@@ -213,3 +225,5 @@ export default function Watchlist() {
     </Container>
   );
 }
+
+export default withAuthUser()(Watchlist);

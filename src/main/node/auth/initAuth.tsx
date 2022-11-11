@@ -1,9 +1,11 @@
 import { init } from 'next-firebase-auth';
+import absoluteUrl from 'next-absolute-url';
 
 const TWELVE_DAYS_IN_MS = 12 * 60 * 60 * 24 * 1000;
 
 const initAuth = () => {
   init({
+    debug: true,
     // This demonstrates setting a dynamic destination URL when
     // redirecting from app pages. Alternatively, you can simply
     // specify `authPageURL: '/auth-ssr'`.
@@ -38,7 +40,7 @@ const initAuth = () => {
       if (destinationParamVal) {
         // Verify the redirect URL host is allowed.
         // https://owasp.org/www-project-web-security-testing-guide/v41/4-Web_Application_Security_Testing/11-Client_Side_Testing/04-Testing_for_Client_Side_URL_Redirect
-        const allowedHosts = ['localhost:3000', 'nfa-example.vercel.app'];
+        const allowedHosts = ['localhost:3000'];
         const allowed = allowedHosts.indexOf(new URL(destinationParamVal).host) > -1;
         if (allowed) {
           destURL = destinationParamVal;
@@ -60,6 +62,17 @@ const initAuth = () => {
     },
     onLogoutRequestError: (err) => {
       console.error(err);
+    },
+    firebaseAdminInitConfig: {
+      credential: {
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        clientEmail: process.env.NEXT_PUBLIC_FIREBASE_EMAIL,
+        // Using JSON to handle newline problems when storing the
+        // key as a secret in Vercel. See:
+        // https://github.com/vercel/vercel/issues/749#issuecomment-707515089
+        privateKey: process.env.FIREBASE_PRIVATE_KEY,
+      },
+      databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DB_URL,
     },
     // Use application default credentials (takes precedence over firebaseAdminInitConfig if set)
     // useFirebaseAdminDefaultCredential: false,

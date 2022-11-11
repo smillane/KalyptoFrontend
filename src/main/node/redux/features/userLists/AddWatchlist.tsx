@@ -8,37 +8,40 @@ import { IconPlus } from '@tabler/icons';
 
 // eslint-disable-next-line import/no-cycle
 import { addListHandler } from './Watchlist';
-import { addList } from './WatchlistSlice';
+import { AddWatchlistQuery } from './WatchlistSlice';
 
 export default function AddWatchlist(props) {
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState<string>('');
   const [listName, setListName] = useState<string>('');
+  const [addRequestStatus, setAddRequestStatus] = useState('idle');
 
   const dispatch = useDispatch();
 
   const onNewListNameChange = (e) => setListName(e.currentTarget.value);
 
-  const onSaveListClicked = () => {
-    if (listName) {
+  const canSave = [listName].every(Boolean) && addRequestStatus === 'idle';
+
+  const onSaveListClicked = async () => {
+    if (listName && canSave) {
       const newWatchlist = {};
       newWatchlist[listName] = [];
-      addListHandler('userId', listName)
-        .then(() => {
-          dispatch(
-            addList(
-              newWatchlist,
-            ),
-          );
-
-          setListName('');
-          setOpened(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setOpened(true);
-          setError('There was an error, please try again');
-        });
+      try {
+        setAddRequestStatus('pending');
+        await dispatch(
+          AddWatchlistQuery({
+            user: props.user, listName, position: props.position,
+          }),
+        ).unwrap();
+        setListName('');
+        setOpened(false);
+      } catch (err) {
+        console.error(err);
+        setOpened(true);
+        setError('There was an error, please try again');
+      } finally {
+        setAddRequestStatus('idle');
+      }
     }
   };
 
