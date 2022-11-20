@@ -2,7 +2,7 @@ import { Table } from '@mantine/core';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 
-import LayoutWithAuth from '../../main/node/components/layout.tsx';
+import Layout from '../../main/node/components/layout.tsx';
 
 // if user is not logged in with an account, only show a basic quote and chart
 export default function EditWatchListPage({ temp }) {
@@ -15,13 +15,13 @@ export default function EditWatchListPage({ temp }) {
   if (watchlist && Object.keys(watchlist).length === 0
     && Object.getPrototypeOf(watchlist) === Object.prototype) {
     return (
-      <LayoutWithAuth>
+      <Layout>
         <h2>error</h2>
-      </LayoutWithAuth>
+      </Layout>
     );
   }
   return (
-    <LayoutWithAuth>
+    <Layout>
       {Object.entries(watchlist).map(([key, value]) => (
         <>
           <thead>
@@ -38,7 +38,7 @@ export default function EditWatchListPage({ temp }) {
           </Table>
         </>
       ))}
-    </LayoutWithAuth>
+    </Layout>
   );
 }
 

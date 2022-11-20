@@ -4,22 +4,11 @@ import {
   Container,
   Space,
 } from '@mantine/core';
-import { createContext } from 'react';
 
 import Meta from './meta';
 import HeaderMenu from './header.tsx';
 import FooterLinks from './footer.tsx';
-import IsUserSignedIn from '../auth/authState.tsx';
 import Banner from './banner';
-
-const AuthStateContext = createContext(null);
-function AuthStateContextProvider({ children }) {
-  return (
-    <AuthStateContext.Provider value={IsUserSignedIn()}>
-      {children}
-    </AuthStateContext.Provider>
-  );
-}
 
 function Layout({ children }) {
   const theme = useMantineTheme();
@@ -49,12 +38,4 @@ function Layout({ children }) {
   );
 }
 
-function LayoutWithAuth({ children }) {
-  return (
-    <Layout>
-      { children }
-    </Layout>
-  );
-}
-
-export default LayoutWithAuth;
+export default Layout;

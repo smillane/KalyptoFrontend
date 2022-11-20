@@ -1,8 +1,7 @@
 import React from 'react';
 import {
-  Container, ActionIcon, Group, Space, Button, TextInput, Collapse, Title, Text,
+  Container, Group, Space, Button, TextInput, Collapse, Title, Text,
 } from '@mantine/core';
-import { IconPlus } from '@tabler/icons';
 import Link from 'next/link';
 
 export default function DisabledWatchList(props) {

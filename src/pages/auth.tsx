@@ -1,21 +1,28 @@
 import React from 'react';
 import { withAuthUser, AuthAction } from 'next-firebase-auth';
+import {
+  AppShell, Container, Title, Text,
+} from '@mantine/core';
 
 import FirebaseAuth from '../main/node/auth/FirebaseAuth';
-
-const styles = {
-  content: {
-    padding: '8px 32px',
-  },
-  textContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    margin: 16,
-  },
-};
+import Meta from '../main/node/components/meta';
 
 function Auth() {
-  return <FirebaseAuth />;
+  return (
+    <AppShell>
+      <Meta />
+      <Container>
+        <Title
+          order={2}
+          align="center"
+        >
+          Log in to Kalypto
+        </Title>
+        <FirebaseAuth />
+        <Text>Not on Kalypto? Choose from above how you would like to create an account</Text>
+      </Container>
+    </AppShell>
+  );
 }
 
 export default withAuthUser({

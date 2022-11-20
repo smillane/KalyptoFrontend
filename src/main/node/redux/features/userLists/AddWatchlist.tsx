@@ -6,9 +6,7 @@ import {
 } from '@mantine/core';
 import { IconPlus } from '@tabler/icons';
 
-// eslint-disable-next-line import/no-cycle
-import { addListHandler } from './Watchlist';
-import { AddWatchlistQuery } from './WatchlistSlice';
+import { addWatchlistQuery } from './WatchlistSlice.tsx';
 
 export default function AddWatchlist(props) {
   const [opened, setOpened] = useState(false);
@@ -20,17 +18,13 @@ export default function AddWatchlist(props) {
 
   const onNewListNameChange = (e) => setListName(e.currentTarget.value);
 
-  const canSave = [listName].every(Boolean) && addRequestStatus === 'idle';
-
   const onSaveListClicked = async () => {
-    if (listName && canSave) {
-      const newWatchlist = {};
-      newWatchlist[listName] = [];
+    if (addRequestStatus === 'idle') {
       try {
         setAddRequestStatus('pending');
         await dispatch(
-          AddWatchlistQuery({
-            user: props.user, listName, position: props.position,
+          addWatchlistQuery({
+            userID: props.user.id, listName, position: props.position,
           }),
         ).unwrap();
         setListName('');
@@ -63,7 +57,7 @@ export default function AddWatchlist(props) {
         />
         <Space h="xs" />
         <Button.Group sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="outline" color="dark" onClick={() => setOpened(false)}>Cancel</Button>
+          <Button variant="outline" color="dark" onClick={() => { setOpened(false); setListName(''); }}>Cancel</Button>
           <Button variant="outline" color="dark" onClick={onSaveListClicked}>Add</Button>
         </Button.Group>
       </Collapse>

@@ -9,7 +9,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 
-import LayoutWithAuth from '../main/node/components/layout.tsx';
+import Layout from '../main/node/components/layout.tsx';
 import Watchlist from '../main/node/redux/features/userLists/Watchlist.tsx';
 import { greenOrRed } from '../main/node/util/formating.tsx';
 
@@ -427,7 +427,7 @@ function marketTrends(value: string) {
 function Index() {
   const [markets, setMarkets] = useState('mostActive');
   return (
-    <LayoutWithAuth>
+    <Layout>
       <Grid grow>
         <Container>
           <Title>US Markets</Title>
@@ -542,7 +542,7 @@ function Index() {
         </Container>
         <Watchlist />
       </Grid>
-    </LayoutWithAuth>
+    </Layout>
   );
 }
 

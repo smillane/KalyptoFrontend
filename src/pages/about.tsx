@@ -8,11 +8,11 @@ import {
   Center, Container, Space, Text, Title,
 } from '@mantine/core';
 
-import LayoutWithAuth from '../main/node/components/layout.tsx';
+import Layout from '../main/node/components/layout.tsx';
 
 function about() {
   return (
-    <LayoutWithAuth>
+    <Layout>
       <Container>
         <Center>
           <Title>About</Title>
@@ -24,7 +24,7 @@ function about() {
         <Text>Congressional Trades</Text>
         <Text>Crypto, Commoddities, Bonds</Text>
       </Container>
-    </LayoutWithAuth>
+    </Layout>
   );
 }
 

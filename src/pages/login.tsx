@@ -1,36 +1,27 @@
 import React from 'react';
 import { withAuthUser, AuthAction } from 'next-firebase-auth';
+import {
+  AppShell, Container, Title, Text,
+} from '@mantine/core';
 
 import FirebaseAuth from '../main/node/auth/FirebaseAuth';
-import LayoutWithAuth from '../main/node/components/layout.tsx';
-
-const styles = {
-  content: {
-    padding: '8px 32px',
-  },
-  textContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    margin: 16,
-  },
-};
+import Meta from '../main/node/components/meta';
 
 function Auth() {
   return (
-    <LayoutWithAuth>
-      <div style={styles.textContainer}>
-        <p>
-          This auth page is
-          {' '}
-          <b>static</b>
-          . It will redirect on the client side if
-          the user is already authenticated.
-        </p>
-      </div>
-      <div>
+    <AppShell>
+      <Meta />
+      <Container>
+        <Title
+          order={2}
+          align="center"
+        >
+          Log in to Kalypto
+        </Title>
         <FirebaseAuth />
-      </div>
-    </LayoutWithAuth>
+        <Text>Not on Kalypto? Choose from above how you would like to create an account</Text>
+      </Container>
+    </AppShell>
   );
 }
 

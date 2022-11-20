@@ -5,7 +5,7 @@ import {
 import Link from 'next/link';
 import { v4 as uuidv4 } from 'uuid';
 
-import LayoutWithAuth from '../../main/node/components/layout.tsx';
+import Layout from '../../main/node/components/layout.tsx';
 import {
   transactionColor, typeOfTransaction, reduceZerosToLetters, greenOrRed,
 } from '../../main/node/util/formating.tsx';
@@ -22,7 +22,7 @@ export default function Stock({
   insiderSummary, peerGroup, news,
 }) {
   return (
-    <LayoutWithAuth>
+    <Layout>
       <Grid grow>
         <Container size="xl">
           <Group>
@@ -707,7 +707,7 @@ export default function Stock({
         </Container>
         <Watchlist />
       </Grid>
-    </LayoutWithAuth>
+    </Layout>
   );
 }
 

@@ -3,11 +3,11 @@ import {
 } from '@mantine/core';
 import Link from 'next/link';
 
-import LayoutWithAuth from '../../../main/node/components/layout';
+import Layout from '../../../main/node/components/layout';
 
 export default function Dividends({ stockSymbol, previousDividends }) {
   return (
-    <LayoutWithAuth>
+    <Layout>
       <Container>
         <Title order={2} align="center" transform="capitalize">
           Dividends for
@@ -46,7 +46,7 @@ export default function Dividends({ stockSymbol, previousDividends }) {
           </tbody>
         </Table>
       </Container>
-    </LayoutWithAuth>
+    </Layout>
   );
 }
 

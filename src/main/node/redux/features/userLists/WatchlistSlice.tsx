@@ -1,85 +1,53 @@
+/* eslint-disable dot-notation */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import client from '../../../api/client.tsx';
 
-// will initially fetch from async server-side api call to get initial state, which is users lists
-// if no lists created, will create an empty list for initial state
-const initialStateDummyData = [{
-  tech: {
-    amd: {
-      latestPrice: 62.12,
-      changePercent: -0.0048,
-    },
-    nvda: {
-      latestPrice: 120.02,
-      changePercent: -0.0148,
-    },
-    net: {
-      latestPrice: 89.02,
-      changePercent: -0.0341,
-    },
-    crwd: {
-      latestPrice: 198.00,
-      changePercent: -0.0018,
-    },
-  },
-}, {
-  oil: {
-    bp: {
-      latestPrice: 42.61,
-      changePercent: 0.0348,
-    },
-    shel: {
-      latestPrice: 52.57,
-      changePercent: 0.0241,
-    },
-    eog: {
-      latestPrice: 130.10,
-      changePercent: 0.0097,
-    },
-    oxy: {
-      latestPrice: 45.91,
-      changePercent: 0.0122,
-    },
-  },
-}];
-
-interface UsersState {
-  data: []
-  loading: 'idle' | 'pending' | 'succeeded' | 'failed'
-}
-
-const initialState = {
-  data: [],
-  status: 'idle',
-} as UsersState;
-
-export const FetchWatchlistsQuery = createAsyncThunk(
+export const fetchWatchlistsQuery = createAsyncThunk(
   'users/fetchLists',
   async (data, thunkAPI) => {
-    const { user } = data;
-    if (user.id === null) {
-      const response = await client(`users/lists/${user.id}`, 'GET');
-      return response.data;
+    const { userID } = data;
+    if (userID !== null) {
+      const response = await client(`users/lists/${userID}`, 'GET');
+      if (response.response.ok) {
+        console.log('response ok', response.data);
+        return response.data;
+      }
     }
     return [];
   },
 );
 
-export const AddWatchlistQuery = createAsyncThunk(
+export const addWatchlistQuery = createAsyncThunk(
   'users/addNewList',
   async (data, thunkAPI) => {
     const {
-      user, listName, position,
+      userID, listName, position,
     } = data;
-    if (user.id === null) {
-      console.log(user.firebaseUser.uid, listName, position);
-      const response = await client(`users/lists/${user.id}/watchlist/${listName}/position/${position}`, 'POST');
-      return response.data;
+    if (userID !== null) {
+      const response = await client(`users/lists/${userID}/watchlist/${listName}/position/${position}`, 'POST');
+      if (response.response.ok) {
+        const newList = {};
+        newList['watchlist'] = [];
+        newList['position'] = position;
+        newList['watchlistName'] = listName;
+        return newList;
+      }
     }
     return null;
   },
 );
+
+interface WatchlistsState {
+  data: []
+  status: 'idle' | 'pending' | 'succeeded' | 'failed'
+}
+
+const initialState = {
+  data: [],
+  status: 'idle',
+  error: null,
+} as WatchlistsState;
 
 // add an async thunk functionality for when the list is
 // updated/changeOrder/addList to call API with necessary information
@@ -87,9 +55,6 @@ const WatchlistSlice = createSlice({
   name: 'watchlists',
   initialState,
   reducers: {
-    // addList(state, action) {
-    //   state.data.push(action.payload);
-    // },
     removeList(state, action) {
       const newState = state.data.filter(
         (i) => !Object.prototype.hasOwnProperty.call(i, action.payload),
@@ -115,25 +80,25 @@ const WatchlistSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(FetchWatchlistsQuery.pending, (state, action) => {
+      .addCase(fetchWatchlistsQuery.pending, (state, action) => {
         state.status = 'loading';
       })
-      .addCase(FetchWatchlistsQuery.fulfilled, (state, action) => {
+      .addCase(fetchWatchlistsQuery.fulfilled, (state, action) => {
+        state.data = action.payload;
         state.status = 'succeeded';
-        // Add any fetched posts to the array
-        state.watchlists = state.watchlists.concat(action.payload);
       })
-      .addCase(FetchWatchlistsQuery.rejected, (state, action) => {
+      .addCase(fetchWatchlistsQuery.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       })
-      .addCase(AddWatchlistQuery.pending, (state, action) => {
+      .addCase(addWatchlistQuery.pending, (state, action) => {
         state.status = 'loading';
       })
-      .addCase(AddWatchlistQuery.fulfilled, (state, action) => {
+      .addCase(addWatchlistQuery.fulfilled, (state, action) => {
         state.data.push(action.payload);
+        state.status = 'succeeded';
       })
-      .addCase(AddWatchlistQuery.rejected, (state, action) => {
+      .addCase(addWatchlistQuery.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       });
@@ -146,4 +111,4 @@ export const {
 
 export default WatchlistSlice.reducer;
 
-export const selectAllWatchlists = (state) => state.watchlists.data;
+export const getWatchlists = (state) => state.data;
