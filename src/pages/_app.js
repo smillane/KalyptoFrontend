@@ -1,12 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { Provider } from 'react-redux';
-import { useAuthUser, withAuthUser } from 'next-firebase-auth';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 
 import { store } from '../main/node/redux/store.ts';
-import { fetchWatchlistsQuery } from '../main/node/redux/features/userLists/WatchlistSlice.tsx';
 import initAuth from '../main/node/auth/initAuth.tsx';
 import '../styles/styles.css';
 
@@ -24,14 +22,10 @@ const config = {
 
 firebase.initializeApp(config);
 
-function App({ Component, pageProps }) {
-  const user = useAuthUser();
-  store.dispatch(fetchWatchlistsQuery({ userID: user.id }));
+export default function App({ Component, pageProps }) {
   return (
     <Provider store={store}>
       <Component {...pageProps} />
     </Provider>
   );
 }
-
-export default withAuthUser()(App);

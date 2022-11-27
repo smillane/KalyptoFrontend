@@ -1,40 +1,34 @@
 import React, { useState } from 'react';
-
-import { useDispatch } from 'react-redux';
 import {
-  Container, ActionIcon, Group, Space, Button, TextInput, Collapse, Title, Divider,
+  Container, ActionIcon, Group, Space, Button, TextInput, Collapse, Title,
 } from '@mantine/core';
 import { IconPlus } from '@tabler/icons';
 
-import { addWatchlistQuery } from './WatchlistSlice.tsx';
+import { useAddWatchlistMutation } from './WatchlistSlice.tsx';
 
 export default function AddWatchlist(props) {
-  const [opened, setOpened] = useState(false);
+  const [opened, setOpened] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [listName, setListName] = useState<string>('');
-  const [addRequestStatus, setAddRequestStatus] = useState('idle');
+  const [listname, setListname] = useState<string>('');
+  const [addWatchlist, { isLoading }] = useAddWatchlistMutation();
 
-  const dispatch = useDispatch();
-
-  const onNewListNameChange = (e) => setListName(e.currentTarget.value);
+  const onNewListName = (e) => setListname(e.currentTarget.value);
 
   const onSaveListClicked = async () => {
-    if (addRequestStatus === 'idle') {
+    if (listname.length !== 0 && !isLoading) {
       try {
-        setAddRequestStatus('pending');
-        await dispatch(
-          addWatchlistQuery({
-            userID: props.user.id, listName, position: props.position,
-          }),
+        await addWatchlist(
+          {
+            userID: props.userID,
+            listname,
+            position: props.position,
+          },
         ).unwrap();
-        setListName('');
+        setListname('');
         setOpened(false);
       } catch (err) {
-        console.error(err);
-        setOpened(true);
-        setError('There was an error, please try again');
-      } finally {
-        setAddRequestStatus('idle');
+        console.error('failed to add watchlist', err);
+        setError('Please input a name');
       }
     }
   };
@@ -52,12 +46,12 @@ export default function AddWatchlist(props) {
         <TextInput
           placeholder="Name your list!"
           error={error}
-          value={listName}
-          onChange={onNewListNameChange}
+          value={listname}
+          onChange={onNewListName}
         />
         <Space h="xs" />
         <Button.Group sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="outline" color="dark" onClick={() => { setOpened(false); setListName(''); }}>Cancel</Button>
+          <Button variant="outline" color="dark" onClick={() => { setOpened(false); setListname(''); }}>Cancel</Button>
           <Button variant="outline" color="dark" onClick={onSaveListClicked}>Add</Button>
         </Button.Group>
       </Collapse>

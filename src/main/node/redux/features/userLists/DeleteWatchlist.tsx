@@ -1,23 +1,23 @@
-import { useDispatch } from 'react-redux';
 import { Menu } from '@mantine/core';
 import { IconSettings } from '@tabler/icons';
 
 // eslint-disable-next-line import/no-cycle
-import { deleteListNameHandler } from './Watchlist';
-import { removeList } from './WatchlistSlice';
+import { useDeleteWatchlistMutation } from './WatchlistSlice.tsx';
 
 export default function DeleteWatchlist(props) {
-  const dispatch = useDispatch();
-
-  const deleteList = () => {
-    deleteListNameHandler(props.userID, props.listname)
-      .then(() => {
-        dispatch(
-          removeList(
-            props.listname,
-          ),
-        );
-      });
+  const [deleteWatchlist] = useDeleteWatchlistMutation();
+  const deleteList = async () => {
+    try {
+      await deleteWatchlist(
+        {
+          userID: props.userID,
+          listname: props.listname,
+          position: props.position,
+        },
+      ).unwrap();
+    } catch (err) {
+      console.error('failed to delete watchlist', err);
+    }
   };
 
   return (

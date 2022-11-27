@@ -23,3 +23,5 @@ create logic for fetching data from backend
 use caching to to not fetch data for daily lists more than once every 5 minutes, empty cache after 5 minutes and refetch data
 
 have display on index page for pre/post market gainers/losers, display pre market movers if time is between 4am and 4pm Eastern, else show post market movers by default
+
+create notification system for when new features/changes get pushed

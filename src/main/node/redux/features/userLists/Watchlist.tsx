@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
   Menu,
   Container,
@@ -14,7 +14,6 @@ import {
   useMantineTheme,
   Text,
   Table,
-  Stack,
   Divider,
 } from '@mantine/core';
 import { IconDots, IconSettings } from '@tabler/icons';
@@ -26,30 +25,36 @@ import { v4 as uuidv4 } from 'uuid';
 import AddWatchlist from './AddWatchlist.tsx';
 // eslint-disable-next-line import/no-cycle
 import DeleteWatchlist from './DeleteWatchlist.tsx';
-import { updateListName, fetchWatchlistsQuery, getWatchlists } from './WatchlistSlice.tsx';
+import { useGetUserWatchlistsQuery, useUpdateWatchlistNameMutation } from './WatchlistSlice.tsx';
 import DisabledWatchList from '../../../components/disabledAddWatchlist.tsx';
-import { greenOrRed } from '../../../util/formating.tsx';
-import { store } from '../../store';
 
 function AccordionControl(props) {
-  const [opened, setOpened] = useState(false);
+  const [opened, setOpened] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [listName, setListName] = useState<string>('');
+  const [newListName, setNewListName] = useState<string>('');
   const theme = useMantineTheme();
-  const dispatch = useDispatch();
+  const [updateWatchlistName, { isLoading }] = useUpdateWatchlistNameMutation();
   const onNewListNameInput = (
     e: { currentTarget: { value: React.SetStateAction<string>; }; },
-  ) => setListName(e.currentTarget.value);
+  ) => setNewListName(e.currentTarget.value);
 
-  const onUpdateListName = () => {
-    if (listName.length !== 0) {
-      dispatch(
-        updateListName({ oldName: props.listname, newName: listName }),
-      );
-      setListName('');
-      setOpened(false);
-    } else {
-      setError('Please input a name');
+  const onUpdateListName = async () => {
+    if (newListName.length !== 0 && !isLoading) {
+      try {
+        await updateWatchlistName(
+          {
+            userID: props.userID,
+            currentListName: props.currentListName,
+            position: props.position,
+            newListName,
+          },
+        ).unwrap();
+        setNewListName('');
+        setOpened(false);
+      } catch (err) {
+        console.error('failed to update watchlistname', err);
+        setError('Please input a name');
+      }
     }
   };
 
@@ -66,7 +71,7 @@ function AccordionControl(props) {
           placeholder="Name your list!"
           data-autofocus
           error={error}
-          value={listName}
+          value={newListName}
           onChange={onNewListNameInput}
         />
         <Space h="xs" />
@@ -96,8 +101,12 @@ function AccordionControl(props) {
             <Menu.Item icon={<IconSettings size={14} />} onClick={() => setOpened(true)}>
               Rename
             </Menu.Item>
-            <Link href={`/watchlists/${props.listname}`} passHref><Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item></Link>
-            <DeleteWatchlist userID="userID" listname={props.listname} />
+            <Link href={`/watchlists/${props.listname}/${props.position}`} passHref><Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item></Link>
+            <DeleteWatchlist
+              userID={props.userID}
+              listname={props.currentListName}
+              position={props.position}
+            />
           </Menu.Dropdown>
         </Menu>
       </Box>
@@ -107,9 +116,14 @@ function AccordionControl(props) {
 
 function Watchlist() {
   const user = useAuthUser();
-  const state = store.getState();
-  const lists: Array<Object> = state.watchlists.data;
-  console.log('watchlist', lists);
+  const {
+    data: Watchlists,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useGetUserWatchlistsQuery(user.id);
+  console.log('watchlist', Watchlists);
   if (user.id === null) {
     return (
       <DisabledWatchList
@@ -120,7 +134,7 @@ function Watchlist() {
       />
     );
   }
-  if (user.id !== null && Array.isArray(lists) && lists.length !== 0) {
+  if (user.id !== null && Array.isArray(Watchlists) && Watchlists.length !== 0) {
     return (
       <Container sx={(theme) => ({
         boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', padding: '0px 0px 15px 0px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content', width: '240px',
@@ -128,8 +142,8 @@ function Watchlist() {
       >
         <Space h="xl" />
         <AddWatchlist
-          user={user}
-          position={lists.length}
+          userID={user.id}
+          position={Watchlists.at(-1).position + 1}
         />
         <Space h="xs" />
         <Divider />
@@ -141,10 +155,12 @@ function Watchlist() {
           }}
           styles={{ content: { padding: '0px' } }}
         >
-          {lists.map((it) => (
+          {Watchlists.map((it) => (
             <Accordion.Item value={it.watchlistName} key={uuidv4()}>
               <AccordionControl
-                listname={it.watchlistName}
+                userID={user.id}
+                currentListName={it.watchlistName}
+                position={it.position}
                 sx={(theme) => ({
                   background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
                   '&:hover': {
@@ -189,7 +205,11 @@ function Watchlist() {
                               $
                               {quote.latestPrice}
                             </Text>
-                            <Text weight={500} align="right" color={greenOrRed(quote.changePercent)}>
+                            <Text
+                              weight={500}
+                              align="right"
+                              color={greenOrRed(quote.changePercent)}
+                            >
                               {(quote.changePercent * 100).toFixed(2)}
                             </Text>
                           </Stack> */}
