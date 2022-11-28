@@ -10,6 +10,12 @@ export const apiSlice = createApi({
       query: (userID) => `/users/lists/${userID}`,
       providesTags: ['Watchlist'],
     }),
+    getUserSingleWatchlist: builder.query({
+      query: ({ userID, listname, position }) => ({
+        url: `/users/lists/${userID}/watchlist/${listname}/position/${position}`,
+      }),
+      providesTags: ['Watchlist'],
+    }),
     addWatchlist: builder.mutation({
       query: ({ userID, listname, position }) => ({
         url: `/users/lists/${userID}/watchlist/${listname}/position/${position}`,
@@ -66,6 +72,7 @@ export const apiSlice = createApi({
 
 export const {
   useGetUserWatchlistsQuery,
+  useGetUserSingleWatchlistQuery,
   useAddWatchlistMutation,
   useDeleteWatchlistMutation,
   useUpdateWatchlistNameMutation,

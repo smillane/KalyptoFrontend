@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import {
   Menu,
   Container,
@@ -101,7 +100,7 @@ function AccordionControl(props) {
             <Menu.Item icon={<IconSettings size={14} />} onClick={() => setOpened(true)}>
               Rename
             </Menu.Item>
-            <Link href={`/watchlists/${props.listname}/${props.position}`} passHref><Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item></Link>
+            <Link href={`/watchlist/${props.currentListName}&${props.position}`} passHref><Menu.Item icon={<IconSettings size={14} />}>Edit</Menu.Item></Link>
             <DeleteWatchlist
               userID={props.userID}
               listname={props.currentListName}
