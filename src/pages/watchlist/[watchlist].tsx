@@ -8,52 +8,51 @@ import { useGetUserSingleWatchlistQuery } from '../../main/node/redux/features/u
 // if user is not logged in with an account, only show a basic quote and chart
 function EditWatchListPage({ watchlistNameData, positionData }) {
   const user = useAuthUser();
-
-  if (user.id === null) {
-    return (
-      <Layout>
-        <h2>There was an error</h2>
-      </Layout>
+  if (user.id !== null) {
+    console.log(user.id, watchlistNameData, positionData);
+    const {
+      data: Watchlist,
+      isLoading,
+      isSuccess,
+      isError,
+      error,
+    } = useGetUserSingleWatchlistQuery(
+      { userID: user.id, listname: watchlistNameData, position: positionData },
     );
+
+    if (isLoading) {
+      return (
+        <Layout>
+          <h1>loading...</h1>
+        </Layout>
+      );
+    }
+
+    if (isError || error) {
+      console.error('watchlist error', error);
+      return (
+        <Layout>
+          <h2>There was an error</h2>
+        </Layout>
+      );
+    }
+
+    if (isSuccess) {
+      return (
+        <Layout>
+          <h1>{Watchlist.watchlistName}</h1>
+          {Watchlist.watchlist.map((stock) => (
+            <h2 key={stock}>{stock}</h2>
+          ))}
+        </Layout>
+      );
+    }
   }
-
-  const {
-    data: Watchlists,
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-  } = useGetUserSingleWatchlistQuery(user.id, watchlistNameData, positionData);
-
-  const filteredWatchlist: Record<string, any> = Watchlists?.at(0);
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <h1>loading...</h1>
-      </Layout>
-    );
-  }
-
-  if (isError || error) {
-    console.error('watchlist error', error);
-    return (
-      <Layout>
-        <h2>There was an error</h2>
-      </Layout>
-    );
-  }
-
-  if (isSuccess) {
-    return (
-      <Layout>
-        <h1>{filteredWatchlist.watchlistName}</h1>
-        {filteredWatchlist.watchlist.map((stock) => (
-          <h2 key={stock}>{stock}</h2>
-        ))}
-      </Layout>
-    );
-  }
+  return (
+    <Layout>
+      <h1>loading...</h1>
+    </Layout>
+  );
 }
 
 export async function getServerSideProps(context) {
