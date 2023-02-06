@@ -1,24 +1,74 @@
-import { Table } from '@mantine/core';
+import {
+  createStyles, Box, Text, Title,
+} from '@mantine/core';
+import { useListState } from '@mantine/hooks';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { IconGripVertical } from '@tabler/icons';
 import { useAuthUser, withAuthUser } from 'next-firebase-auth';
 import Link from 'next/link';
 
 import Layout from '../../main/node/components/layout.tsx';
 import { useGetUserSingleWatchlistQuery } from '../../main/node/redux/features/userLists/WatchlistSlice.tsx';
 
+async function getStockQuote(stock: string) {
+  const stockData = await fetch(`http://localhost:8080/stocks/${stock}/quote`);
+  return stockData;
+}
+
+const useStyles = createStyles((theme) => ({
+  item: {
+    display: 'flex',
+    alignItems: 'center',
+    borderRadius: theme.radius.md,
+    border: `1px solid ${
+      theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]
+    }`,
+    padding: `${theme.spacing.sm}px ${theme.spacing.xl}px`,
+    paddingLeft: theme.spacing.xl - theme.spacing.md, // to offset drag handle
+    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.white,
+    marginBottom: theme.spacing.sm,
+  },
+
+  itemDragging: {
+    boxShadow: theme.shadows.sm,
+  },
+
+  symbol: {
+    fontSize: 30,
+    fontWeight: 700,
+    width: 60,
+  },
+
+  dragHandle: {
+    ...theme.fn.focusStyles(),
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    color: theme.colorScheme === 'dark' ? theme.colors.dark[1] : theme.colors.gray[6],
+    paddingLeft: theme.spacing.md,
+    paddingRight: theme.spacing.md,
+  },
+}));
+
 // if user is not logged in with an account, only show a basic quote and chart
 function EditWatchListPage({ watchlistNameData, positionData }) {
   const user = useAuthUser();
   if (user.id !== null) {
-    console.log(user.id, watchlistNameData, positionData);
     const {
       data: Watchlist,
       isLoading,
       isSuccess,
       isError,
       error,
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     } = useGetUserSingleWatchlistQuery(
       { userID: user.id, listname: watchlistNameData, position: positionData },
     );
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { classes, cx } = useStyles();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [state, handlers] = useListState();
 
     if (isLoading) {
       return (
@@ -38,16 +88,77 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
     }
 
     if (isSuccess) {
+      console.log(Watchlist.watchlist);
+      const setState = () => handlers.setState(Watchlist.watchlist);
+      console.log(state);
+      const items = state.map((stock, index) => (
+        <Draggable key={stock} index={index} draggableId={stock}>
+          {(provided, snapshot) => (
+            <div
+              className={cx(classes.item, { [classes.itemDragging]: snapshot.isDragging })}
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+            >
+              <div {...provided.dragHandleProps} className={classes.dragHandle}>
+                <IconGripVertical size={18} stroke={1.5} />
+              </div>
+              <Text className={classes.symbol}>{stock}</Text>
+              <Text className={classes.symbol}>{getStockQuote(stock).latestPrice}</Text>
+              {/* <div>
+                <Text>{item.name}</Text>
+                <Text color="dimmed" size="sm">
+                  Position: {item.position} • Mass: {item.mass}
+                </Text>
+              </div> */}
+            </div>
+          )}
+        </Draggable>
+      ));
+
       return (
         <Layout>
-          <h1>{Watchlist.watchlistName}</h1>
-          {Watchlist.watchlist.map((stock) => (
-            <h2 key={stock}>{stock}</h2>
-          ))}
+          <Title order={1}>{Watchlist.watchlistName}</Title>
+          <DragDropContext
+            onDragEnd={({ destination, source }) => handlers.reorder(
+              { from: source.index, to: destination?.index || 0 },
+            )}
+          >
+            <Droppable droppableId="dnd-list" direction="vertical">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {items}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+          {/* {Watchlist.watchlist.map((stock) => (
+            <Link href={`/stocks/${stock}`} key={stock} passHref>
+              <Box
+                sx={(theme) => ({
+                  height: '70px',
+                  width: '100%',
+                  padding: '0px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  '&:hover': {
+                    backgroundColor:
+                              theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3],
+                  },
+                })}
+              >
+                <Text align="left" transform="uppercase" weight={700}>{stock}</Text>
+                <h2>{getStockQuote(stock).latestPrice}</h2>
+              </Box>
+            </Link>
+          ))} */}
         </Layout>
       );
     }
   }
+
   return (
     <Layout>
       <h1>loading...</h1>
@@ -56,13 +167,10 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
 }
 
 export async function getServerSideProps(context) {
-  // const res = await fetch(`http://localhost:8080/stocks/${context.params.stock}/quote`)
-  // const stockInformation = await res.json()
-  const data: string = `${context.params.watchlist}`;
-  const splitData: Array<string> = data.split('&');
+  const data: Array<string> = `${context.params.watchlist}`.split('&');
 
   return {
-    props: { watchlistNameData: splitData.at(0), positionData: splitData.at(1) },
+    props: { watchlistNameData: data.at(0), positionData: data.at(1) },
   };
 }
 

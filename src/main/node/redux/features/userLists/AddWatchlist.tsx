@@ -6,7 +6,7 @@ import { IconPlus } from '@tabler/icons';
 
 import { useAddWatchlistMutation } from './WatchlistSlice.tsx';
 
-export default function AddWatchlist(props) {
+export default function AddWatchlist({ userID, position, theme }) {
   const [opened, setOpened] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [listname, setListname] = useState<string>('');
@@ -19,9 +19,9 @@ export default function AddWatchlist(props) {
       try {
         await addWatchlist(
           {
-            userID: props.userID,
+            userID,
             listname,
-            position: props.position,
+            position,
           },
         ).unwrap();
         setListname('');
@@ -34,8 +34,7 @@ export default function AddWatchlist(props) {
   };
 
   return (
-    <Container sx={props.theme}>
-      {props.space}
+    <Container sx={theme}>
       <Group position="apart">
         <Title order={4} align="center" transform="capitalize">Lists</Title>
         <ActionIcon color="dark" onClick={() => setOpened(true)}>

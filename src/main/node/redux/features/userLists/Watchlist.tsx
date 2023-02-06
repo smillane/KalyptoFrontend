@@ -126,7 +126,6 @@ function Watchlist() {
   if (user.id === null) {
     return (
       <DisabledWatchList
-        space={<Space h="xl" />}
         theme={(theme) => ({
           boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', padding: '20px 20px 40px 20px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content',
         })}
@@ -229,7 +228,6 @@ function Watchlist() {
     <AddWatchlist
       user={user}
       position={0}
-      space={<Space h="xl" />}
       theme={(theme) => ({
         boxShadow: theme.shadows.sm, borderRadius: theme.radius.sm, margin: '2px', padding: '20px 20px 40px 20px', background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1], height: 'min-content',
       })}

@@ -4,16 +4,14 @@ import {
 } from '@mantine/core';
 import Link from 'next/link';
 
-export default function DisabledWatchList(props) {
-  const opened = true;
+export default function DisabledWatchList({ theme }) {
   return (
-    <Container sx={props.theme}>
-      {props.space}
+    <Container sx={theme}>
       <Group position="apart" sx={{ width: 180 }}>
         <Title order={3} align="center" transform="capitalize">Lists</Title>
         <Space w="md" />
       </Group>
-      <Collapse in={opened} sx={{ width: 200 }}>
+      <Collapse in sx={{ width: 200 }}>
         <TextInput
           placeholder="Name your list!"
         />
