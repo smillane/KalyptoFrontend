@@ -53,23 +53,20 @@ const useStyles = createStyles((theme) => ({
 
 // if user is not logged in with an account, only show a basic quote and chart
 function EditWatchListPage({ watchlistNameData, positionData }) {
+  const { classes, cx } = useStyles();
+  const [state, handlers] = useListState();
   const user = useAuthUser();
-  if (user.id !== null) {
-    const {
-      data: Watchlist,
-      isLoading,
-      isSuccess,
-      isError,
-      error,
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    } = useGetUserSingleWatchlistQuery(
-      { userID: user.id, listname: watchlistNameData, position: positionData },
-    );
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { classes, cx } = useStyles();
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [state, handlers] = useListState();
+  const {
+    data: Watchlist,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useGetUserSingleWatchlistQuery(
+    { userID: user.id, listname: watchlistNameData, position: positionData },
+  );
 
+  if (user.id !== null) {
     if (isLoading) {
       return (
         <Layout>
@@ -82,15 +79,17 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
       console.error('watchlist error', error);
       return (
         <Layout>
-          <h2>There was an error</h2>
+          <h1>There was an error</h1>
         </Layout>
       );
     }
 
+    if (Watchlist.watchlist == null) {
+      <Title order={1}>{Watchlist.watchlistName}</Title>;
+    }
+
     if (isSuccess) {
-      console.log(Watchlist.watchlist);
       const setState = () => handlers.setState(Watchlist.watchlist);
-      console.log(state);
       const items = state.map((stock, index) => (
         <Draggable key={stock} index={index} draggableId={stock}>
           {(provided, snapshot) => (
@@ -105,11 +104,11 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
               <Text className={classes.symbol}>{stock}</Text>
               <Text className={classes.symbol}>{getStockQuote(stock).latestPrice}</Text>
               {/* <div>
-                <Text>{item.name}</Text>
-                <Text color="dimmed" size="sm">
-                  Position: {item.position} • Mass: {item.mass}
-                </Text>
-              </div> */}
+                    <Text>{item.name}</Text>
+                    <Text color="dimmed" size="sm">
+                      Position: {item.position} • Mass: {item.mass}
+                    </Text>
+                  </div> */}
             </div>
           )}
         </Draggable>
@@ -133,27 +132,27 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
             </Droppable>
           </DragDropContext>
           {/* {Watchlist.watchlist.map((stock) => (
-            <Link href={`/stocks/${stock}`} key={stock} passHref>
-              <Box
-                sx={(theme) => ({
-                  height: '70px',
-                  width: '100%',
-                  padding: '0px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  '&:hover': {
-                    backgroundColor:
-                              theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3],
-                  },
-                })}
-              >
-                <Text align="left" transform="uppercase" weight={700}>{stock}</Text>
-                <h2>{getStockQuote(stock).latestPrice}</h2>
-              </Box>
-            </Link>
-          ))} */}
+                <Link href={`/stocks/${stock}`} key={stock} passHref>
+                  <Box
+                    sx={(theme) => ({
+                      height: '70px',
+                      width: '100%',
+                      padding: '0px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      '&:hover': {
+                        backgroundColor:
+                                  theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3],
+                      },
+                    })}
+                  >
+                    <Text align="left" transform="uppercase" weight={700}>{stock}</Text>
+                    <h2>{getStockQuote(stock).latestPrice}</h2>
+                  </Box>
+                </Link>
+              ))} */}
         </Layout>
       );
     }
