@@ -54,7 +54,7 @@ const useStyles = createStyles((theme) => ({
 // if user is not logged in with an account, only show a basic quote and chart
 function EditWatchListPage({ watchlistNameData, positionData }) {
   const { classes, cx } = useStyles();
-  const [state, handlers] = useListState();
+  const [state, handlers] = useListState<string>([]);
   const user = useAuthUser();
   const {
     data: Watchlist,
@@ -89,30 +89,57 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
     }
 
     if (isSuccess) {
-      const setState = () => handlers.setState(Watchlist.watchlist);
-      const items = state.map((stock, index) => (
-        <Draggable key={stock} index={index} draggableId={stock}>
-          {(provided, snapshot) => (
-            <div
-              className={cx(classes.item, { [classes.itemDragging]: snapshot.isDragging })}
-              ref={provided.innerRef}
-              {...provided.draggableProps}
-            >
-              <div {...provided.dragHandleProps} className={classes.dragHandle}>
-                <IconGripVertical size={18} stroke={1.5} />
-              </div>
-              <Text className={classes.symbol}>{stock}</Text>
-              <Text className={classes.symbol}>{getStockQuote(stock).latestPrice}</Text>
-              {/* <div>
+      console.log(state);
+      const items = (() => {
+        if (state.length === 0) {
+          return Watchlist.watchlist.map((stock, index) => (
+            <Draggable key={stock} index={index} draggableId={stock}>
+              {(provided, snapshot) => (
+                <div
+                  className={cx(classes.item, { [classes.itemDragging]: snapshot.isDragging })}
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                >
+                  <div {...provided.dragHandleProps} className={classes.dragHandle}>
+                    <IconGripVertical size={18} stroke={1.5} />
+                  </div>
+                  <Text className={classes.symbol}>{stock}</Text>
+                  <Text className={classes.symbol}>{getStockQuote(stock).latestPrice}</Text>
+                  {/* <div>
+                      <Text>{item.name}</Text>
+                      <Text color="dimmed" size="sm">
+                        Position: {item.position} • Mass: {item.mass}
+                      </Text>
+                    </div> */}
+                </div>
+              )}
+            </Draggable>
+          ));
+        }
+        return state.map((stock, index) => (
+          <Draggable key={stock} index={index} draggableId={stock}>
+            {(provided, snapshot) => (
+              <div
+                className={cx(classes.item, { [classes.itemDragging]: snapshot.isDragging })}
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+              >
+                <div {...provided.dragHandleProps} className={classes.dragHandle}>
+                  <IconGripVertical size={18} stroke={1.5} />
+                </div>
+                <Text className={classes.symbol}>{stock}</Text>
+                <Text className={classes.symbol}>{getStockQuote(stock).latestPrice}</Text>
+                {/* <div>
                     <Text>{item.name}</Text>
                     <Text color="dimmed" size="sm">
                       Position: {item.position} • Mass: {item.mass}
                     </Text>
                   </div> */}
-            </div>
-          )}
-        </Draggable>
-      ));
+              </div>
+            )}
+          </Draggable>
+        ));
+      })();
 
       return (
         <Layout>
