@@ -1,7 +1,8 @@
 import {
   Table, Box, Grid, Title, Text, Container,
-  Button, Stack, Space, Group, SimpleGrid, Divider, Spoiler,
+  Button, Stack, Space, Group, SimpleGrid, Divider, Spoiler, ActionIcon, Center,
 } from '@mantine/core';
+import { IconPlus, IconSquarePlus } from '@tabler/icons';
 import Link from 'next/link';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,6 +30,7 @@ export default function Stock({
             <Title order={1} transform="uppercase">{stockSymbol.symbol}</Title>
             <Title order={1} transform="uppercase">{company.symbol}</Title>
             <Title order={1} weight={100} transform="capitalize">{company.companyName}</Title>
+            <Center><ActionIcon variant="default" color="dark"><IconPlus size={20} /></ActionIcon></Center>
           </Group>
           <Space h="sm" />
           <Group>

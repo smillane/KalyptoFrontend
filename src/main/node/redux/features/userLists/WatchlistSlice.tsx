@@ -62,7 +62,7 @@ export const apiSlice = createApi({
         userID, listname, position, list,
       }) => ({
         url: `/users/lists/${userID}/watchlist/${listname}/position/${position}`,
-        method: 'POST',
+        method: 'PUT',
         body: list,
       }),
       invalidatesTags: ['Watchlist'],

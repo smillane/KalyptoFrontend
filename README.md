@@ -4,6 +4,9 @@ Backend located https://github.com/smillane/StockAppBackend
 
 Work in progress.
 
+Currently working on:
+- adding button to add stock to list
+
 add SEC documents using edgar
 
 if query not found, add logic to not save to db, and return 404 not found page.

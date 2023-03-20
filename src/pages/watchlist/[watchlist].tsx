@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import {
-  createStyles, Box, Text, Title,
+  Button,
+  createStyles, Space, Text, Title,
 } from '@mantine/core';
 import { useListState } from '@mantine/hooks';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -8,12 +9,7 @@ import { IconGripVertical } from '@tabler/icons';
 import { useAuthUser, withAuthUser } from 'next-firebase-auth';
 
 import Layout from '../../main/node/components/layout.tsx';
-import { useGetUserSingleWatchlistQuery } from '../../main/node/redux/features/userLists/WatchlistSlice.tsx';
-
-async function getStockQuote(stock: string) {
-  const stockData = await fetch(`http://localhost:8080/stocks/${stock}/quote`);
-  return stockData;
-}
+import { useGetUserSingleWatchlistQuery, useUpdateWatchlistMutation } from '../../main/node/redux/features/userLists/WatchlistSlice.tsx';
 
 const useStyles = createStyles((theme) => ({
   item: {
@@ -51,12 +47,17 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function getStock(stock) {
-  const quote = getStockQuote(stock).latestPrice;
-  return (quote || 'temp');
+async function getStockQuote(stock: string) {
+  const stockData = await fetch(`http://localhost:8080/stocks/${stock}/quote`);
+  return stockData;
 }
 
-// if user is not logged in with an account, only show a basic quote and chart
+function getStockLatestPrice(stock) {
+  // const quote = getStockQuote(stock).latestPrice;
+  // return (quote || 0.00);
+  return 0.00;
+}
+
 function EditWatchListPage({ watchlistNameData, positionData }) {
   const { classes, cx } = useStyles();
   const [state, handlers] = useListState<string>([]);
@@ -70,12 +71,22 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
   } = useGetUserSingleWatchlistQuery(
     { userID: user.id, listname: watchlistNameData, position: positionData },
   );
+  const [updateWatchlist] = useUpdateWatchlistMutation();
 
   useEffect(() => {
     if (isSuccess && state.length === 0) {
       handlers.setState(Watchlist.watchlist);
     }
   });
+
+  const UpdateWatchlistUponChange = async () => {
+    console.log('current state is ', state);
+    await updateWatchlist(
+      {
+        userID: user.id, listname: watchlistNameData, position: positionData, list: state,
+      },
+    );
+  };
 
   if (user.id !== null) {
     if (isLoading) {
@@ -96,7 +107,6 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
     }
 
     if (isSuccess && state.length !== 0) {
-      console.log(state);
       const items = state.map((stock, index) => (
         <Draggable key={stock} index={index} draggableId={stock}>
           {(provided, snapshot) => (
@@ -109,7 +119,7 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
                 <IconGripVertical size={18} stroke={1.5} />
               </div>
               <Text className={classes.symbol}>{stock}</Text>
-              <Text className={classes.symbol}>{getStock(stock)}</Text>
+              <Text className={classes.symbol} align="right">{getStockLatestPrice(stock)}</Text>
             </div>
           )}
         </Draggable>
@@ -117,11 +127,14 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
 
       return (
         <Layout>
-          <Title order={1}>{Watchlist.watchlistName}</Title>
+          <Title order={1} align="center">{Watchlist.watchlistName}</Title>
+          <Space h="xl" />
           <DragDropContext
-            onDragEnd={({ destination, source }) => handlers.reorder(
-              { from: source.index, to: destination?.index || 0 },
-            )}
+            onDragEnd={({ destination, source }) => {
+              handlers.reorder(
+                { from: source.index, to: destination?.index || 0 },
+              );
+            }}
           >
             <Droppable droppableId="watchlist" direction="vertical">
               {(provided) => (
@@ -132,6 +145,8 @@ function EditWatchListPage({ watchlistNameData, positionData }) {
               )}
             </Droppable>
           </DragDropContext>
+          <Space />
+          <Button color="dark" size="md" onClick={UpdateWatchlistUponChange}>Done</Button>
         </Layout>
       );
     }
