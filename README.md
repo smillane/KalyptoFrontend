@@ -1,13 +1,8 @@
-Front end for Stock app for displaying various market information.
+# Front end for Stock app for displaying various market information.
 
-Backend located https://github.com/smillane/StockAppBackend
+## Backend located https://github.com/smillane/StockAppBackend
 
-Work in progress.
-
-Currently working on:
-- adding button to add stock to list
-
-Current Roadmap:
+### Current Roadmap:
 
 - Add equity to watchlist (button next to stock name at top, try styling to be on bottom, not centered)
   - use Modal for pop up to select which lists to add to, or create a new list (will replace option with a box to create list name with a cancel and create list button)
@@ -19,26 +14,24 @@ Current Roadmap:
 - Adjust vertical spacing on some parts of stocks/{stock} page
 
 
-TODO's
+### Future Roadmap
 
-add SEC documents using edgar
+- add SEC documents using edgar
 
-if query not found, add logic to not save to db, and return 404 not found page.
+- if query not found, add logic to not save to db, and return 404 not found page.
 
-https://iexcloud.io/docs/api/#u-s-holidays-and-trading-dates just create dict with those dates?
+- create feature which checks https://iexcloud.io/docs/api/#u-s-holidays-and-trading-dates every month, updates upon changes, look into if any API endpoints shouldn't be queried (depending on data in db's?)
 
-https://iexcloud.io/docs/api/#list create endpoint for mostactive, gainers, losers
+- Add logic for if nothing found in db, populate with last 4, 8, etc for endpoints such as past dividends, insider transactions
 
-Add logic for if nothing found in db, populate with last 4, 8, etc for endpoints such as past dividends, insider transactions
+- create logic for a skeleton loading screen when logging in
 
-create logic for a skeleton loading screen when logging in
+- create logic for skeleton loading containers for when assets are loading from backend
 
-create logic for skeleton loading containers for when assets are loading from backend
+- use caching to to not fetch data for daily lists more than once every 5 minutes, empty cache after 5 minutes and refetch data
 
-create logic for fetching data from backend
+- have display on index page for pre/post market gainers/losers, display pre market movers if time is between 4am and 4pm Eastern, else show post market movers by default
 
-use caching to to not fetch data for daily lists more than once every 5 minutes, empty cache after 5 minutes and refetch data
+- create notification system for when new features/changes get pushed
 
-have display on index page for pre/post market gainers/losers, display pre market movers if time is between 4am and 4pm Eastern, else show post market movers by default
-
-create notification system for when new features/changes get pushed
+- create logic for fetching data from backend (once site ready for beta launch)
