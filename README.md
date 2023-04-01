@@ -7,6 +7,20 @@ Work in progress.
 Currently working on:
 - adding button to add stock to list
 
+Current Roadmap:
+
+- Add equity to watchlist (button next to stock name at top, try styling to be on bottom, not centered)
+  - use Modal for pop up to select which lists to add to, or create a new list (will replace option with a box to create list name with a cancel and create list button)
+
+- Create sorting option for highest/lowest on homepage for most active/gainers/losers/unusual volume box
+
+- Finish dividends, insider transactions, institutional ownership pages
+
+- Adjust vertical spacing on some parts of stocks/{stock} page
+
+
+TODO's
+
 add SEC documents using edgar
 
 if query not found, add logic to not save to db, and return 404 not found page.

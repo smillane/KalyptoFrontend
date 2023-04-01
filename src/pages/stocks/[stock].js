@@ -1,12 +1,12 @@
 import {
   Table, Box, Grid, Title, Text, Container,
-  Button, Stack, Space, Group, SimpleGrid, Divider, Spoiler, ActionIcon, Center,
+  Button, Stack, Space, Group, SimpleGrid, Divider, Spoiler,
 } from '@mantine/core';
-import { IconPlus, IconSquarePlus } from '@tabler/icons';
 import Link from 'next/link';
 import { v4 as uuidv4 } from 'uuid';
 
 import Layout from '../../main/node/components/layout.tsx';
+import AddItemToListButton from '../../main/node/components/addItemToListButton.tsx';
 import {
   transactionColor, typeOfTransaction, reduceZerosToLetters, greenOrRed,
 } from '../../main/node/util/formating.tsx';
@@ -30,7 +30,7 @@ export default function Stock({
             <Title order={1} transform="uppercase">{stockSymbol.symbol}</Title>
             <Title order={1} transform="uppercase">{company.symbol}</Title>
             <Title order={1} weight={100} transform="capitalize">{company.companyName}</Title>
-            <Center><ActionIcon variant="default" color="dark"><IconPlus size={20} /></ActionIcon></Center>
+            <AddItemToListButton />
           </Group>
           <Space h="sm" />
           <Group>
