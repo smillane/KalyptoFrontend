@@ -4,7 +4,7 @@ import {
 } from '@mantine/core';
 import { IconPlus } from '@tabler/icons';
 
-import { useAddWatchlistMutation } from './WatchlistSlice.tsx';
+import { useAddWatchlistMutation } from './WatchlistSlice';
 
 export default function AddWatchlist({ userID, position, theme }) {
   const [opened, setOpened] = useState<boolean>(false);

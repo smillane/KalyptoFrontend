@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
 import {
-  withAuthUser,
-  withAuthUserTokenSSR,
-} from 'next-firebase-auth';
-import {
   Box, Container, Grid, Text, Title, Table, Group, Stack, Divider, Space, SegmentedControl,
 } from '@mantine/core';
 import Link from 'next/link';
@@ -546,6 +542,4 @@ function Index() {
   );
 }
 
-export const getServerSideProps = withAuthUserTokenSSR()();
-
-export default withAuthUser()(Index);
+export default Index;

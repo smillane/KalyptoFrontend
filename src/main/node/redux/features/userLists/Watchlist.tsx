@@ -17,15 +17,15 @@ import {
 } from '@mantine/core';
 import { IconDots, IconSettings } from '@tabler/icons';
 import Link from 'next/link';
-import { useAuthUser, withAuthUser } from 'next-firebase-auth';
+import { AuthAction, useAuthUser, withAuthUser } from 'next-firebase-auth';
 import { v4 as uuidv4 } from 'uuid';
 
 // eslint-disable-next-line import/no-cycle
-import AddWatchlist from './AddWatchlist.tsx';
+import AddWatchlist from './AddWatchlist';
 // eslint-disable-next-line import/no-cycle
-import DeleteWatchlist from './DeleteWatchlist.tsx';
-import { useGetUserWatchlistsQuery, useUpdateWatchlistNameMutation } from './WatchlistSlice.tsx';
-import DisabledWatchList from '../../../components/disabledAddWatchlist.tsx';
+import DeleteWatchlist from './DeleteWatchlist';
+import { useGetUserWatchlistsQuery, useUpdateWatchlistNameMutation } from './WatchlistSlice';
+import DisabledWatchList from '../../../components/disabledAddWatchlist';
 
 function AccordionControl(props) {
   const [opened, setOpened] = useState<boolean>(false);
@@ -235,4 +235,9 @@ function Watchlist() {
   );
 }
 
-export default withAuthUser()(Watchlist);
+export default withAuthUser({
+  whenAuthed: AuthAction.RENDER,
+  whenAuthedBeforeRedirect: AuthAction.SHOW_LOADER,
+  whenUnauthedBeforeInit: AuthAction.SHOW_LOADER,
+  whenUnauthedAfterInit: AuthAction.RENDER,
+})(Watchlist);

@@ -4,6 +4,9 @@ import {
 } from '@mantine/core';
 import Link from 'next/link';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  AuthAction, withAuthUser,
+} from 'next-firebase-auth';
 
 import Layout from '../../main/node/components/layout.tsx';
 import AddItemToListButton from '../../main/node/components/addItemToListButton.tsx';
@@ -17,8 +20,9 @@ import Watchlist from '../../main/node/redux/features/userLists/Watchlist.tsx';
 // or restructure how data is displayed, what data is, format, etc
 // trailing ..., not finishing full name for people/companies for insider/institutions
 // if user is not logged in with an account, only show a basic quote and chart
-export default function Stock({
-  stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations,
+
+function Stock({
+  stock, stockSymbol, company, quote, last4Dividends, financials, fundamentalValuations,
   fundamentals, stats, basicStats, nextDiv, insiderTrading, institutionalOwnership,
   insiderSummary, peerGroup, news,
 }) {
@@ -30,7 +34,7 @@ export default function Stock({
             <Title order={1} transform="uppercase">{stockSymbol.symbol}</Title>
             <Title order={1} transform="uppercase">{company.symbol}</Title>
             <Title order={1} weight={100} transform="capitalize">{company.companyName}</Title>
-            <AddItemToListButton />
+            <AddItemToListButton stock={stock} />
           </Group>
           <Space h="sm" />
           <Group>
@@ -714,7 +718,8 @@ export default function Stock({
 }
 
 export async function getServerSideProps(context) {
-  // const res = await Promise.all(fetch(`http://localhost:8080/stocks/${context.params.stock}/quote`))
+  const { stock } = context.params;
+  // const res = await Promise.all(fetch(`http://localhost:8080/stocks/${stock}/quote`))
   // const stockInformation = await res.json()
   // context.res.setHeader(
   //   'Cache-Control',
@@ -1563,6 +1568,7 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
+      stock,
       stockSymbol,
       company,
       quote,
@@ -1581,3 +1587,10 @@ export async function getServerSideProps(context) {
     },
   };
 }
+
+export default withAuthUser({
+  whenAuthed: AuthAction.RENDER,
+  whenAuthedBeforeRedirect: AuthAction.SHOW_LOADER,
+  whenUnauthedBeforeInit: AuthAction.SHOW_LOADER,
+  whenUnauthedAfterInit: AuthAction.RENDER,
+})(Stock);

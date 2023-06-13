@@ -5,6 +5,7 @@
 ### Current Roadmap:
 
 - Add equity to watchlist (button next to stock name at top, try styling to be on bottom, not centered)
+
   - use Modal for pop up to select which lists to add to, or create a new list (will replace option with a box to create list name with a cancel and create list button)
 
 - Create sorting option for highest/lowest on homepage for most active/gainers/losers/unusual volume box
